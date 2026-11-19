@@ -1,7 +1,7 @@
 ---
 /**
- * §5 "Two kinds of memory": the weights (a foggy cloud of half-remembered
- * text) and the context window (a desk with limited space). Put real files
+ * §5 "Two kinds of memory": the weights (what training saw, and how often:
+ * a probability spread over remembered answers) and the context window (a desk with limited space). Put real files
  * on the desk and read their contents; the answer then cites the exact line
  * it used, highlighted in the file. Overfill the desk and older items fall
  * off. pubspec.yaml and the lib/ listing are the real Mood Tracker handover;
@@ -61,7 +61,7 @@ const lib: string[] = [
 const copy = {
 	en: {
 		kicker: 'The memory desk',
-		weights: 'Weights: vague memory', weightsSub: 'everything seen in training, blurred, frozen at the cut-off',
+		weights: 'Weights: vague memory', weightsSub: 'compressed from training, frozen at the cut-off',
 		desk: 'Context window: the desk', deskSub: 'exact text, current, limited',
 		empty: 'The desk is empty: the model has only your question and its vague memory.',
 		shelf: 'Put on the desk:', answer: 'Answer', from: 'from',
@@ -71,7 +71,14 @@ const copy = {
 		q: 'Question',
 		cap: 'context used: ≈{u}k of {c}k tokens',
 		capNote: 'A tiny window, to make the point. Real ones hold 100k tokens or more, and a whole repository or a long chat still fills them.',
-		cloud: ['StatefulWidget', 'http 0.13?', 'setState', 'pubspec', 'FastAPI', 'Riverpod', 'deprecated?', 'ADR…', 'TestFlight', 'widget tree', 'mood', 'v1.0?'],
+		seen: 'In training data', recalls: 'What the weights recall', illus: 'Illustrative probabilities.',
+		freq: { often: 'very often, always the same', mixed: 'often, in many conflicting versions', never: 'never: your files are private' },
+		overridden: '📄 The answer is copied from the desk. The vague memory is not needed.',
+		recall: [
+			{ freq: 'often', note: 'Thousands of tutorials say the same thing, so the memory is peaked and right.', cands: [['mutable state + setState()', 0.86, 1], ['a widget that never changes', 0.07, 0], ['a Riverpod provider', 0.04, 0], ['a kind of route', 0.03, 0]] },
+			{ freq: 'mixed', note: 'Every version ever released appears somewhere, and older tutorials outnumber new ones. The most common one wins, not the one in your project.', cands: [['http 0.13.x', 0.38, 0], ['http 1.1.x', 0.22, 0], ['http 1.2.x', 0.18, 1], ['http 0.12.x', 0.12, 0], ['http 1.0.x', 0.10, 0]] },
+			{ freq: 'never', note: 'Your decision record was never in the training data. The weights only hold generic reasons why people drop packages, so the model picks one.', cands: [['it is deprecated', 0.29, 0], ['security issues', 0.24, 0], ['it increases app size', 0.19, 0], ['it does not work on web', 0.15, 0], ['licence problems', 0.13, 0]] },
+		],
 		docs: [
 			{ key: 'pubspec', name: 'pubspec.yaml', kind: 'yaml', size: 0.3, start: 10, lines: pubspec, more: '(lines 1–9 and 21–33 not shown)' },
 			{ key: 'adr', name: 'docs/adr/0003-app-version.md', kind: 'md', size: 0.4, start: 1, lines: adr, more: '## Consequences …' },
@@ -94,7 +101,7 @@ const copy = {
 	},
 	pl: {
 		kicker: 'Biurko pamięci',
-		weights: 'Wagi: mglista pamięć', weightsSub: 'wszystko z treningu, rozmyte, zamrożone w dniu odcięcia',
+		weights: 'Wagi: mglista pamięć', weightsSub: 'skompresowane z treningu, zamrożone w dniu odcięcia',
 		desk: 'Context window: biurko', deskSub: 'dokładny tekst, aktualny, ograniczony',
 		empty: 'Biurko jest puste: model ma tylko twoje pytanie i mglistą pamięć.',
 		shelf: 'Połóż na biurku:', answer: 'Odpowiedź', from: 'z',
@@ -104,7 +111,14 @@ const copy = {
 		q: 'Pytanie',
 		cap: 'zajęty kontekst: ≈{u}k z {c}k tokenów',
 		capNote: 'Celowo malutkie okno. Prawdziwe mieszczą 100k tokenów i więcej, a i tak zapełnia je całe repozytorium albo długi czat.',
-		cloud: ['StatefulWidget', 'http 0.13?', 'setState', 'pubspec', 'FastAPI', 'Riverpod', 'deprecated?', 'ADR…', 'TestFlight', 'widget tree', 'mood', 'v1.0?'],
+		seen: 'W danych treningowych', recalls: 'Co pamiętają wagi', illus: 'Prawdopodobieństwa przykładowe.',
+		freq: { often: 'bardzo często, zawsze to samo', mixed: 'często, w wielu sprzecznych wersjach', never: 'nigdy: twoje pliki są prywatne' },
+		overridden: '📄 Odpowiedź jest przepisana z biurka. Mglista pamięć nie jest potrzebna.',
+		recall: [
+			{ freq: 'often', note: 'Tysiące tutoriali mówią to samo, więc pamięć jest skupiona i trafna.', cands: [['zmienny stan + setState()', 0.86, 1], ['widget, który się nie zmienia', 0.07, 0], ['provider z Riverpoda', 0.04, 0], ['rodzaj trasy (route)', 0.03, 0]] },
+			{ freq: 'mixed', note: 'Każda wydana wersja gdzieś występuje, a starych tutoriali jest więcej niż nowych. Wygrywa najczęstsza, a nie ta z twojego projektu.', cands: [['http 0.13.x', 0.38, 0], ['http 1.1.x', 0.22, 0], ['http 1.2.x', 0.18, 1], ['http 0.12.x', 0.12, 0], ['http 1.0.x', 0.10, 0]] },
+			{ freq: 'never', note: 'Waszego zapisu decyzji nigdy nie było w danych treningowych. Wagi pamiętają tylko ogólne powody, dla których ludzie rezygnują z pakietów, więc model wybiera jeden z nich.', cands: [['jest przestarzały', 0.29, 0], ['problemy z bezpieczeństwem', 0.24, 0], ['zwiększa rozmiar aplikacji', 0.19, 0], ['nie działa w wersji web', 0.15, 0], ['problemy z licencją', 0.13, 0]] },
+		],
 		docs: [
 			{ key: 'pubspec', name: 'pubspec.yaml', kind: 'yaml', size: 0.3, start: 10, lines: pubspec, more: '(linie 1–9 i 21–33 pominięte)' },
 			{ key: 'adr', name: 'docs/adr/0003-app-version.md', kind: 'md', size: 0.4, start: 1, lines: adr, more: '## Consequences …' },
@@ -143,7 +157,13 @@ const icon: Record<string, string> = { yaml: '📄', md: '📝', web: '🌐', ch
 		<div class="desk__weights">
 			<p class="desk__title">{`🧠 ${copy.weights}`}</p>
 			<p class="desk__sub">{copy.weightsSub}</p>
-			<div class="desk__cloud" aria-hidden="true">{copy.cloud.map((w, k) => <span style={`--d:${k % 5}`}>{w}</span>)}</div>
+			<p class="desk__over">{copy.overridden}</p>
+			<p class="desk__mini">{copy.seen}</p>
+			<p class="desk__freq"><i></i><span></span></p>
+			<p class="desk__mini">{copy.recalls}</p>
+			<div class="desk__recall"></div>
+			<p class="desk__rnote"></p>
+			<p class="desk__illus">{copy.illus}</p>
 		</div>
 		<div class="desk__ctx">
 			<p class="desk__title">{`🗂️ ${copy.desk}`}</p>
@@ -207,6 +227,24 @@ const icon: Record<string, string> = { yaml: '📄', md: '📝', web: '🌐', ch
 			box.querySelector<HTMLElement>('.desk__cap i')!.style.width = `${Math.min(100, (u / CAP) * 100)}%`;
 			box.querySelector<HTMLElement>('.desk__cap span')!.textContent = String(C.cap).replace('{u}', fmt(u)).replace('{c}', String(CAP));
 			const fromCtx = onDesk.includes(Q.needs);
+			const R = C.recall[q];
+			const wbox = box.querySelector<HTMLElement>('.desk__weights')!;
+			wbox.dataset.freq = R.freq;
+			wbox.classList.toggle('is-over', fromCtx);
+			wbox.querySelector<HTMLElement>('.desk__freq span')!.textContent = C.freq[R.freq];
+			wbox.querySelector<HTMLElement>('.desk__rnote')!.textContent = R.note;
+			const rec = wbox.querySelector<HTMLElement>('.desk__recall')!;
+			rec.textContent = '';
+			const top = Math.max(...R.cands.map((c: any[]) => c[1]));
+			R.cands.forEach(([label, p, ok]: [string, number, number], j: number) => {
+				const row = document.createElement('div');
+				row.className = 'desk__rrow' + (p === top ? ' is-top' : '') + (ok ? ' is-true' : '');
+				row.innerHTML = '<span class="desk__rlabel"></span><b></b><span class="desk__rbar"><i></i></span>';
+				row.querySelector<HTMLElement>('.desk__rlabel')!.textContent = label;
+				row.querySelector('b')!.textContent = `${Math.round(p * 100)}%`;
+				rec.appendChild(row);
+				requestAnimationFrame(() => (row.querySelector<HTMLElement>('.desk__rbar i')!.style.width = `${(p / top) * 100}%`));
+			});
 			const A = fromCtx ? Q.context : Q.weights;
 			box.querySelector<HTMLElement>('.desk__from')!.textContent = `${C.from} ${fromCtx ? C.fromC : C.fromW}`;
 			const g = box.querySelector<HTMLElement>('.desk__grade')!;
