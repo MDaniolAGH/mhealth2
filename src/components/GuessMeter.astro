@@ -1,0 +1,142 @@
+---
+/**
+ * §6 Why hallucinations sound confident: three prompts, from a fact the model
+ * knows well to one it cannot know. The distribution over next tokens goes
+ * from peaked to flat, but sampling always produces a fluent answer. A switch
+ * shows what training to say "I don't know" changes. Illustrative numbers.
+ * English and Polish.
+ */
+import { langOf } from '../i18n/ui';
+const lang = langOf(Astro);
+
+const copy = {
+	en: {
+		kicker: 'Why invented answers sound sure',
+		sure: 'How sure is the model?', sample: 'Sample an answer', idk: 'Trained to say “I don’t know”',
+		note: 'Illustrative probabilities, not from a real model.',
+		idkTok: ' I don’t know',
+		idkLine: 'I don’t know: nothing I have been given says who it is. Ask the clinic.',
+		kinds: { fact: 'fact', guess: 'lucky guess', invented: 'invented', honest: 'honest' },
+		prompts: [
+			{ text: 'The capital of Poland is', truth: ' Warsaw', cands: [[' Warsaw', 0.93], [' Kraków', 0.03], [' a', 0.02], [' located', 0.02]] },
+			{ text: 'The Mood Tracker’s server is written in', truth: ' Python', cands: [[' Python', 0.26], [' Node', 0.22], [' Java', 0.17], [' Go', 0.13], [' Dart', 0.12], [' PHP', 0.10]] },
+			{ text: 'The clinic’s contact person for participants is Dr', truth: '', cands: [[' Nowak', 0.13], [' Kowalska', 0.12], [' Wiśniewski', 0.11], [' Zielińska', 0.10], [' Lewandowski', 0.10], [' Mazur', 0.09], [' Kamińska', 0.09], [' Wójcik', 0.08]] },
+		],
+		read: [
+			'The model has seen this fact countless times: the probability piles up on one token.',
+			'It has never seen this private project. The probability spreads out; any pick is a guess, sometimes a lucky one.',
+			'Nobody knows this yet: the client has not decided. Every name is invented, and each one sounds equally real.',
+		],
+	},
+	pl: {
+		kicker: 'Dlaczego zmyślone odpowiedzi brzmią pewnie',
+		sure: 'Jak pewny jest model?', sample: 'Wylosuj odpowiedź', idk: 'Wytrenowany, by mówić „nie wiem”',
+		note: 'Prawdopodobieństwa przykładowe, nie z prawdziwego modelu.',
+		idkTok: ' nie wiem',
+		idkLine: 'Nie wiem: nic, co dostałem, tego nie mówi. Zapytaj klinikę.',
+		kinds: { fact: 'fakt', guess: 'szczęśliwy traf', invented: 'zmyślone', honest: 'uczciwie' },
+		prompts: [
+			{ text: 'Stolicą Polski jest', truth: ' Warszawa', cands: [[' Warszawa', 0.93], [' Kraków', 0.03], [' miasto', 0.02], [' położona', 0.02]] },
+			{ text: 'Serwer Mood Trackera jest napisany w', truth: ' Pythonie', cands: [[' Pythonie', 0.26], [' Node', 0.22], [' Javie', 0.17], [' Go', 0.13], [' Darcie', 0.12], [' PHP', 0.10]] },
+			{ text: 'Osobą kontaktową kliniki dla uczestników jest dr', truth: '', cands: [[' Nowak', 0.13], [' Kowalska', 0.12], [' Wiśniewski', 0.11], [' Zielińska', 0.10], [' Lewandowski', 0.10], [' Mazur', 0.09], [' Kamińska', 0.09], [' Wójcik', 0.08]] },
+		],
+		read: [
+			'Model widział ten fakt niezliczoną ilość razy: prawdopodobieństwo skupia się na jednym tokenie.',
+			'Tego prywatnego projektu nigdy nie widział. Prawdopodobieństwo się rozlewa; każdy wybór to zgadywanie, czasem trafne.',
+			'Tego jeszcze nikt nie wie: klient nie zdecydował. Każde nazwisko jest zmyślone i każde brzmi równie prawdziwie.',
+		],
+	},
+}[lang];
+---
+
+<div class="biz-widget guess not-content" data-copy={JSON.stringify(copy)}>
+	<div class="biz-head">
+		<p class="biz-kicker">{copy.kicker}</p>
+		<span class="guess__note">{copy.note}</span>
+	</div>
+	<div class="guess__prompts" role="tablist">
+		{copy.prompts.map((p, k) => <button type="button" role="tab" class="guess__prompt" data-i={k} aria-selected={k === 0 ? 'true' : 'false'}>{p.text}…</button>)}
+	</div>
+	<div class="guess__sure">
+		<span>{copy.sure}</span>
+		<div class="guess__gauge"><i></i></div>
+		<b class="guess__pct"></b>
+	</div>
+	<div class="guess__bars"></div>
+	<p class="guess__read"></p>
+	<div class="guess__ctrl">
+		<button type="button" class="sdlc-btn sdlc-btn--primary" data-act="sample">{copy.sample}</button>
+		<label class="guess__idk"><input type="checkbox" /> {copy.idk}</label>
+	</div>
+	<p class="guess__out" aria-live="polite"></p>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.guess').forEach((box) => {
+		const C = JSON.parse(box.dataset.copy || '{}');
+		const tabs = Array.from(box.querySelectorAll<HTMLButtonElement>('.guess__prompt'));
+		const bars = box.querySelector<HTMLElement>('.guess__bars')!;
+		const idk = box.querySelector<HTMLInputElement>('.guess__idk input')!;
+		const out = box.querySelector<HTMLElement>('.guess__out')!;
+		let k = 0;
+		let dist: [string, number][] = [];
+		const entropy = (ps: number[]) => -ps.reduce((a, p) => a + (p > 0 ? p * Math.log2(p) : 0), 0);
+		const build = () => {
+			const P = C.prompts[k];
+			let d: [string, number][] = P.cands.map((c: [string, number]) => [c[0], c[1]]);
+			const sum = d.reduce((a, c) => a + c[1], 0);
+			d = d.map(([t, p]) => [t, p / sum]);
+			if (idk.checked) {
+				// The flatter the distribution, the more mass "I don't know" gets.
+				const h = entropy(d.map((x) => x[1])) / Math.log2(d.length);
+				const m = Math.max(0, Math.min(0.85, (h - 0.35) * 1.4));
+				d = d.map(([t, p]) => [t, p * (1 - m)]);
+				d.unshift([C.idkTok, m]);
+			}
+			return d;
+		};
+		const render = () => {
+			tabs.forEach((t, j) => t.setAttribute('aria-selected', j === k ? 'true' : 'false'));
+			dist = build();
+			const top = Math.max(...dist.map((x) => x[1]));
+			bars.textContent = '';
+			dist.forEach(([t, p]) => {
+				const row = document.createElement('div');
+				row.className = 'guess__row' + (t === C.idkTok ? ' is-idk' : '');
+				row.innerHTML = '<code></code><span><i></i></span><b></b>';
+				row.querySelector('code')!.textContent = t.trim();
+				row.querySelector('b')!.textContent = `${Math.round(p * 100)}%`;
+				bars.appendChild(row);
+				requestAnimationFrame(() => ((row.querySelector('i') as HTMLElement).style.width = `${(p / top) * 100}%`));
+			});
+			const ps = dist.filter((x) => x[0] !== C.idkTok).map((x) => x[1]);
+			const s = ps.reduce((a, b) => a + b, 0) || 1;
+			const h = entropy(ps.map((p) => p / s)) / Math.log2(Math.max(2, ps.length));
+			const sure = Math.round((1 - h) * 100);
+			const gi = box.querySelector<HTMLElement>('.guess__gauge i')!;
+			gi.style.width = `${Math.max(4, sure)}%`;
+			gi.style.setProperty('--g', sure >= 60 ? 'var(--sdlc-tool)' : sure >= 30 ? 'var(--sdlc-work)' : 'var(--sdlc-fail)');
+			box.querySelector<HTMLElement>('.guess__pct')!.textContent = `${sure}%`;
+			box.querySelector<HTMLElement>('.guess__read')!.textContent = C.read[k];
+			out.textContent = '';
+		};
+		box.querySelector('[data-act="sample"]')!.addEventListener('click', () => {
+			let x = Math.random();
+			let pick = dist[dist.length - 1][0];
+			for (const [t, p] of dist) { x -= p; if (x <= 0) { pick = t; break; } }
+			const P = C.prompts[k];
+			const kind = pick === C.idkTok ? 'honest' : P.truth === '' ? 'invented' : pick === P.truth ? (k === 0 ? 'fact' : 'guess') : 'invented';
+			out.innerHTML = '';
+			const line = document.createElement('span');
+			line.className = 'guess__line';
+			line.textContent = kind === 'honest' ? C.idkLine : P.text + pick + '.';
+			const badge = document.createElement('span');
+			badge.className = `guess__badge is-${kind}`;
+			badge.textContent = C.kinds[kind];
+			out.append(line, badge);
+		});
+		tabs.forEach((t, j) => t.addEventListener('click', () => { k = j; render(); }));
+		idk.addEventListener('change', render);
+		render();
+	});
+</script>

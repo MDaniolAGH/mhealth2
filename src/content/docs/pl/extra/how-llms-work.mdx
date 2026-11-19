@@ -7,13 +7,17 @@ import Banner from '../../../../components/Banner.astro';
 import Tokenizer from '../../../../components/Tokenizer.astro';
 import Sampler from '../../../../components/Sampler.astro';
 import Picker from '../../../../components/Picker.astro';
-import Scene from '../../../../components/Scene.astro';
 import Sorter from '../../../../components/Sorter.astro';
 import Quiz from '../../../../components/Quiz.astro';
 import Predict from '../../../../components/Predict.astro';
 import Tldr from '../../../../components/Tldr.astro';
 import AtWork from '../../../../components/AtWork.astro';
 import Done from '../../../../components/Done.astro';
+import StageMorph from '../../../../components/StageMorph.astro';
+import MemoryDesk from '../../../../components/MemoryDesk.astro';
+import CheeseMap from '../../../../components/CheeseMap.astro';
+import GuessMeter from '../../../../components/GuessMeter.astro';
+import LlmFlow from '../../../../components/LlmFlow.astro';
 
 <Banner
 	eyebrow="Dodatek · na podstawie wykładu Andreja Karpathy'ego"
@@ -27,7 +31,7 @@ import Done from '../../../../components/Done.astro';
 	]}
 />
 
-<Tldr minutes={15} items={["Tekst jest dzielony na tokeny; model widzi wyłącznie tokeny.", "Model przewiduje następny token, potem kolejny; losowanie sprawia, że odpowiedzi się różnią.", "Wiedza w wagach to mgliste wspomnienie; context window to pamięć robocza."]} />
+<Tldr minutes={20} items={["Tekst jest dzielony na tokeny; model widzi wyłącznie tokeny.", "Model przewiduje następny token, potem kolejny; losowanie sprawia, że odpowiedzi się różnią.", "Wiedza w wagach to mgliste wspomnienie; context window to pamięć robocza."]} />
 
 Ta strona idzie śladem wykładu Andreja Karpathy'ego [*Deep Dive into LLMs like ChatGPT*](https://www.youtube.com/watch?v=7xTGNNLPyMI) (2025) – warto obejrzeć go w całości. Jest tutaj, bo każda zasada z części 1–3, od „daj agentowi dziennik klienta” po „nie ufaj żadnej liczbie bez źródła”, wynika z tego, jak działają te modele.
 
@@ -91,14 +95,7 @@ Przykład jest celowo po angielsku: tak wyglądają prompt i kandydaci na nastę
 
 Model trenowany tylko na tekstach z sieci to **model bazowy**: Karpathy nazywa go symulatorem dokumentów z internetu. Daj mu początek strony, a on dopisze resztę. Nie odpowiada na pytania – pisze to, co zwykle pojawia się dalej.
 
-<Scene
-	title="To samo pytanie, dwa modele (ilustracja)"
-	messages={[
-		{ who: 'you', name: 'Prompt', text: 'Jak najlepiej śledzić nastrój po operacji?' },
-		{ who: 'other', name: 'Model bazowy', text: 'Jak najlepiej śledzić ból po operacji? Jak najlepiej śledzić sen po operacji? 10 pytań, które pacjenci zadają najczęściej… [ciąg dalszy jak na stronie internetowej]' },
-		{ who: 'agent', name: 'Asystent', text: 'Dobrze sprawdza się krótka codzienna samoocena: jedna ocena i opcjonalna notatka, codziennie o tej samej porze. Twój zespół leczący powie ci, co warto zapisywać…' },
-	]}
-/>
+<StageMorph />
 
 Asystent powstaje dzięki dalszemu treningowi, w kilku etapach. Karpathy porównuje to do szkolnego podręcznika:
 
@@ -141,15 +138,23 @@ Gdy plik jest w **kontekście**. Rozróżnienie Karpathy'ego: wiedza w parametra
 | Aktualne? | zamrożone w chwili końca treningu | tak aktualne jak to, co do niego wrzucisz |
 | Twoja kontrola | żadna | pełna: na tym polega context engineering |
 
+Spróbuj: zadaj poniższe pytania przy pustym biurku, a potem połóż na nim właściwy dokument. Zapełnij biurko dużymi rzeczami i zobacz, co spada: pełne context window też coś gubi.
+
+<MemoryDesk />
+
 ## 6. Halucynacje i Swiss cheese
 
 Modele **halucynują**: piszą płynny, pewny siebie tekst, który jest nieprawdziwy. W treningu pewne siebie odpowiedzi prawie zawsze miały właściwy styl, więc model naśladuje pewność, nawet kiedy nie wie. Laboratoria ograniczają ten problem: uczą modele mówić „nie wiem” i dają im **tools** (wyszukiwanie, uruchamianie kodu). Ale halucynacje nigdy nie znikają całkiem.
+
+<GuessMeter />
 
 Umiejętności modeli są też nierówne. Karpathy porównuje je do **Swiss cheese**, czyli sera szwajcarskiego: model jest świetny w trudnych zadaniach, a w łatwych ma przypadkowe dziury.
 
 - **Liczenie liter.** Model widzi `straw` + `berry`, a nie litery, więc pytanie „ile jest liter r w strawberry?” może pójść źle. Poproś go o kod, który policzy litery, a odpowie dobrze.
 - **9.11 czy 9.9?** Niektóre modele twierdziły, że 9.11 jest większe – możliwe, że dlatego, że w wielu tekstach, na przykład w numeracji wersetów Biblii albo w numerach wersji, 9.11 występuje po 9.9.
 - **Model potrzebuje tokenów, żeby myśleć.** Na każdy token przypada stała porcja obliczeń. Odpowiedź ściśnięta w jeden token to bardzo mało „myślenia”. Praca krok po kroku, w wielu tokenach albo z pomocą narzędzia, jest dużo pewniejsza.
+
+<CheeseMap />
 
 <Sorter
 	title="Wystarczy sam model czy potrzeba narzędzia albo sprawdzenia?"
@@ -165,6 +170,14 @@ Umiejętności modeli są też nierówne. Karpathy porównuje je do **Swiss chee
 		{ text: 'Podanie dawki leku dla pacjenta', bin: 'tool', why: 'Nigdy z samego modelu: fakt medyczny, przy którym grozi szkoda, wymaga wiarygodnego źródła i specjalisty.' },
 	]}
 />
+
+## 7. Wszystko razem: model w harnessie
+
+Copilot, Claude Code i podobne narzędzia to nie sam model. To **harness** wokół niego: program, który buduje kontekst, wysyła go do modelu, czyta odpowiedź, a gdy model poprosi o narzędzie – uruchamia je. Wszystko z tej strony spotyka się w jednej pętli. Odtwórz ją z włączonym harnessem, potem przełącz na *Sam model* i porównaj zakończenia.
+
+<LlmFlow />
+
+Model w obu przebiegach jest ten sam. Różnicę robi harness: pozwala modelowi **poprosić** o dowód i wkłada ten dowód do kontekstu. To pętla agenta z części 2, widziana od środka.
 
 <Quiz
 	question="Dlaczego ten sam prompt daje różne odpowiedzi przy kolejnych uruchomieniach?"

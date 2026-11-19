@@ -40,7 +40,7 @@
   --sdlc-loop: #D97706;
   --sdlc-client: #0D9488;
   --sdlc-fail: #DC2626;
-  --sdlc-work: var(--sdlc-work);
+  --sdlc-work: #D97706;
   --sdlc-predict: #B45309;
   --sdlc-surface: #F8FAFC;
   --sdlc-card: #FFFFFF;

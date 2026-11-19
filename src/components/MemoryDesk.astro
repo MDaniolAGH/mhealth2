@@ -1,0 +1,168 @@
+---
+/**
+ * §5 "Two kinds of memory": the weights (a foggy cloud of half-remembered
+ * text) and the context window (a desk with limited space). Pick a question,
+ * put documents on the desk, and watch the answer change from vague or
+ * invented to sharp and sourced. Overfill the desk and the oldest item falls
+ * off. English and Polish.
+ */
+import { langOf } from '../i18n/ui';
+const lang = langOf(Astro);
+
+const copy = {
+	en: {
+		kicker: 'The memory desk',
+		weights: 'Weights: vague memory', weightsSub: 'everything seen in training, blurred, frozen at the cut-off',
+		desk: 'Context window: the desk', deskSub: 'sharp, current, limited',
+		shelf: 'Put on the desk:', answer: 'Answer', from: 'from',
+		fromW: 'vague memory', fromC: 'the desk',
+		dropped: 'Fell off the desk, the context was full: {d}.',
+		q: 'Question',
+		cloud: ['StatefulWidget', 'http 0.13?', 'setState', 'pubspec', 'FastAPI', 'Riverpod', 'deprecated?', 'ADR…', 'TestFlight', 'widget tree', 'mood', 'v1.0?'],
+		docs: [
+			{ key: 'pubspec', name: 'pubspec.yaml', size: 2 },
+			{ key: 'adr', name: 'ADR-0003', size: 2 },
+			{ key: 'flutterdocs', name: 'Flutter docs: StatefulWidget', size: 3 },
+			{ key: 'chat', name: 'yesterday’s chat', size: 5 },
+			{ key: 'lib', name: 'the whole lib/ folder', size: 7 },
+		],
+		questions: [
+			{ key: 'q1', text: 'What is a StatefulWidget in Flutter?', needs: 'flutterdocs',
+				weights: { text: 'A widget whose state can change: the state lives in a separate State object, and calling setState() rebuilds it.', grade: 'good', tag: 'General knowledge: the weights are fine here.' },
+				context: { text: 'A widget whose mutable state lives in a State object; setState() schedules a rebuild. (Flutter docs, StatefulWidget)', grade: 'good', tag: 'Same answer, now with a source.' } },
+			{ key: 'q2', text: 'Which version of the http package does the Mood Tracker use?', needs: 'pubspec',
+				weights: { text: 'The Mood Tracker most likely uses http 0.13.x, the common version in Flutter apps.', grade: 'vague', tag: 'A plausible guess from old training data. Confident, and wrong.' },
+				context: { text: 'http: ^1.2.2 (mood_tracker/pubspec.yaml, line 19).', grade: 'good', tag: 'Read from the file: a fact with file and line.' } },
+			{ key: 'q3', text: 'Why doesn’t the Mood Tracker use package_info_plus?', needs: 'adr',
+				weights: { text: 'Because package_info_plus is deprecated and has known security issues.', grade: 'invented', tag: 'Invented. The model never saw your decision, so it made up a reason that sounds right.' },
+				context: { text: 'ADR-0003: every package is a SOUP item that must be registered and maintained; one version string does not justify one. The version comes from --dart-define.', grade: 'good', tag: 'The real reason, from the decision record.' } },
+		],
+		grades: { good: 'sharp', vague: 'vague', invented: 'invented' },
+		capacity: 'space used',
+	},
+	pl: {
+		kicker: 'Biurko pamięci',
+		weights: 'Wagi: mglista pamięć', weightsSub: 'wszystko z treningu, rozmyte, zamrożone w dniu odcięcia',
+		desk: 'Context window: biurko', deskSub: 'ostre, aktualne, ograniczone',
+		shelf: 'Połóż na biurku:', answer: 'Odpowiedź', from: 'z',
+		fromW: 'mglistej pamięci', fromC: 'biurka',
+		dropped: 'Spadło z biurka, bo kontekst był pełny: {d}.',
+		q: 'Pytanie',
+		cloud: ['StatefulWidget', 'http 0.13?', 'setState', 'pubspec', 'FastAPI', 'Riverpod', 'deprecated?', 'ADR…', 'TestFlight', 'widget tree', 'mood', 'v1.0?'],
+		docs: [
+			{ key: 'pubspec', name: 'pubspec.yaml', size: 2 },
+			{ key: 'adr', name: 'ADR-0003', size: 2 },
+			{ key: 'flutterdocs', name: 'dokumentacja Fluttera: StatefulWidget', size: 3 },
+			{ key: 'chat', name: 'wczorajszy czat', size: 5 },
+			{ key: 'lib', name: 'cały folder lib/', size: 7 },
+		],
+		questions: [
+			{ key: 'q1', text: 'Czym jest StatefulWidget we Flutterze?', needs: 'flutterdocs',
+				weights: { text: 'To widget, którego stan może się zmieniać: stan żyje w osobnym obiekcie State, a setState() go przebudowuje.', grade: 'good', tag: 'Wiedza ogólna: tu wagi wystarczą.' },
+				context: { text: 'Widget, którego zmienny stan żyje w obiekcie State; setState() planuje przebudowę. (dokumentacja Fluttera, StatefulWidget)', grade: 'good', tag: 'Ta sama odpowiedź, teraz ze źródłem.' } },
+			{ key: 'q2', text: 'Której wersji pakietu http używa Mood Tracker?', needs: 'pubspec',
+				weights: { text: 'Mood Tracker najpewniej używa http 0.13.x, popularnej wersji w aplikacjach Fluttera.', grade: 'vague', tag: 'Wiarygodne zgadywanie ze starych danych treningowych. Pewne siebie i błędne.' },
+				context: { text: 'http: ^1.2.2 (mood_tracker/pubspec.yaml, linia 19).', grade: 'good', tag: 'Odczytane z pliku: fakt z plikiem i linią.' } },
+			{ key: 'q3', text: 'Dlaczego Mood Tracker nie używa package_info_plus?', needs: 'adr',
+				weights: { text: 'Bo package_info_plus jest przestarzały i ma znane problemy z bezpieczeństwem.', grade: 'invented', tag: 'Zmyślone. Model nigdy nie widział waszej decyzji, więc wymyślił powód, który dobrze brzmi.' },
+				context: { text: 'ADR-0003: każdy pakiet to element SOUP, który trzeba zarejestrować i utrzymywać; jeden napis z wersją tego nie uzasadnia. Wersja pochodzi z --dart-define.', grade: 'good', tag: 'Prawdziwy powód, z zapisu decyzji.' } },
+		],
+		grades: { good: 'ostra', vague: 'mglista', invented: 'zmyślona' },
+		capacity: 'zajęte miejsce',
+	},
+}[lang];
+const CAP = 10;
+---
+
+<div class="biz-widget desk not-content" data-copy={JSON.stringify(copy)} data-cap={CAP}>
+	<p class="biz-kicker">{copy.kicker}</p>
+	<div class="desk__qs" role="tablist">
+		{copy.questions.map((q, k) => <button type="button" role="tab" class="desk__q" data-i={k} aria-selected={k === 1 ? 'true' : 'false'}><span>{copy.q} {k + 1}</span>{q.text}</button>)}
+	</div>
+	<div class="desk__grid">
+		<div class="desk__weights">
+			<p class="desk__title">{`🧠 ${copy.weights}`}</p>
+			<p class="desk__sub">{copy.weightsSub}</p>
+			<div class="desk__cloud" aria-hidden="true">{copy.cloud.map((w, k) => <span style={`--d:${k % 5}`}>{w}</span>)}</div>
+		</div>
+		<div class="desk__ctx">
+			<p class="desk__title">{`🗂️ ${copy.desk}`}</p>
+			<p class="desk__sub">{copy.deskSub}</p>
+			<div class="desk__slots"></div>
+			<div class="desk__cap"><i></i><span></span></div>
+		</div>
+	</div>
+	<div class="desk__shelf">
+		<span class="sdlc-legend__hint">{copy.shelf}</span>
+		{copy.docs.map((d) => <button type="button" class="desk__doc" data-key={d.key} data-size={d.size} aria-pressed="false">{`📄 ${d.name}`}</button>)}
+	</div>
+	<div class="desk__answer" aria-live="polite">
+		<p class="desk__ahead"><b>{copy.answer}</b> <span class="desk__from"></span> <span class="desk__grade"></span></p>
+		<p class="desk__text"></p>
+		<p class="desk__tag"></p>
+		<p class="desk__drop"></p>
+	</div>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.desk').forEach((box) => {
+		const C = JSON.parse(box.dataset.copy || '{}');
+		const CAP = Number(box.dataset.cap);
+		const qs = Array.from(box.querySelectorAll<HTMLButtonElement>('.desk__q'));
+		const docsBtns = Array.from(box.querySelectorAll<HTMLButtonElement>('.desk__doc'));
+		const slots = box.querySelector<HTMLElement>('.desk__slots')!;
+		let q = 1;
+		let onDesk: string[] = [];
+		let dropped = '';
+		const sizeOf = (k: string) => Number(docsBtns.find((b) => b.dataset.key === k)!.dataset.size);
+		const nameOf = (k: string) => C.docs.find((d: any) => d.key === k).name;
+		const used = () => onDesk.reduce((a, k) => a + sizeOf(k), 0) + 1;
+		const render = () => {
+			qs.forEach((b, j) => b.setAttribute('aria-selected', j === q ? 'true' : 'false'));
+			docsBtns.forEach((b) => b.setAttribute('aria-pressed', onDesk.includes(b.dataset.key!) ? 'true' : 'false'));
+			slots.textContent = '';
+			const qSlot = document.createElement('span');
+			qSlot.className = 'desk__card is-q';
+			qSlot.style.setProperty('--u', '1');
+			qSlot.textContent = '❓ ' + C.questions[q].text;
+			slots.appendChild(qSlot);
+			onDesk.forEach((k) => {
+				const c = document.createElement('span');
+				c.className = 'desk__card' + (k === C.questions[q].needs ? ' is-key' : '');
+				c.style.setProperty('--u', String(sizeOf(k)));
+				c.textContent = '📄 ' + nameOf(k);
+				slots.appendChild(c);
+			});
+			const u = used();
+			box.querySelector<HTMLElement>('.desk__cap i')!.style.width = `${Math.min(100, (u / CAP) * 100)}%`;
+			box.querySelector<HTMLElement>('.desk__cap span')!.textContent = `${C.capacity}: ${u}/${CAP}`;
+			const Q = C.questions[q];
+			const fromCtx = onDesk.includes(Q.needs);
+			const A = fromCtx ? Q.context : Q.weights;
+			box.querySelector<HTMLElement>('.desk__from')!.textContent = `${C.from} ${fromCtx ? C.fromC : C.fromW}`;
+			const g = box.querySelector<HTMLElement>('.desk__grade')!;
+			g.textContent = C.grades[A.grade];
+			g.className = `desk__grade is-${A.grade}`;
+			const t = box.querySelector<HTMLElement>('.desk__text')!;
+			t.textContent = A.text;
+			t.className = `desk__text is-${A.grade}`;
+			box.querySelector<HTMLElement>('.desk__tag')!.textContent = A.tag;
+			box.querySelector<HTMLElement>('.desk__drop')!.textContent = dropped ? String(C.dropped).replace('{d}', dropped) : '';
+			box.classList.toggle('is-sharp', fromCtx);
+		};
+		qs.forEach((b, j) => b.addEventListener('click', () => { q = j; dropped = ''; render(); }));
+		docsBtns.forEach((b) =>
+			b.addEventListener('click', () => {
+				const k = b.dataset.key!;
+				dropped = '';
+				if (onDesk.includes(k)) onDesk = onDesk.filter((x) => x !== k);
+				else {
+					onDesk.push(k);
+					while (used() > CAP && onDesk.length > 1) { const out = onDesk.shift()!; dropped = dropped ? `${dropped}, ${nameOf(out)}` : nameOf(out); }
+				}
+				render();
+			}),
+		);
+		render();
+	});
+</script>

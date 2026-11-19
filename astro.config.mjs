@@ -30,7 +30,7 @@ export default defineConfig({
 			],
 			editLink: { baseUrl: 'https://github.com/MDaniolAGH/mhealth2/edit/main/' },
 			lastUpdated: true,
-			customCss: ['./src/styles/theme.css', './src/styles/sdlc.css', './src/styles/learn.css', './src/styles/biz.css'],
+			customCss: ['./src/styles/theme.css', './src/styles/sdlc.css', './src/styles/learn.css', './src/styles/biz.css', './src/styles/llm.css'],
 			sidebar: [
 				{ label: 'Start here', translations: { pl: 'Zacznij tutaj' }, link: '/' },
 				{

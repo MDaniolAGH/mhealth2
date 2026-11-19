@@ -1,0 +1,130 @@
+---
+/**
+ * §4 "From internet simulator to assistant": one prompt, three training
+ * stages. For each stage: the kind of data it learned from, the answer it
+ * writes (typed token by token) and the probabilities of the first token.
+ * Illustrative, not output from real models. English and Polish.
+ */
+import { langOf } from '../i18n/ui';
+const lang = langOf(Astro);
+
+const copy = {
+	en: {
+		kicker: 'Same prompt, three models',
+		prompt: 'What is the best way to track mood after surgery?',
+		learned: 'Learned from', writes: 'Writes', first: 'First token: probabilities',
+		note: 'Illustrative outputs and probabilities, not from real models.',
+		stages: [
+			{ key: 'base', label: 'Base model', sub: 'after pre-training', tone: 'agent',
+				data: '<div class="sm-web"><span class="sm-url">forum.example.com › recovery › tracking</span><b>What is the best way to track pain after surgery?</b><small>Asked 3 years ago · 12 answers · Related: track sleep after surgery…</small></div>',
+				out: ['What', ' is', ' the', ' best', ' way', ' to', ' track', ' pain', ' after', ' surgery', '?', ' What', ' is', ' the', ' best', ' way', ' to', ' track', ' sleep', '…', ' See', ' also:', ' 10', ' recovery', ' tips'],
+				dist: [['␤ What', 0.34], ['␤', 0.22], [' See', 0.12], [' A', 0.08], [' Top', 0.07]],
+				moral: 'It continues the <b>document</b>: it has seen thousands of FAQ pages, so it writes more questions. It is not answering anyone.' },
+			{ key: 'sft', label: 'Assistant', sub: 'after supervised fine-tuning', tone: 'client',
+				data: '<div class="sm-chat"><p><b>User</b> How do I keep track of how I feel during recovery?</p><p><b>Assistant</b> A simple way is a short daily note: a score from 1 to 10 and a few words…</p><small>written by people following labelling instructions</small></div>',
+				out: ['A', ' short', ' daily', ' self', '-report', ' works', ' well', ':', ' one', ' score', ' and', ' an', ' optional', ' note', ',', ' at', ' the', ' same', ' time', ' each', ' day', '.', ' Your', ' care', ' team', ' can', ' tell', ' you', ' what', ' to', ' record', '.'],
+				dist: [[' A', 0.31], [' Great', 0.14], [' The', 0.12], [' Tracking', 0.10], [' It', 0.08]],
+				moral: 'It answers like the helpful people whose example conversations it learned from: friendly, structured, careful.' },
+			{ key: 'rl', label: 'Thinking model', sub: 'after reinforcement learning', tone: 'you',
+				data: '<div class="sm-rl"><b>Problem:</b> 3 participants × 14 days = ? entries<span class="ok">42 ✓ reward</span><span class="bad">41 ✗</span><span class="bad">17 ✗</span><small>many attempts; the ones that check out are reinforced</small></div>',
+				out: ['〈thinking〉', ' Mood', ' after', ' surgery', ' can', ' change', ' with', ' pain', ' and', ' medication', '…', ' keep', ' it', ' simple', '.', '〈/thinking〉', ' A', ' daily', ' score', ' plus', ' a', ' short', ' note', ' works', ';', ' agree', ' the', ' time', ' with', ' your', ' care', ' team', '.'],
+				dist: [['〈thinking〉', 0.62], [' A', 0.14], [' Let', 0.09], [' First', 0.06], [' Great', 0.03]],
+				moral: 'On problems with checkable answers it learned to <b>think in tokens</b> before answering. More tokens, more computation, often better answers.' },
+		],
+	},
+	pl: {
+		kicker: 'Ten sam prompt, trzy modele',
+		prompt: 'What is the best way to track mood after surgery?',
+		learned: 'Uczył się z', writes: 'Pisze', first: 'Pierwszy token: prawdopodobieństwa',
+		note: 'Przykładowe odpowiedzi i prawdopodobieństwa, nie z prawdziwych modeli. Przykład po angielsku, bo na takich danych uczy się większość modeli.',
+		stages: [
+			{ key: 'base', label: 'Model bazowy', sub: 'po pre-trainingu', tone: 'agent',
+				data: '<div class="sm-web"><span class="sm-url">forum.example.com › recovery › tracking</span><b>What is the best way to track pain after surgery?</b><small>Asked 3 years ago · 12 answers · Related: track sleep after surgery…</small></div>',
+				out: ['What', ' is', ' the', ' best', ' way', ' to', ' track', ' pain', ' after', ' surgery', '?', ' What', ' is', ' the', ' best', ' way', ' to', ' track', ' sleep', '…', ' See', ' also:', ' 10', ' recovery', ' tips'],
+				dist: [['␤ What', 0.34], ['␤', 0.22], [' See', 0.12], [' A', 0.08], [' Top', 0.07]],
+				moral: 'Kontynuuje <b>dokument</b>: widział tysiące stron z FAQ, więc dopisuje kolejne pytania. Nikomu nie odpowiada.' },
+			{ key: 'sft', label: 'Asystent', sub: 'po supervised fine-tuningu', tone: 'client',
+				data: '<div class="sm-chat"><p><b>User</b> How do I keep track of how I feel during recovery?</p><p><b>Assistant</b> A simple way is a short daily note: a score from 1 to 10 and a few words…</p><small>rozmowy napisane przez ludzi według instrukcji</small></div>',
+				out: ['A', ' short', ' daily', ' self', '-report', ' works', ' well', ':', ' one', ' score', ' and', ' an', ' optional', ' note', ',', ' at', ' the', ' same', ' time', ' each', ' day', '.', ' Your', ' care', ' team', ' can', ' tell', ' you', ' what', ' to', ' record', '.'],
+				dist: [[' A', 0.31], [' Great', 0.14], [' The', 0.12], [' Tracking', 0.10], [' It', 0.08]],
+				moral: 'Odpowiada jak pomocni ludzie, z których przykładowych rozmów się uczył: uprzejmie, porządnie, ostrożnie.' },
+			{ key: 'rl', label: 'Model „myślący”', sub: 'po reinforcement learningu', tone: 'you',
+				data: '<div class="sm-rl"><b>Zadanie:</b> 3 uczestników × 14 dni = ? wpisów<span class="ok">42 ✓ nagroda</span><span class="bad">41 ✗</span><span class="bad">17 ✗</span><small>wiele prób; nagradzane są te, które się sprawdzają</small></div>',
+				out: ['〈thinking〉', ' Mood', ' after', ' surgery', ' can', ' change', ' with', ' pain', ' and', ' medication', '…', ' keep', ' it', ' simple', '.', '〈/thinking〉', ' A', ' daily', ' score', ' plus', ' a', ' short', ' note', ' works', ';', ' agree', ' the', ' time', ' with', ' your', ' care', ' team', '.'],
+				dist: [['〈thinking〉', 0.62], [' A', 0.14], [' Let', 0.09], [' First', 0.06], [' Great', 0.03]],
+				moral: 'Na zadaniach ze sprawdzalną odpowiedzią nauczył się <b>myśleć w tokenach</b>, zanim odpowie. Więcej tokenów to więcej obliczeń i często lepsza odpowiedź.' },
+		],
+	},
+}[lang];
+---
+
+<div class="biz-widget morph not-content" data-stages={JSON.stringify(copy.stages)}>
+	<p class="biz-kicker">{copy.kicker}</p>
+	<div class="morph__steps" role="tablist">
+		{
+			copy.stages.map((s, k) => (
+				<button type="button" role="tab" class={`morph__step is-${s.tone}`} data-i={k} aria-selected={k === 0 ? 'true' : 'false'}>
+					<span class="morph__dot">{k + 1}</span>
+					<span><b>{s.label}</b><small>{s.sub}</small></span>
+				</button>
+			))
+		}
+	</div>
+	<p class="morph__prompt"><span>Prompt</span>{copy.prompt}</p>
+	<div class="morph__grid">
+		<div class="morph__col"><p class="morph__label">{copy.learned}</p><div class="morph__data"></div></div>
+		<div class="morph__col">
+			<p class="morph__label">{copy.writes}</p>
+			<div class="morph__out" aria-live="polite"></div>
+			<p class="morph__label">{copy.first}</p>
+			<div class="morph__dist"></div>
+		</div>
+	</div>
+	<p class="morph__moral" aria-live="polite"></p>
+	<p class="morph__note">{copy.note}</p>
+</div>
+
+<script>
+	const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+	document.querySelectorAll<HTMLElement>('.morph').forEach((box) => {
+		const stages = JSON.parse(box.dataset.stages || '[]');
+		const tabs = Array.from(box.querySelectorAll<HTMLButtonElement>('.morph__step'));
+		const data = box.querySelector<HTMLElement>('.morph__data')!;
+		const out = box.querySelector<HTMLElement>('.morph__out')!;
+		const dist = box.querySelector<HTMLElement>('.morph__dist')!;
+		const moral = box.querySelector<HTMLElement>('.morph__moral')!;
+		let typing = 0;
+		const show = (k: number) => {
+			const s = stages[k];
+			tabs.forEach((t, j) => { t.setAttribute('aria-selected', j === k ? 'true' : 'false'); t.classList.toggle('is-past', j < k); });
+			box.dataset.tone = s.tone;
+			data.innerHTML = s.data;
+			moral.innerHTML = s.moral;
+			dist.textContent = '';
+			const max = Math.max(...s.dist.map((d: [string, number]) => d[1]));
+			s.dist.forEach(([tok, p]: [string, number], j: number) => {
+				const row = document.createElement('div');
+				row.className = 'morph__bar' + (j === 0 ? ' is-top' : '');
+				row.innerHTML = '<code></code><span><i></i></span><b></b>';
+				row.querySelector('code')!.textContent = tok.replace(/ /g, '·');
+				row.querySelector('b')!.textContent = `${Math.round(p * 100)}%`;
+				dist.appendChild(row);
+				requestAnimationFrame(() => ((row.querySelector('i') as HTMLElement).style.width = `${(p / max) * 100}%`));
+			});
+			out.textContent = '';
+			const my = ++typing;
+			s.out.forEach((tok: string, j: number) => {
+				const add = () => {
+					if (my !== typing) return;
+					const span = document.createElement('span');
+					span.className = 'morph__tok' + (tok.startsWith('〈') ? ' is-think' : '');
+					span.textContent = tok;
+					out.appendChild(span);
+				};
+				if (reduce) add(); else setTimeout(add, j * 70);
+			});
+		};
+		tabs.forEach((t, k) => t.addEventListener('click', () => show(k)));
+		show(0);
+	});
+</script>
