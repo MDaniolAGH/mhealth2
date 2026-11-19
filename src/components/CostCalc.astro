@@ -1,0 +1,72 @@
+---
+/**
+ * Business-case calculator: total cost of ownership over the study, and the
+ * cost per participant per month. One-off work + running costs over time.
+ */
+import { t } from '../i18n/ui';
+interface Props {
+	title: string;
+	oneOff: number;
+	rate: number;
+	hosting: number;
+	support: number;
+	fees: number;
+	people: number;
+	months: number;
+}
+const p = Astro.props;
+const T = t(Astro);
+const fields = [
+	['oneOff', T.calcOneOff, p.oneOff],
+	['rate', T.calcRate, p.rate],
+	['hosting', T.calcHosting, p.hosting],
+	['support', T.calcSupport, p.support],
+	['fees', T.calcFees, p.fees],
+	['people', T.calcPeople, p.people],
+	['months', T.calcMonths, p.months],
+] as const;
+---
+
+<div class="biz-widget costcalc not-content" data-note={T.calcNote}>
+	<p class="biz-kicker">{T.calcKicker}</p>
+	<p class="biz-title" set:html={p.title} />
+	<div class="costcalc__inputs">
+		{
+			fields.map(([k, label, v]) => (
+				<label>
+					<span>{label}</span>
+					<input type="number" min="0" step="1" value={v} data-k={k} />
+				</label>
+			))
+		}
+	</div>
+	<div class="costcalc__out">
+		<div class="costcalc__big"><span>{T.calcTotal}</span><b data-out="total"></b></div>
+		<div class="costcalc__big is-main"><span>{T.calcPerPerson}</span><b data-out="per"></b></div>
+		<div class="costcalc__split" aria-hidden="true"><i class="is-oneoff"></i><i class="is-running"></i></div>
+		<p class="costcalc__note" aria-live="polite"></p>
+	</div>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.costcalc').forEach((box) => {
+		const get = (k: string) => Math.max(0, Number(box.querySelector<HTMLInputElement>(`input[data-k="${k}"]`)!.value) || 0);
+		const fmt = (x: number) => Math.round(x).toLocaleString(document.documentElement.lang || 'en');
+		const render = () => {
+			const oneOff = get('oneOff') * get('rate');
+			const months = get('months');
+			const running = months * (get('hosting') + get('support') * get('rate')) + get('fees') * Math.max(1, Math.ceil(months / 12));
+			const total = oneOff + running;
+			const people = get('people');
+			const per = people && months ? total / people / months : 0;
+			box.querySelector<HTMLElement>('[data-out="total"]')!.textContent = `${fmt(total)} PLN`;
+			box.querySelector<HTMLElement>('[data-out="per"]')!.textContent = `${fmt(per)} PLN`;
+			const share = total ? Math.round((running / total) * 100) : 0;
+			box.querySelector<HTMLElement>('.is-oneoff')!.style.width = `${100 - share}%`;
+			box.querySelector<HTMLElement>('.is-running')!.style.width = `${share}%`;
+			box.querySelector<HTMLElement>('.costcalc__note')!.textContent = String(box.dataset.note).replace('{p}', String(share));
+		};
+		box.querySelectorAll('input').forEach((i) => i.addEventListener('input', render));
+		render();
+	});
+</script>

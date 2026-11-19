@@ -1,0 +1,98 @@
+---
+title: '5. After launch'
+description: Monitoring and incidents, updates when platforms and libraries change, which changes need a new check, measuring without leaking health data, and the end of the study.
+---
+
+import Sorter from '../../../components/Sorter.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+import Checklist from '../../../components/Checklist.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={6} items={["Launch is the start of the work, not the end.", "Platforms, libraries and stores change every year; your app has to follow.", "Plan the end too: what happens to the data when the study is over."]} />
+
+## Incidents
+
+Something will go wrong: a bug, a lost phone, a leaked log. What matters is that you know **in advance** who does what.
+
+- **If it is a medical device:** post-market surveillance is a legal duty (MDR Articles 83–86), and serious incidents must be reported (Article 87).
+- **For every app with personal data:** a personal-data breach must be reported by the controller to the data protection authority within **72 hours** of becoming aware of it (GDPR Article 33), and sometimes to the people affected. In Poland, that authority is UODO.
+
+Write down who notices, who decides, who reports, and who can be reached on a Friday evening. Then update the risk file: every incident is a hazard you now know about.
+
+## Updates never stop
+
+<Predict id="drift" question="You change nothing in the Mood Tracker for a year. Does it keep working as it is?">
+
+Probably not. In a year: Android and iOS get new versions, and the stores raise their requirements (Google Play requires apps to target a recent Android version, a rule that moves every year). Libraries get security fixes, some of which you must take. TestFlight builds expire after 90 days. An app with nobody looking after it slowly stops working, or becomes unsafe. Budget for upkeep in the business case.
+
+</Predict>
+
+- **Platforms:** new Android and iOS versions, new store rules, a yearly move of Android's target API level.
+- **Libraries (SOUP):** follow security advisories, update on purpose, run the full gate and tests, update the SOUP list.
+- **Your own toolchain:** pinned Flutter and Python versions, so that a build in six months is the same build.
+
+## Which changes need a new check?
+
+<Sorter
+	title="After launch, the clinic asks for changes. Which ones need a new look at the intended purpose (and maybe at qualification)?"
+	bins={[
+		{ key: 'yes', label: 'New purpose check', tone: 'you' },
+		{ key: 'no', label: 'Normal change process', tone: 'tool' },
+	]}
+	items={[
+		{ text: 'A new colour theme', bin: 'no', why: 'It changes how the app looks, not what it is for.' },
+		{ text: 'A message that suggests contacting a doctor based on what a participant entered', bin: 'yes', why: 'Recommending an action from health data is exactly the kind of function that can make software a medical device.' },
+		{ text: 'Updating a library to fix a security vulnerability', bin: 'no', why: 'A normal change, but not a small one: SOUP list, full tests, release notes.' },
+		{ text: 'A new store description written by the marketing team', bin: 'yes', why: 'The purpose is stated in the store too. New text can claim a new purpose.' },
+		{ text: 'Replacing the AI model behind a feature that summarises entries', bin: 'yes', why: 'A different model can behave differently: re-evaluate it as a change to the product, with the purpose in mind.' },
+	]}
+/>
+
+## Measuring without leaking
+
+Product teams measure everything: activation, retention, funnels, A/B tests, session recordings. With health data, most of the usual tools are a problem: they send what happens in the app to a third party. Measure what you need for the decision, with the least data: counts on your own server, aggregated, with no content of entries, agreed with the controller. A/B testing a health-related feature on participants starts to look like research, and may need the same approvals as research.
+
+## The end of the study
+
+The study ends in July. Decide early, with the controller:
+
+<Checklist
+	id="end-of-study"
+	title="End-of-study plan"
+	items={[
+		'What happens to the data: kept (where, how long, why) or deleted (how, with proof)',
+		'Participants told what happens to their data and to the app',
+		'The app removed from the beta channel, or the builds left to expire, on purpose',
+		'Server and backups shut down or handed over, with the access removed',
+		'The technical file archived, so the next study can start from it',
+	]}
+/>
+
+<Quiz
+	question="Four months after launch, a participant reports that the app showed another participant's entries for a moment. What comes first?"
+	options={[
+		'Fix the bug quickly and release a new build',
+		'Tell the controller now, so the 72-hour clock for a possible breach report can be met',
+		'Ask Copilot whether this counts as a breach',
+		'Wait for a second report to be sure',
+	]}
+	answer={1}
+	why={[
+		'Fixing matters, but the reporting duty runs from the moment the controller becomes aware. Do both, in that order.',
+		'',
+		'Whether it is a reportable breach is the controller\'s call, with their data protection officer. An agent cannot take that responsibility.',
+		'Waiting can make the clinic miss the 72-hour deadline.',
+	]}
+	explain="Seeing someone else's health data is a possible personal-data breach. The controller decides about reporting, within 72 hours; your job is to tell them at once, preserve the evidence, and then fix and test."
+/>
+
+<AtWork>Teams trust people who think about upkeep, incidents and the end of a project before anyone asks. It is also what separates a demo from a product.</AtWork>
+
+:::tip[Do this in your project]
+Write half a page called "After launch" for your client: who handles incidents and how fast, the updates you expect in the next year, the changes that would need a new purpose check, and the end-of-study plan. Put its cost into your business case.
+:::
+
+<Done />

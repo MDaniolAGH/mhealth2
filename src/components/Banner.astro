@@ -1,0 +1,28 @@
+---
+/** A big gradient banner with stat cards, for the top of an extra page. */
+interface Props {
+	eyebrow: string;
+	title: string;
+	sub: string;
+	stats: { value: string; label: string }[];
+	tokens?: string[];
+}
+const { eyebrow, title, sub, stats, tokens = [] } = Astro.props;
+---
+
+<header class="banner not-content">
+	{tokens.length > 0 && <div class="banner__tokens" aria-hidden="true">{tokens.map((t) => <span>{t}</span>)}</div>}
+	<p class="banner__eyebrow">{eyebrow}</p>
+	<p class="banner__title" set:html={title} />
+	<p class="banner__sub" set:html={sub} />
+	<div class="banner__stats">
+		{
+			stats.map((s) => (
+				<div class="banner__stat">
+					<b>{s.value}</b>
+					<span set:html={s.label} />
+				</div>
+			))
+		}
+	</div>
+</header>

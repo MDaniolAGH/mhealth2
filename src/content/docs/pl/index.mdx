@@ -1,55 +1,79 @@
 ---
 title: 'Aplikacje Mobilne w Medycynie - Od Pomysłu do Wprowadzenia na Rynek'
-description: 'Aplikacje mobilne w medycynie, od pomysłu do rynku: jak budować oprogramowanie z agentami kodującymi, od briefu klienta do zmergowanego pull requesta.'
+description: 'Aplikacje mobilne w medycynie, od pomysłu do rynku: odkryj, co budować, zbuduj to z agentami kodującymi i wprowadź na rynek – krok po kroku, na jednym przykładzie.'
 template: splash
 hero:
   title: 'Aplikacje Mobilne w Medycynie'
   image:
     file: ../../../assets/hero-pl.svg
-  tagline: '<b>Od Pomysłu do Wprowadzenia na Rynek</b> · Agent kodujący napisze ekran we Flutterze w kilka minut. Ten przewodnik jest o całej reszcie: jak zdecydować, co budować i po co, jak dać agentowi to, czego potrzebuje, jak sprawdzić, co zrobił, i jak wytłumaczyć to kilka miesięcy później.'
+  tagline: '<b>Od Pomysłu do Wprowadzenia na Rynek</b> · Jak aplikacja zdrowotna trafia od maila klienta do telefonów ludzi: decyzja, co budować, budowanie z agentem u boku i bezpieczne wprowadzenie na rynek. Jeden przykład przez cały kurs: klinika Anny i Mood Tracker.'
   actions:
-    - text: Zacznij od mapy
-      link: ai-sdlc/overview/
+    - text: Zacznij od części 1
+      link: product/overview/
       icon: right-arrow
-    - text: Przejdź do szablonów
-      link: ai-sdlc/templates/
+    - text: Jak działają LLM-y
+      link: extra/how-llms-work/
       variant: minimal
 ---
 
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 import Progress from '../../../components/Progress.astro';
 
-## Część 1 · AI SDLC: od pomysłu do merge'a
+## Część 1 · Odkryj: od briefu do decyzji
 
-Przewodnik śledzi **jedną funkcję** – ekran About w Mood Trackerze, który teraz rozwijasz – od szkicu do zmergowanego pull requesta. Na każdym etapie pokazuje, kto wykonuje pracę, co wchodzi, co wychodzi i co to sprawdza. Na każdej stronie jest coś do wypróbowania, kilka pytań do samosprawdzenia i zadanie do twojego projektu.
-
-<CardGrid>
-	<LinkCard title="Pipeline w pigułce" description="Cały proces na jednej interaktywnej mapie. Zacznij tutaj. (5 min)" href="ai-sdlc/overview/" />
-	<LinkCard title="1. Od promptu do agenta" description="Model, harness, tools i to, dlaczego każde narzędzie jest też furtką. (6 min)" href="ai-sdlc/agents/" />
-	<LinkCard title="2. Kontekst" description="Co agent wie i ile to kosztuje. Zbuduj kontekst. (5 min)" href="ai-sdlc/context/" />
-	<LinkCard title="3. Wiedza o projekcie" description="Na czym opiera się plan: architektura, decyzje, notatki, słowa klienta. (5 min)" href="ai-sdlc/knowledge/" />
-	<LinkCard title="4. AGENTS.md" description="Zasady projektu dla agentów: od prośby do egzekwowania. (4 min)" href="ai-sdlc/agents-md/" />
-	<LinkCard title="5. Etap po etapie" description="Przykład w trzech częściach: od pomysłu do planu, kod i quality gate, od testów do merge'a. (20 min)" href="ai-sdlc/idea-to-plan/" />
-	<LinkCard title="6. Audytowalność" description="Przejdź od linijki kodu z powrotem do celu. Przerwij jedno ogniwo i zobacz, co tracisz. (4 min)" href="ai-sdlc/auditability/" />
-	<LinkCard title="7. Szablony" description="AGENTS.md, ARCHITECTURE.md, ADR, NOTES.md, spec, commit, pull request: gotowe do skopiowania." href="ai-sdlc/templates/" />
-</CardGrid>
-
-## Część 2 · Rozwój produktu z agentami
-
-Biznesowa strona projektu: od wiadomości klienta do user stories i rekomendacji na jedną stronę. Agent pisze wersje robocze, a decydujesz ty. Poznaj Annę, koordynatorkę badania, i prześledź jej prośbę na interaktywnej mapie: właśnie stąd bierze się issue #7.
+Od wiadomości klienta do user stories i rekomendacji na jedną stronę. Poznaj Annę, koordynatorkę badania, i prześledź jej prośbę na interaktywnej mapie. Agent pisze wersje robocze, a decydujesz ty.
 
 <CardGrid>
-	<LinkCard title="Od briefu do backlogu" description="Mapa produktu: prześledź prośbę Anny od maila do decyzji. (6 min)" href="product/overview/" />
+	<LinkCard title="Od briefu do decyzji: mapa" description="Prześledź prośbę Anny od maila do decyzji. Zacznij tutaj. (6 min)" href="product/overview/" />
 	<LinkCard title="1. Decyzja, fakty, ludzie" description="Najpierw decyzja, potem rozwiązanie; fakty, założenia, syntetyczni użytkownicy; interesariusze. (7 min)" href="product/decision-and-facts/" />
 	<LinkCard title="2. Intended purpose" description="Dziennik czy wyrób medyczny? Decyduje jedno zdanie. (5 min)" href="product/purpose/" />
-	<LinkCard title="3. Pytania i obserwacje" description="Pytania, które zmieniają odpowiedź; co aplikacja naprawdę robi. (5 min)" href="product/questions-and-observation/" />
+	<LinkCard title="3. Pytania i obserwacje" description="Pytania, które zmieniają odpowiedź; spotkanie z klientem; co aplikacja naprawdę robi. (6 min)" href="product/questions-and-observation/" />
 	<LinkCard title="4. User stories" description="Od potrzeby do user story, każda ze źródłem. Popraw story napisaną przez agenta. (5 min)" href="product/user-stories/" />
 	<LinkCard title="5. Testowalne, z priorytetem, podzielone" description="Given/When/Then, INVEST, MoSCoW, dzielenie stories, słowa o jednym znaczeniu. (6 min)" href="product/testable-stories/" />
 	<LinkCard title="6. Opcje i rekomendacja" description="Twarde ograniczenia, całkowity koszt, estymacje trzypunktowe, jedna strona. (8 min)" href="product/options-and-recommendation/" />
 </CardGrid>
 
+## Część 2 · Zbuduj: AI SDLC
+
+Wybrana funkcja – ekran About – od szkicu do zmergowanego pull requesta: kto wykonuje pracę na każdym etapie, co wchodzi, co wychodzi i co to sprawdza.
+
+<CardGrid>
+	<LinkCard title="Pipeline w pigułce" description="Cały proces na jednej interaktywnej mapie. (5 min)" href="ai-sdlc/overview/" />
+	<LinkCard title="1. Od promptu do agenta" description="Model, harness, tools i to, dlaczego każde narzędzie jest też furtką. (6 min)" href="ai-sdlc/agents/" />
+	<LinkCard title="2. Kontekst" description="Co agent wie i ile to kosztuje. Zbuduj kontekst. (5 min)" href="ai-sdlc/context/" />
+	<LinkCard title="3. Wiedza o projekcie" description="Na czym opiera się plan: architektura, decyzje, notatki, słowa klienta. (5 min)" href="ai-sdlc/knowledge/" />
+	<LinkCard title="4. AGENTS.md" description="Zasady projektu dla agentów: od prośby do egzekwowania. (4 min)" href="ai-sdlc/agents-md/" />
+	<LinkCard title="5. Etap po etapie" description="Od pomysłu do planu, kod i quality gate, od testów do merge'a. (20 min)" href="ai-sdlc/idea-to-plan/" />
+	<LinkCard title="6. Audytowalność" description="Przejdź od linijki kodu z powrotem do celu. (4 min)" href="ai-sdlc/auditability/" />
+	<LinkCard title="7. Szablony" description="AGENTS.md, ARCHITECTURE.md, ADR, NOTES.md, spec, commit, pull request: gotowe do skopiowania." href="ai-sdlc/templates/" />
+</CardGrid>
+
+## Część 3 · Wprowadź na rynek: premiera i to, co potem
+
+Od „u mnie na telefonie działa” do pięćdziesięciu uczestników, którzy przez sześć miesięcy bezpiecznie korzystają z aplikacji: wyrób medyczny czy nie, dane zdrowotne i bezpieczeństwo, release, business case i życie po wprowadzeniu na rynek.
+
+<CardGrid>
+	<LinkCard title="Droga na rynek: mapa" description="Wprowadź Mood Trackera do kolejnej grupy w klinice – razem z odrzuceniem w sklepie. (6 min)" href="launch/overview/" />
+	<LinkCard title="1. Wyrób medyczny czy nie?" description="Kwalifikacja, klasy według reguły 11 MDR i to, czego wymaga każda ścieżka. (7 min)" href="launch/device-or-not/" />
+	<LinkCard title="2. Dane, ryzyko i bezpieczeństwo" description="Dane zdrowotne i RODO, dokumentacja ryzyka, która zaczyna od szkody, MASVS, pakiet dowodów. (8 min)" href="launch/privacy-and-security/" />
+	<LinkCard title="3. Release" description="Kanały beta, review w sklepie, privacy labels, buildy, checklista przed release'em. (7 min)" href="launch/release/" />
+	<LinkCard title="4. Business case i pilotaż" description="Kalkulator kosztów, pilotaż z kryteriami ustalonymi z góry, go albo no-go. (6 min)" href="launch/business-case/" />
+	<LinkCard title="5. Po wprowadzeniu" description="Incydenty, aktualizacje, zmiany, które wymagają ponownego sprawdzenia, koniec badania. (6 min)" href="launch/after-launch/" />
+</CardGrid>
+
+<LinkCard title="Dodatek · Jak działają LLM-y" description="Wizualny przegląd na podstawie wykładu Andreja Karpathy'ego: tokenizer na żywo, losowanie następnego tokenu, modele bazowe i asystenci, halucynacje. (15 min)" href="extra/how-llms-work/" />
+
 <Progress parts={[
-	{ title: 'Część 1 · AI SDLC', pages: [
+	{ title: 'Część 1 · Odkryj', pages: [
+		{ slug: 'product/overview/', label: 'Od briefu do decyzji: mapa' },
+		{ slug: 'product/decision-and-facts/', label: '1. Decyzja, fakty, ludzie' },
+		{ slug: 'product/purpose/', label: '2. Intended purpose' },
+		{ slug: 'product/questions-and-observation/', label: '3. Pytania i obserwacje' },
+		{ slug: 'product/user-stories/', label: '4. User stories' },
+		{ slug: 'product/testable-stories/', label: '5. Testowalne, z priorytetem, podzielone' },
+		{ slug: 'product/options-and-recommendation/', label: '6. Opcje i rekomendacja' },
+	] },
+	{ title: 'Część 2 · Zbuduj', pages: [
 		{ slug: 'ai-sdlc/overview/', label: 'Pipeline w pigułce' },
 		{ slug: 'ai-sdlc/agents/', label: '1. Od promptu do agenta' },
 		{ slug: 'ai-sdlc/context/', label: '2. Kontekst' },
@@ -60,25 +84,27 @@ Biznesowa strona projektu: od wiadomości klienta do user stories i rekomendacji
 		{ slug: 'ai-sdlc/tests-to-merge/', label: '5c. Od testów do merge' },
 		{ slug: 'ai-sdlc/auditability/', label: '6. Audytowalność' },
 	] },
-	{ title: 'Część 2 · Rozwój produktu z agentami', pages: [
-		{ slug: 'product/overview/', label: 'Od briefu do backlogu' },
-		{ slug: 'product/decision-and-facts/', label: '1. Decyzja, fakty, ludzie' },
-		{ slug: 'product/purpose/', label: '2. Intended purpose' },
-		{ slug: 'product/questions-and-observation/', label: '3. Pytania i obserwacje' },
-		{ slug: 'product/user-stories/', label: '4. User stories' },
-		{ slug: 'product/testable-stories/', label: '5. Testowalne, z priorytetem, podzielone' },
-		{ slug: 'product/options-and-recommendation/', label: '6. Opcje i rekomendacja' },
+	{ title: 'Część 3 · Wprowadź na rynek', pages: [
+		{ slug: 'launch/overview/', label: 'Droga na rynek: mapa' },
+		{ slug: 'launch/device-or-not/', label: '1. Wyrób medyczny czy nie?' },
+		{ slug: 'launch/privacy-and-security/', label: '2. Dane, ryzyko i bezpieczeństwo' },
+		{ slug: 'launch/release/', label: '3. Release' },
+		{ slug: 'launch/business-case/', label: '4. Business case i pilotaż' },
+		{ slug: 'launch/after-launch/', label: '5. Po wprowadzeniu' },
+	] },
+	{ title: 'Dodatek', pages: [
+		{ slug: 'extra/how-llms-work/', label: 'Jak działają LLM-y' },
 	] },
 ]} />
 
 ## Jak korzystać z tego przewodnika
 
 <CardGrid>
-	<Card title="Przed W3" icon="open-book">
-		Przeczytaj mapę i rozdziały 1–4 z części 1. Opierają się na W2: jak działa model, czym jest kontekst i `AGENTS.md` twojej pary.
+	<Card title="Idź za cyklem życia" icon="open-book">
+		Odkryj, zbuduj, wprowadź na rynek: części idą za kursem od W1 do W6. Każda strona zaczyna się od TL;DR i kończy zadaniem do twojego projektu.
 	</Card>
 	<Card title="Na laboratoriach" icon="laptop">
-		Miej rozdział 5 otwarty, kiedy pracujesz nad briefem klienta. Przy każdym etapie jest napisane, co ma po sobie zostawić.
+		Miej otwartą mapę części, nad którą pracujesz. Przy każdym etapie jest napisane, co ma po sobie zostawić w twoim dossier.
 	</Card>
 	<Card title="Najpierw przewidź, potem sprawdź" icon="pencil">
 		Ramki oznaczone **Najpierw przewidź** proszą o twoją odpowiedź, zanim zobaczysz naszą. Twoje odpowiedzi zostają tylko w twojej przeglądarce.

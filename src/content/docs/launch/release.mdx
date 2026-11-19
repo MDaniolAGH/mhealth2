@@ -1,0 +1,103 @@
+---
+title: '3. Release: getting the app onto phones'
+description: How a study app reaches its users, what the stores check, privacy labels, versions and builds, and a quality checklist for mobile releases.
+---
+
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+import Scene from '../../../components/Scene.astro';
+import Checklist from '../../../components/Checklist.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={7} items={["A study app rarely needs a public store: beta channels are often enough.", "The stores check the text, the privacy labels and the health claims, not only the code.", "Test the release build on real phones, not the debug build on yours."]} />
+
+## How does the app reach 50 participants?
+
+| Channel | Good for | Watch out for |
+|---|---|---|
+| **TestFlight** (iOS) | closed groups; up to 10,000 external testers | external testers need Beta App Review; **each build expires after 90 days** |
+| **Google Play closed testing** | a known list of testers on Android | the same policies apply as for a public app, including the health declaration |
+| **Public store listing** | anyone can find and install it | full review; the listing is public, so every word in it counts |
+
+<Predict id="ninety" question="The clinic's study lasts six months, and participants on iPhones get the app through TestFlight. What will happen in month four if you do nothing?">
+
+The build **expires after 90 days**, and the app stops working for the iPhone participants in the middle of the study. A six-month study needs at least one new build, uploaded and approved in time, and a short message to participants. This is the kind of detail that turns into a support crisis if nobody plans it.
+
+</Predict>
+
+## What the stores check
+
+Store review is not only about crashes. For health apps, the text and the data matter as much:
+
+- **Medical claims.** Apple's App Store Review Guidelines (1.4.1) can ask a medical app for regulatory clearance. Claims your intended purpose does not cover are the fastest way to a rejection.
+- **Health declaration.** Google Play asks **every** app for a health-apps declaration in Play Console, including apps without health features.
+- **Privacy labels.** Apple's *App Privacy* details and Google Play's *Data safety* section must match what the app really collects. Build them from your data inventory, not from memory.
+- **Platform rules.** For example, from 31 August 2026 Google Play requires new apps and updates to target Android 16 (API level 36). Rules like this change every year.
+
+<Scene
+	title="Tuesday: the beta review"
+	messages={[
+		{ who: 'other', name: 'Store review', text: 'Your app description includes health claims (“supports your mental health”). Please provide documentation of regulatory clearance, or revise the description.' },
+		{ who: 'you', name: 'You', text: 'Copilot wrote that line, and I missed it. 🙈 Replacing it with the purpose from docs/product.md, word for word.' },
+		{ who: 'client', name: 'Anna', text: 'Good catch by them, honestly. That sentence would have worried our committee too.' },
+	]}
+/>
+
+## Versions and builds
+
+Every release has a **version** (what people see, such as `1.3.0`) and a **build number** (which exact build, such as `12`). The About screen from Part 2 shows both, so support can tell which build a participant runs. Keep **release notes** for every build, and roll out gradually where the store allows it (staged rollout on Google Play, phased release on the App Store), so a bad build reaches few people.
+
+```bash title="Release builds (Flutter)"
+flutter build appbundle --release --build-name=1.3.0 --build-number=12 \
+  --dart-define=APP_VERSION=1.3.0+12 --dart-define=API_BASE_URL=https://…
+flutter build ipa --release --build-name=1.3.0 --build-number=12 \
+  --dart-define=APP_VERSION=1.3.0+12 --dart-define=API_BASE_URL=https://…
+```
+
+Signing keys and keystores never go into the repository. Developer accounts cost money too: at the time of writing, about 99 USD a year for Apple and a one-off 25 USD for Google. Check the current prices before you budget.
+
+## A mobile release checklist
+
+<Checklist
+	id="release-check"
+	title="Before the build goes to participants"
+	items={[
+		'Tested as a <b>release</b> build, on real phones: an older Android, a small iPhone',
+		'Large text and screen reader labels checked; dark mode readable',
+		'Only the permissions the app really needs',
+		'No debug settings, test accounts or cleartext traffic left in the build',
+		'Crash reporting sends no health data',
+		'Store screenshots made with synthetic data only',
+		'Store text within the intended purpose; health declaration and privacy labels match the data inventory',
+		'Version and build number visible in the app; release notes written',
+		'A date in the calendar for the next build before anything expires',
+	]}
+/>
+
+<Quiz
+	question="Your privacy label says the app collects &quot;no health data&quot;, because the mood entries are stored on your own server. Is that right?"
+	options={[
+		'Yes: only third-party collection counts for privacy labels',
+		'Yes: the data stays in the clinic, so it is not collected',
+		'No: the label must describe what the app collects, including data sent to your own server',
+		'It does not matter, labels are not checked',
+	]}
+	answer={2}
+	why={[
+		'Both stores ask what the app collects, not only what third parties receive. Check each store\'s definitions.',
+		'Sending data from the phone to any server is collection in the sense of the labels.',
+		'',
+		'A wrong label is a policy violation and a broken promise to users. Treat it like code: from evidence.',
+	]}
+	explain="Privacy labels describe the data the app collects and how it is used. Build them from the data inventory, the same way as the GDPR documents."
+/>
+
+<AtWork>Shipping to the stores, with signing, review, privacy labels and staged rollouts, is a skill many developers only learn on the job. Having done a release once, even a closed beta, is worth a line on your CV.</AtWork>
+
+:::tip[Do this in your project]
+Decide how your client's users would get the app (TestFlight, closed testing, public store) and write down why. Draft the privacy labels from your data inventory, and run the release checklist on one release build on a real phone.
+:::
+
+<Done />

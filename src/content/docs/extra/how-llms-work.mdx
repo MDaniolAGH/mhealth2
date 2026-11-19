@@ -1,0 +1,211 @@
+---
+title: How LLMs work
+description: 'A visual tour of large language models, after Andrej Karpathy''s lecture Deep Dive into LLMs like ChatGPT: data, tokens, next-token prediction, base models and assistants, memory, hallucinations.'
+---
+
+import Banner from '../../../components/Banner.astro';
+import Tokenizer from '../../../components/Tokenizer.astro';
+import Sampler from '../../../components/Sampler.astro';
+import Picker from '../../../components/Picker.astro';
+import Scene from '../../../components/Scene.astro';
+import Sorter from '../../../components/Sorter.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Banner
+	eyebrow="Extra · after Andrej Karpathy"
+	title="How LLMs work, in 15 minutes"
+	sub="A chatbot is a very large function that reads a window of tokens and guesses the next one. Everything else (knowledge, style, mistakes) follows from that."
+	tokens={['How', ' L', 'LM', 's', ' work', '?']}
+	stats={[
+		{ value: '15T', label: 'tokens of filtered web text in FineWeb, one open pre-training dataset' },
+		{ value: '~200k', label: 'different tokens in the GPT-4o tokenizer' },
+		{ value: '1', label: 'token at a time: that is how every answer is written' },
+	]}
+/>
+
+<Tldr minutes={15} items={["Text is cut into tokens; the model only ever sees tokens.", "The model predicts the next token, then the next; sampling makes answers vary.", "Knowledge in the weights is a vague memory; the context window is working memory."]} />
+
+This page follows the story of Andrej Karpathy's lecture [*Deep Dive into LLMs like ChatGPT*](https://www.youtube.com/watch?v=7xTGNNLPyMI) (2025), which is worth watching in full. It is here because every rule in Parts 1–3, from "give the agent the client log" to "never trust a number without a source", comes from how these models work.
+
+## 1. It starts with the internet
+
+A model is first trained on a huge amount of text. Builders download web pages and filter them: drop unwanted sites, extract the text, keep the languages they want, remove duplicates, remove personal information. What is left is the **pre-training data**. One open example, Hugging Face's FineWeb, holds about **15 trillion tokens** (about 44 TB of text).
+
+The model will absorb the patterns of this text, including its facts, its style and its mistakes.
+
+## 2. Tokens: what the model actually reads
+
+A model does not read letters or words. Text is cut into **tokens**: frequent pieces of text, from single characters to whole words. The vocabulary is built from the data with an algorithm called byte-pair encoding: start from bytes, and keep merging the pairs that appear most often. GPT-4's tokenizer has about 100,000 tokens; GPT-4o's has about 200,000.
+
+<Predict id="strawberry" question="How many tokens is the word &quot;strawberry&quot;? And will a Polish sentence need more tokens than the same sentence in English, fewer, or the same?">
+
+"strawberry" is **3 tokens** in both tokenizers below. Polish usually needs **more** tokens than English for the same meaning: the tokenizers learned mostly from English text, so English words are often single tokens while Polish words are split into pieces. Try the two clinical sentences in the playground: the same meaning, very different counts. More tokens means more cost and a fuller context window.
+
+</Predict>
+
+<Tokenizer presets={[
+	{ label: 'English sentence', text: 'The patient reports low mood.' },
+	{ label: 'Polish sentence', text: 'Pacjent zgłasza obniżony nastrój.' },
+	{ label: 'strawberry', text: 'strawberry' },
+	{ label: '9.11 vs 9.9', text: 'Which is bigger: 9.11 or 9.9?' },
+	{ label: 'Code', text: 'final appVersion = String.fromEnvironment(\'APP_VERSION\');' },
+	{ label: 'Emoji', text: 'Feeling great today 😊🎉' },
+]} />
+
+The dots (·) stand for spaces: a space is usually part of the next token. Notice what the model can and cannot "see": it sees `straw` and `berry`, not ten letters. Keep that in mind for section 6.
+
+## 3. The model predicts the next token
+
+The neural network is a mathematical function with billions of **parameters** (weights). It takes a window of tokens and outputs a **probability for every token in the vocabulary**: how likely each one is to come next.
+
+**Training** shows it trillions of real examples and nudges the parameters so that the token that really came next gets a slightly higher probability. **Using** the model (inference) means: pick a next token from the probabilities, add it to the window, and repeat. Every answer you have ever read from a chatbot was written this way, one token at a time.
+
+The pick is random, weighted by the probabilities. **Temperature** controls how random: low temperature sharpens the distribution towards the top token, high temperature flattens it.
+
+<Sampler
+	prompt="After the surgery, the patient felt"
+	candidates={[
+		{ token: ' tired', p: 0.30 },
+		{ token: ' better', p: 0.22 },
+		{ token: ' sore', p: 0.14 },
+		{ token: ' anxious', p: 0.10 },
+		{ token: ' fine', p: 0.08 },
+		{ token: ' dizzy', p: 0.06 },
+		{ token: ' grateful', p: 0.05 },
+		{ token: ' purple', p: 0.005 },
+	]}
+/>
+
+Sample ten times at temperature 1, then at 0.2, then at 2. This is why the same prompt gives different answers: the effect behind the W2 exercise “Seven answers”, where every pair sent Copilot the same prompt. In tools like Copilot you cannot set the temperature yourself, so you get variation whether you want it or not.
+
+## 4. From internet simulator to assistant
+
+A model trained only on web text is a **base model**: Karpathy calls it an internet document simulator. Give it the start of a page, and it continues the page. It does not answer questions; it writes what usually comes next.
+
+<Scene
+	title="The same question, two models (illustrative)"
+	messages={[
+		{ who: 'you', name: 'Prompt', text: 'What is the best way to track mood after surgery?' },
+		{ who: 'other', name: 'Base model', text: 'What is the best way to track pain after surgery? What is the best way to track sleep after surgery? Top 10 questions patients ask… [continues like a web page]' },
+		{ who: 'agent', name: 'Assistant', text: 'A short daily self-report works well: one score and an optional note, at the same time each day. Your care team can tell you what is useful to record…' },
+	]}
+/>
+
+The assistant comes from more training, in stages. Karpathy compares it to a school textbook:
+
+<Picker
+	kicker="How an assistant is made"
+	title="Three stages of training"
+	intro="Click through the stages. The analogy is Karpathy's: reading the textbook, studying worked examples, doing practice problems."
+	initial="pre"
+	paths={[
+		{ key: 'pre', label: '1. Pre-training', tone: 'agent', summary: 'Reading the textbook: trillions of tokens of web text. The model learns language and a lot of knowledge.', items: [
+			'Data: filtered internet text, plus books, code and more',
+			'Result: a base model that continues documents',
+			'By far the most compute; done rarely, by large labs',
+		] },
+		{ key: 'sft', label: '2. Supervised fine-tuning', tone: 'client', summary: 'Worked examples: conversations written to show how a helpful assistant answers.', items: [
+			'Data: example dialogues, written by people following labelling instructions, increasingly with help from models',
+			'Result: the model takes on the persona of an assistant',
+			'When you chat with an assistant, you are talking to a statistical imitation of those labellers',
+		] },
+		{ key: 'rl', label: '3. Reinforcement learning', tone: 'you', summary: 'Practice problems: the model tries many solutions and is rewarded for the ones that work.', items: [
+			'For problems with checkable answers (maths, code), the model discovers its own ways of reasoning: the “thinking” models',
+			'For taste (jokes, style), a reward model trained on human preferences stands in for people (RLHF)',
+			'A reward model can be gamed, so this stage is used carefully',
+		] },
+	]}
+/>
+
+## 5. Two kinds of memory
+
+<Predict id="memory" question="You ask a model about a detail of the Mood Tracker's code. When is it more likely to be right: when it relies on what it learned in training, or when the file is in its context?">
+
+When the file is in the **context**. Karpathy's distinction: knowledge in the parameters is like a **vague recollection** of something you read months ago; the context window is **working memory**, sharp and directly available. That is the whole idea behind Part 2: put the client log, the architecture and the right files in the context, instead of relying on what the model half-remembers.
+
+</Predict>
+
+| | Parameters (weights) | Context window |
+|---|---|---|
+| Like | a vague memory of what you once read | what is on the desk in front of you |
+| Contains | patterns from the training data | your prompt, the files, tool output |
+| Up to date? | frozen at the end of training | as current as what you put in |
+| Your control | none | complete: that is context engineering |
+
+## 6. Hallucinations and the Swiss cheese
+
+Models **hallucinate**: they produce fluent, confident text that is false. In training, confident answers were almost always the right style, so a model imitates confidence even when it does not know. Labs reduce this by training models to say "I don't know" and by giving them **tools** (search, running code), but it never goes away.
+
+Capabilities are also uneven. Karpathy compares them to **Swiss cheese**: brilliant at hard problems, with random holes in easy ones.
+
+- **Counting letters.** The model sees `straw` + `berry`, not letters, so "how many r's in strawberry?" can go wrong. Ask it to write code that counts, and it gets it right.
+- **9.11 or 9.9?** Some models have said 9.11 is bigger, possibly because in many texts, such as Bible verses or version numbers, 9.11 comes after 9.9.
+- **Models need tokens to think.** Each token gets a fixed amount of computation. An answer squeezed into one token has had little "thinking"; working step by step, in many tokens, or with a tool, is more reliable.
+
+<Sorter
+	title="Fine for a model on its own, or needs a tool or a check?"
+	bins={[
+		{ key: 'ok', label: 'Model alone, then you read it', tone: 'agent' },
+		{ key: 'tool', label: 'Needs a tool or a check', tone: 'you' },
+	]}
+	items={[
+		{ text: 'Draft ten interview questions for the study coordinator', bin: 'ok', why: 'Language work, low stakes, and you choose the questions anyway.' },
+		{ text: 'Count how many entries in a file have a score below 3', bin: 'tool', why: 'Counting and arithmetic: ask it to write and run code, then check the code.' },
+		{ text: 'Say which version of a library the project uses', bin: 'tool', why: 'A fact about your project: read <code>pubspec.lock</code>. The model\'s memory is vague and out of date.' },
+		{ text: 'Rewrite a paragraph of your report in simpler English', bin: 'ok', why: 'What models do best. Still read it: meaning can shift.' },
+		{ text: 'Give the dose of a medicine for a patient', bin: 'tool', why: 'Never from the model alone: a medical fact with a risk of harm needs an authoritative source and a professional.' },
+	]}
+/>
+
+<Quiz
+	question="Why does the same prompt give different answers on different runs?"
+	options={[
+		'The model learns from every conversation in real time',
+		'The next token is drawn at random from the predicted probabilities',
+		'The servers run different models every time',
+		'The tokenizer splits the text differently each time',
+	]}
+	answer={1}
+	why={[
+		'Chatbots do not update their weights from your chat as you talk.',
+		'',
+		'Usually the same model; the randomness is in the sampling.',
+		'Tokenization is deterministic: the same text always gives the same tokens.',
+	]}
+	explain="Sampling is random by design. At temperature 0 the most likely token is always chosen, but tools like Copilot do not let you set it, so plan for variation: check the result, not the wording."
+/>
+
+<Quiz
+	question="A model confidently gives you a citation that does not exist. Which explanation fits best?"
+	options={[
+		'It looked it up in a broken database',
+		'It is lying on purpose to please you',
+		'Its search tool returned a wrong result',
+		'It produced a plausible continuation in the style of a citation, without a source behind it',
+	]}
+	answer={3}
+	why={[
+		'Without a tool, there is no database: only patterns in the weights.',
+		'There is no intent; it continues the text in the most plausible way.',
+		'Possible when tools are used, but the classic hallucination happens with no tool at all.',
+		'',
+	]}
+	explain="This is the core of hallucination, and why the course insists on sources you have opened: a fluent citation is just very plausible text."
+/>
+
+## What this means for you
+
+- **Tokens** are the unit of cost and of the context window. Polish text costs more of both.
+- **Sampling** means variation: check results, not wording. Run important prompts more than once.
+- **Working memory beats vague memory:** give the model the facts (Part 2, context and project knowledge).
+- **Plausible is not true:** facts need sources (Part 1), numbers need tools, and claims about code need `file:line`.
+
+<AtWork>Explaining in two minutes why a model hallucinates, and what you do about it in your workflow, shows that you understand the tools you use, not only how to prompt them. That is the difference people notice in technical conversations.</AtWork>
+
+**Watch:** Andrej Karpathy, [*Deep Dive into LLMs like ChatGPT*](https://www.youtube.com/watch?v=7xTGNNLPyMI) (3.5 h, the basis of this page); [*Let's build the GPT Tokenizer*](https://www.youtube.com/watch?v=zduSFxRajkE) (tokenization in depth); [*Intro to Large Language Models*](https://www.youtube.com/watch?v=zjkBMFhNj_g) (1 h, a shorter overview). FineWeb: [Hugging Face](https://huggingface.co/datasets/HuggingFaceFW/fineweb).
+
+<Done />

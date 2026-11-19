@@ -1,0 +1,105 @@
+---
+/**
+ * Next-token sampler: a fixed, illustrative probability distribution over
+ * candidate next tokens, reshaped by temperature (p_i ∝ p_i^(1/T)), with
+ * repeated sampling to show non-determinism.
+ */
+import { t } from '../i18n/ui';
+interface Props {
+	prompt: string;
+	candidates: { token: string; p: number }[];
+}
+const { prompt, candidates } = Astro.props;
+const T = t(Astro);
+---
+
+<div class="biz-widget smp not-content" data-c={JSON.stringify(candidates)} data-greedy={T.smpGreedy}>
+	<div class="biz-head">
+		<p class="biz-kicker">{T.smpKicker}</p>
+		<span class="smp__note">{T.smpNote}</span>
+	</div>
+	<p class="smp__prompt"><span set:html={prompt} /><span class="smp__cursor">▌</span></p>
+	<div class="smp__bars"></div>
+	<div class="smp__controls">
+		<label class="smp__temp">{T.smpTemp} <input type="range" min="0" max="2" step="0.1" value="1" /> <b>1.0</b></label>
+		<div class="smp__btns">
+			<button type="button" class="sdlc-btn sdlc-btn--primary" data-n="1">{T.smpOne}</button>
+			<button type="button" class="sdlc-btn" data-n="10">{T.smpTen}</button>
+			<button type="button" class="sdlc-btn" data-n="0">{T.smpReset}</button>
+		</div>
+	</div>
+	<p class="smp__greedy" aria-live="polite"></p>
+	<div class="smp__draws" aria-live="polite"></div>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.smp').forEach((box) => {
+		const cands: { token: string; p: number }[] = JSON.parse(box.dataset.c || '[]');
+		const bars = box.querySelector<HTMLElement>('.smp__bars')!;
+		const range = box.querySelector<HTMLInputElement>('input[type=range]')!;
+		const tval = box.querySelector<HTMLElement>('.smp__temp b')!;
+		const draws = box.querySelector<HTMLElement>('.smp__draws')!;
+		const greedy = box.querySelector<HTMLElement>('.smp__greedy')!;
+		const cursor = box.querySelector<HTMLElement>('.smp__cursor')!;
+		const rows = cands.map((c) => {
+			const row = document.createElement('div');
+			row.className = 'smp__row';
+			row.innerHTML = `<span class="smp__tok"></span><span class="smp__bar"><i></i></span><span class="smp__pct"></span>`;
+			row.querySelector('.smp__tok')!.textContent = c.token.replace(/ /g, '·');
+			bars.appendChild(row);
+			return row;
+		});
+		let probs: number[] = [];
+		const dist = () => {
+			const T = Number(range.value);
+			if (T === 0) {
+				const max = Math.max(...cands.map((c) => c.p));
+				return cands.map((c) => (c.p === max ? 1 : 0));
+			}
+			const w = cands.map((c) => Math.pow(c.p, 1 / T));
+			const sum = w.reduce((a, b) => a + b, 0);
+			return w.map((x) => x / sum);
+		};
+		const render = () => {
+			probs = dist();
+			tval.textContent = Number(range.value).toFixed(1);
+			const max = Math.max(...probs);
+			rows.forEach((r, i) => {
+				(r.querySelector('.smp__bar i') as HTMLElement).style.width = `${(probs[i] / max) * 100}%`;
+				r.querySelector('.smp__pct')!.textContent = `${(probs[i] * 100).toFixed(probs[i] < 0.01 && probs[i] > 0 ? 1 : 0)}%`;
+			});
+			greedy.textContent = Number(range.value) === 0 ? box.dataset.greedy || '' : '';
+		};
+		const sample = () => {
+			let x = Math.random();
+			for (let i = 0; i < probs.length; i++) {
+				x -= probs[i];
+				if (x <= 0) return i;
+			}
+			return probs.length - 1;
+		};
+		box.querySelectorAll<HTMLButtonElement>('[data-n]').forEach((b) =>
+			b.addEventListener('click', () => {
+				const n = Number(b.dataset.n);
+				if (!n) {
+					draws.textContent = '';
+					cursor.textContent = '▌';
+					rows.forEach((r) => r.classList.remove('is-hit'));
+					return;
+				}
+				for (let k = 0; k < n; k++) {
+					const i = sample();
+					const chip = document.createElement('span');
+					chip.className = 'smp__draw';
+					chip.textContent = cands[i].token.trim();
+					draws.prepend(chip);
+					rows.forEach((r, j) => r.classList.toggle('is-hit', j === i));
+					cursor.textContent = cands[i].token;
+				}
+				while (draws.children.length > 40) draws.lastChild?.remove();
+			}),
+		);
+		range.addEventListener('input', render);
+		render();
+	});
+</script>

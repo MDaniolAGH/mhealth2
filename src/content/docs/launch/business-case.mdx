@@ -1,0 +1,84 @@
+---
+title: '4. Business case and pilot'
+description: Total cost of ownership, cost per participant per month, a pilot with success criteria fixed in advance, and a go/no-go decision where "no" is a real option.
+---
+
+import CostCalc from '../../../components/CostCalc.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+import Scene from '../../../components/Scene.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={6} items={["Total cost = one-off work + running costs + the client's own time.", "Cost per participant per month makes options comparable.", "Fix the pilot's success criteria before it starts. \"No\" is a valid result."]} />
+
+## What does it really cost?
+
+The build is the visible part. The running costs are the part people forget: hosting, support, updates when Android and iOS change, store fees, and the client's own staff time. **Total cost of ownership** adds them up over the whole period of use, and **cost per participant per month** makes it comparable with the alternatives from [Part 1](../../product/options-and-recommendation/), including paper.
+
+<Predict id="running" question="The clinic's study: 50 participants for six months. Roughly what share of the total cost do you expect to be running costs, after the app is built?">
+
+In the illustrative numbers below, about **40%**, and that is for only six months. Longer studies, more support or more updates push it higher. Try it: change the months to 24, or the support hours to 15, and watch the share and the cost per participant move.
+
+</Predict>
+
+<CostCalc title="The Mood Tracker for the clinic's next group (illustrative numbers; change them)" oneOff={60} rate={150} hosting={50} support={6} fees={500} people={50} months={6} />
+
+Every number here is an assumption, so treat it like one: write down where each came from (a quote, a log, a guess) and give the result as a **range**, using the three-point estimates from Part 1. The *Time* lines in your agent log are real data for the "one-off work" field.
+
+<span id="pilot" class="stage-anchor"></span>
+
+## A pilot, with the criteria fixed first
+
+A pilot is a small, time-boxed launch that answers one question: **should we go ahead?** It only answers it honestly if the success criteria are agreed **before** anyone sees the results. Otherwise, any result can be read as a success.
+
+<Scene
+	title="Monday: agreeing the pilot"
+	messages={[
+		{ who: 'you', name: 'You', text: 'Before the pilot starts: what would make you say “go” after 30 days? And what would make you say “stop”?' },
+		{ who: 'client', name: 'Anna', text: 'Go: participants find the contact without asking us, and Tomek gets fewer calls about versions. Stop: any data incident at all.' },
+		{ who: 'other', name: 'Tomek', text: 'Today it is about five version calls a week. Under two would be a win.' },
+		{ who: 'you', name: 'You', text: 'Written down and dated. Ten participants, 30 days, these three criteria. We report against them, even if it is a “no”.' },
+	]}
+/>
+
+```text title="docs/pilot.md (illustrative)"
+Pilot       10 participants, 30 days, from 2026-12-01
+Question    Should the next group of 50 use the app?
+Go if       8 of 10 participants find the contact without help (short check-in call)
+            version questions to support: fewer than 2 per week
+Stop if     any personal-data incident
+Not measured  long-term use; participants without a smartphone
+Agreed by   Anna (coordinator), 2026-11-24
+```
+
+## Go, change, or no-go
+
+The business case is one page: the decision, the total cost and the cost per participant per month, the pilot results against the criteria, the risks, and the alternatives. **"No" is a valid result**: if paper does the job for less, recommending paper is good engineering, not a failure.
+
+<Quiz
+	question="The pilot ends: 6 of 10 participants found the contact without help (the criterion was 8), there were no incidents, and support calls dropped a lot. What do you report?"
+	options={[
+		'Success: the other results were very good, so it balances out',
+		'The results against each criterion as agreed: one missed; then options to fix it, and the client decides',
+		'Change the criterion to 6 of 10, since that is what most pilots achieve',
+		'Nothing yet: run the pilot again until it passes',
+	]}
+	answer={1}
+	why={[
+		'Averaging good and bad results after the fact is exactly what fixed criteria are meant to prevent.',
+		'',
+		'Moving the target after seeing the results makes the pilot meaningless.',
+		'Repeating until it passes hides the result. Report it, then decide.',
+	]}
+	explain="Report honestly against the criteria agreed in advance, propose what could fix the miss (clearer contact placement, for example), and let the client decide. That is what makes your next pilot believable."
+/>
+
+<AtWork>A business case with a range, a pilot with criteria fixed in advance, and the courage to recommend "no": this is what clients and managers remember about a developer.</AtWork>
+
+:::tip[Do this in your project]
+Put your client's numbers into the calculator, and write down the source of each one. Draft the pilot for your brief: one question, two or three success criteria, one stop criterion, what you will not measure. Send it to your client for agreement before anything else.
+:::
+
+<Done />

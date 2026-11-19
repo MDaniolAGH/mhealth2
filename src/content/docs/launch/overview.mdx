@@ -1,0 +1,74 @@
+---
+title: 'Launch: from a working app to the market'
+description: 'What it takes to put a health app in people''s hands, and keep it there: regulation, privacy, security, release, the business case and life after launch.'
+---
+
+import LaunchMap from '../../../components/LaunchMap.astro';
+import Sorter from '../../../components/Sorter.astro';
+import Scene from '../../../components/Scene.astro';
+import Predict from '../../../components/Predict.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={6} items={["A working app is not a product yet: launching is a chain of decisions and records.", "The intended purpose picks the route: medical device or not.", "Even when it is not a device: health data, honest store text and a plan for after launch."]} />
+
+Parts 1 and 2 got you from a client's request to a merged, tested change. Part 3 is everything between "it works on my phone" and "fifty participants use it for six months, safely, and someone can prove it".
+
+<Scene
+	title="Thursday, a month later"
+	messages={[
+		{ who: 'client', name: 'Anna', text: 'The About screen looks great! The next group starts in January: 50 participants, six months. Can they use the app?' },
+		{ who: 'you', name: 'You', text: 'The app runs, yes. Before it goes to 50 people, a few things: is it a medical device, what happens with their data, how they install it, and who looks after it until July.' },
+		{ who: 'client', name: 'Anna', text: 'Oh. I thought we just put it in the store. 😅' },
+		{ who: 'you', name: 'You', text: 'That is the last step. Let us walk through it together.' },
+	]}
+/>
+
+<Predict id="launch-steps" question="Before you open the map: list everything you think must happen between &quot;the app works&quot; and &quot;50 participants use it in January&quot;.">
+
+Most people list the store upload and maybe a privacy policy. The map has ten stages: the purpose, the device question, the class and route if it is a device, data and GDPR, risk and security, the evidence pack, the release, a pilot, the go/no-go decision, and life after launch. Count how many of yours were there, and which ones surprised you.
+
+</Predict>
+
+## The map
+
+Three lanes: the **client** (the clinic, which puts the app on the market and is responsible for it), **you**, and the **outside world** (regulators, notified bodies, app stores). On the left, the **technical file**: the records that launching depends on. Along the side, **accountability**: being able to show what you did and why.
+
+**Try it.** Press **Walk through** to take the Mood Tracker to the clinic's next group, including a store rejection. Use **Show** for the feedback loops, the evidence flows and the records. Click a stage or a document.
+
+<LaunchMap />
+
+## Always, or only for a medical device?
+
+<Sorter
+	title="Does this apply to every health app, or only to a medical device?"
+	bins={[
+		{ key: 'always', label: 'Every health app', tone: 'client' },
+		{ key: 'device', label: 'Only a medical device', tone: 'tool' },
+	]}
+	items={[
+		{ text: 'Treat mood entries as health data under the GDPR', bin: 'always', why: 'Health data is a special category (Article 9) whatever the app is. Self-reported mood counts.' },
+		{ text: 'Have a notified body assess the quality system', bin: 'device', why: 'Only for devices above the lowest class. Most decision-support software is class IIa or higher.' },
+		{ text: 'Keep the store description within the intended purpose', bin: 'always', why: 'A medical claim in the store text can make the stores ask for regulatory clearance, and can change what the product legally is.' },
+		{ text: 'Put a CE mark on the app', bin: 'device', why: 'CE marking under the MDR is for medical devices. A diary does not carry one.' },
+		{ text: 'Report a personal-data breach to the data protection authority within 72 hours', bin: 'always', why: 'A duty of the controller under GDPR Article 33, for any app that processes personal data.' },
+		{ text: 'Run post-market surveillance and report serious incidents under the MDR', bin: 'device', why: 'MDR Articles 83–87 apply to devices. A non-device still needs a plan for incidents and updates; it just is not this legal duty.' },
+	]}
+/>
+
+## Where you use this in the course
+
+| When | What | In your dossier |
+|---|---|---|
+| **W3** | intended purpose and first qualification | purpose in four lines, first qualification with reasons |
+| **W5** | the route to market, privacy, security, maintenance | regulatory route and required documents; running costs against the brief's limit |
+| **W6** | business case, pilot, life after launch | business case with total cost; a go/no-go decision, "no" included |
+
+<AtWork>Medtech and digital-health companies hire developers who understand why a release needs a risk file and a privacy review. Being able to talk about qualification, GDPR and store review sets you apart from candidates who only talk about code.</AtWork>
+
+:::tip[Do this in your project]
+Walk your client's product through the ten stages of the map. For each stage, write one line: what it means for your brief, and who decides. Mark the stages where you do not know yet: those are your questions for the next client meeting.
+:::
+
+<Done />

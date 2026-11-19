@@ -378,6 +378,16 @@ a.sdlc-stage.is-client-you {
   border-color: var(--sdlc-client) var(--sdlc-you) var(--sdlc-you) var(--sdlc-client);
   background: linear-gradient(90deg, var(--sdlc-client-tint), var(--sdlc-you-tint)), var(--sdlc-card);
 }
+a.sdlc-stage.is-you-tool {
+  --chip: var(--sdlc-tool);
+  border-color: var(--sdlc-you) var(--sdlc-tool) var(--sdlc-tool) var(--sdlc-you);
+  background: linear-gradient(90deg, var(--sdlc-you-tint), var(--sdlc-tool-tint)), var(--sdlc-card);
+}
+a.sdlc-stage.is-client-tool {
+  --chip: var(--sdlc-tool);
+  border-color: var(--sdlc-client) var(--sdlc-tool) var(--sdlc-tool) var(--sdlc-client);
+  background: linear-gradient(90deg, var(--sdlc-client-tint), var(--sdlc-you-tint), var(--sdlc-tool-tint)), var(--sdlc-card);
+}
 /* The plan reads the project knowledge: an indigo edge. */
 a.sdlc-stage.is-kb-reader { box-shadow: inset 4px 0 0 var(--sdlc-kb), var(--w-shadow); }
 a.sdlc-stage.is-kb-reader.is-active { box-shadow: inset 4px 0 0 var(--sdlc-kb), 0 0 0 3px color-mix(in srgb, var(--chip) 35%, transparent); }

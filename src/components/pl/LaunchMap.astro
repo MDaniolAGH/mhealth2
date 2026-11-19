@@ -1,0 +1,169 @@
+---
+/**
+ * The route-to-market map (Polish): ten stages from the intended purpose to life
+ * after launch, in three lanes (client, you, the outside world), with the
+ * technical file on the left and the accountability rail. Engine: src/scripts/sdlc.js.
+ */
+import { link } from '../../lib/url';
+
+const s = {
+	purpose: link('product/purpose/', 'pl'),
+	qualification: link('launch/device-or-not/', 'pl'),
+	classification: link('launch/device-or-not/#route', 'pl'),
+	privacy: link('launch/privacy-and-security/', 'pl'),
+	risk: link('launch/privacy-and-security/#risk', 'pl'),
+	evidence: link('launch/privacy-and-security/#evidence', 'pl'),
+	release: link('launch/release/', 'pl'),
+	pilot: link('launch/business-case/#pilot', 'pl'),
+	decision: link('launch/business-case/', 'pl'),
+	after: link('launch/after-launch/', 'pl'),
+	file: link('launch/privacy-and-security/#evidence', 'pl'),
+};
+
+const flows = {
+	loops: [
+		{ from: 'release', to: 'evidence', label: 'odrzucone → popraw', kind: 'fail', layer: 'base', lane: 0.3, dy: 6 },
+		{ from: 'qualification', to: 'purpose', kind: 'loop', layer: 'loops', lane: 'near' },
+		{ from: 'pilot', to: 'purpose', label: 'poniżej kryteriów → przemyśl', kind: 'loop', layer: 'loops', lane: 0.62, dy: 6, wideOnly: true },
+		{ from: 'after', to: 'risk', label: 'incydent → aktualizuj', kind: 'loop', layer: 'loops', lane: 0.9, dy: -6, labelDy: 40, wideOnly: true },
+	],
+	kb: [
+		{ from: 'evidence', layer: 'base' },
+		{ to: 'release', layer: 'base' },
+		{ from: 'privacy', layer: 'knowledge' },
+		{ from: 'risk', layer: 'knowledge' },
+		{ to: 'decision', layer: 'knowledge' },
+		{ from: 'after', layer: 'knowledge', label: 'na bieżąco' },
+		{ to: 'purpose', layer: 'knowledge', label: 'następna wersja' },
+	],
+};
+
+const i18n = JSON.stringify({
+	play: '▶ Przejdź krok po kroku',
+	pause: '❚❚ Pauza',
+	step: 'Krok {n} z {total}',
+	readSection: 'Przeczytaj cały rozdział →',
+	readKb: 'Przeczytaj o dokumentacji technicznej →',
+	traced: 'Podświetlone: każdy etap, przez który da się prześledzić ten zapis wstecz, aż do intended purpose.',
+});
+---
+
+<div class="sdlc lmap not-content" data-i18n={i18n}>
+	<div class="sdlc-toolbar">
+		<div class="sdlc-toolbar__group" role="group" aria-label="Przejdź mapę krok po kroku">
+			<button type="button" class="sdlc-btn" data-action="prev" aria-label="Poprzedni krok">◀</button>
+			<button type="button" class="sdlc-btn sdlc-btn--primary" data-action="play">▶ Przejdź krok po kroku</button>
+			<button type="button" class="sdlc-btn" data-action="next" aria-label="Następny krok">▶</button>
+			<span class="sdlc-toolbar__status" aria-live="polite"></span>
+		</div>
+		<div class="sdlc-toolbar__group" role="group" aria-label="Warstwy">
+			<span class="sdlc-legend__hint">Pokaż:</span>
+			<button type="button" class="sdlc-chip is-loop" data-layer="loops" aria-pressed="false">Pętle zwrotne</button>
+			<button type="button" class="sdlc-chip is-knowledge" data-layer="knowledge" aria-pressed="false">Przepływy dowodów</button>
+			<button type="button" class="sdlc-chip is-audit" data-layer="audit" aria-pressed="false">Zapisy</button>
+		</div>
+	</div>
+
+	<div class="sdlc-legend">
+		<span class="sdlc-legend__hint">Kto:</span>
+		<button type="button" class="sdlc-chip is-client" data-actor="client" aria-pressed="false">Klient (klinika)</button>
+		<button type="button" class="sdlc-chip is-you" data-actor="you" aria-pressed="false">Ty i twoja para</button>
+		<button type="button" class="sdlc-chip is-tool" data-actor="outside" aria-pressed="false">Świat zewnętrzny</button>
+	</div>
+
+	<div class="sdlc-map" role="group" aria-label="Droga na rynek: dziesięć etapów od intended purpose do życia po wprowadzeniu na rynek, z dokumentacją techniczną po lewej" data-flows={JSON.stringify(flows)}>
+		<div class="sdlc-lane is-client" style="grid-column:4" aria-hidden="true"></div>
+		<div class="sdlc-lane is-you" style="grid-column:5" aria-hidden="true"></div>
+		<div class="sdlc-lane is-tool" style="grid-column:6" aria-hidden="true"></div>
+		<div class="sdlc-lane-title is-knowledge" style="grid-column:2">Dokumentacja</div>
+		<div class="sdlc-lane-title is-client" style="grid-column:4">Klient</div>
+		<div class="sdlc-lane-title is-you" style="grid-column:5">Ty</div>
+		<div class="sdlc-lane-title is-tool" style="grid-column:6">Na zewnątrz</div>
+		<div class="sdlc-rail" aria-hidden="true"><span>Rozliczalność</span><i class="sdlc-rail__fill"></i></div>
+
+		<div class="sdlc-kb is-knowledge" style="grid-row:3 / 11">
+			<a class="sdlc-kb__title" href={s.file}>Dokumen&shy;tacja tech&shy;niczna</a>
+			<a class="sdlc-kb__doc" href={s.purpose} data-doc="purpose" data-feeds="purpose qualification classification privacy risk release">Intended purpose</a>
+			<a class="sdlc-kb__doc" href={s.privacy} data-doc="data" data-feeds="privacy release after">Inwenta&shy;ryzacja danych i DPIA</a>
+			<a class="sdlc-kb__doc" href={s.risk} data-doc="risk" data-feeds="risk release after">Dokumen&shy;tacja ryzyka</a>
+			<a class="sdlc-kb__doc" href={s.evidence} data-doc="trace" data-feeds="evidence after">Śledzalność i SOUP</a>
+			<a class="sdlc-kb__doc" href={s.evidence} data-doc="tests" data-feeds="evidence pilot">Raporty z testów</a>
+			<a class="sdlc-kb__doc" href={s.release} data-doc="store" data-feeds="release after">Opis w sklepie</a>
+		</div>
+
+		<a class="sdlc-stage is-client-you" href={s.purpose} data-stage="purpose" data-order="1" data-actors="client you" style="--row:2;--col:4 / 6"><span class="sdlc-stage__n">1</span><span class="sdlc-stage__t">Intended purpose</span><span class="sdlc-stage__s">cztery linijki, z części 1</span><span class="sdlc-stage__rec">product.md</span></a>
+		<a class="sdlc-stage is-client-you" href={s.qualification} data-stage="qualification" data-order="2" data-actors="client you" style="--row:3;--col:4 / 6"><span class="sdlc-stage__n">2</span><span class="sdlc-stage__t">Wyrób czy nie?</span><span class="sdlc-stage__s">kwalifikacja, z ekspertem</span><span class="sdlc-stage__rec">notatka o kwalifikacji</span></a>
+		<a class="sdlc-stage is-you-tool" href={s.classification} data-stage="classification" data-order="3" data-actors="you outside" style="--row:4;--col:5 / 7"><span class="sdlc-stage__n">3</span><span class="sdlc-stage__t">Klasa i ścieżka</span><span class="sdlc-stage__s">tylko jeśli to wyrób</span><span class="sdlc-stage__rec">plan ścieżki</span></a>
+		<a class="sdlc-stage is-client-you" href={s.privacy} data-stage="privacy" data-order="4" data-actors="client you" style="--row:5;--col:4 / 6"><span class="sdlc-stage__n">4</span><span class="sdlc-stage__t">Dane i RODO</span><span class="sdlc-stage__s">inwentaryzacja · podstawa prawna · DPIA</span><span class="sdlc-stage__rec">inwentaryzacja danych</span></a>
+		<a class="sdlc-stage is-you" href={s.risk} data-stage="risk" data-order="5" data-actors="you" style="--row:6;--col:5"><span class="sdlc-stage__n">5</span><span class="sdlc-stage__t">Ryzyko i bezpie&shy;czeństwo</span><span class="sdlc-stage__s">najpierw szkoda, potem kod</span><span class="sdlc-stage__rec">dokumentacja ryzyka</span></a>
+		<a class="sdlc-stage is-you" href={s.evidence} data-stage="evidence" data-order="6" data-actors="you" style="--row:7;--col:5"><span class="sdlc-stage__n">6</span><span class="sdlc-stage__t">Pakiet dowodów</span><span class="sdlc-stage__s">śledzalność, SOUP, testy</span><span class="sdlc-stage__rec">dokumentacja techniczna</span></a>
+		<a class="sdlc-stage is-you-tool" href={s.release} data-stage="release" data-order="7" data-actors="you outside" style="--row:8;--col:5 / 7"><span class="sdlc-stage__n">7</span><span class="sdlc-stage__t">Release</span><span class="sdlc-stage__s">opis w sklepie, privacy labels, beta</span><span class="sdlc-stage__rec">release notes</span></a>
+		<a class="sdlc-stage is-client-you" href={s.pilot} data-stage="pilot" data-order="8" data-actors="client you" style="--row:9;--col:4 / 6"><span class="sdlc-stage__n">8</span><span class="sdlc-stage__t">Pilotaż</span><span class="sdlc-stage__s">kryteria sukcesu ustalone z góry</span><span class="sdlc-stage__rec">raport z pilotażu</span></a>
+		<a class="sdlc-stage is-client" href={s.decision} data-stage="decision" data-order="9" data-actors="client" style="--row:10;--col:4"><span class="sdlc-stage__n">9</span><span class="sdlc-stage__t">Go&nbsp;/ no&#8209;go</span><span class="sdlc-stage__s">business case, jedna strona</span><span class="sdlc-stage__rec">business case</span></a>
+		<a class="sdlc-stage is-client-tool" href={s.after} data-stage="after" data-order="10" data-actors="client you outside" style="--row:11;--col:4 / 7"><span class="sdlc-stage__n">10</span><span class="sdlc-stage__t">Po wprowadzeniu</span><span class="sdlc-stage__s">monitoruj · aktualizuj · zgłaszaj · wygaszaj</span><span class="sdlc-stage__rec">dziennik monitorowania</span></a>
+	</div>
+
+	<div class="sdlc-panel" aria-live="polite"><p class="sdlc-panel__empty">Kliknij etap albo dokument w dokumentacji technicznej lub naciśnij <b>Przejdź krok po kroku</b>, żeby zaprowadzić Mood Trackera do następnej grupy uczestników kliniki.</p></div>
+
+	<div class="sdlc-layer-info">
+		<div data-layer-info="audit"><h4>Zapisy</h4><p>Wprowadzenie na rynek polega głównie na tym, żeby umieć pokazać, co zrobiono i dlaczego. Każdy etap zostawia zapis, o który może poprosić ktoś z zewnątrz: audytor, inspektor ochrony danych, osoba sprawdzająca aplikację w sklepie, klient. Kliknij etap, żeby zobaczyć jego zapis.</p></div>
+		<div data-layer-info="loops"><h4>Pętle zwrotne</h4><dl><dt>Odrzucone → popraw</dt><dd>Review w sklepie albo review bety odrzuca release (często z powodu opisu, a nie kodu): popraw dowody i spróbuj jeszcze raz.</dd><dt>Wyrób? Zawęź cel</dt><dd>Jeśli cel robi z aplikacji wyrób medyczny, klient może zawęzić cel, zamiast iść ścieżką wyrobu.</dd><dt>Poniżej kryteriów</dt><dd>Pilotaż nie spełnia kryteriów sukcesu uzgodnionych z góry: wracasz do celu i do decyzji, a nie „i tak wypuszczamy”.</dd><dt>Incydent → aktualizuj</dt><dd>Po starcie coś idzie nie tak: zaktualizuj dokumentację ryzyka i kontrole.</dd></dl></div>
+		<div data-layer-info="knowledge"><h4>Przepływy dowodów</h4><p>Dokumentacja techniczna to zbiór zapisów, od których zależy wprowadzenie na rynek: cel, inwentaryzacja danych, dokumentacja ryzyka, śledzalność, testy, opis w sklepie. Etapy do niej piszą; release i decyzja go/no-go z niej czytają; po starcie jest aktualizowana na bieżąco, a następna wersja od niej zaczyna.</p></div>
+	</div>
+
+	<div class="sdlc-details">
+		<div data-detail="purpose"><h4>1. Intended purpose</h4><dl><dt>Kto</dt><dd>Klient go formułuje; ty trzymasz go w <code>docs/product.md</code></dd><dt>Wejście</dt><dd>Cztery linijki z części 1</dd><dt>Wyjście</dt><dd>Zdanie, z którym porównuje się każdy kolejny etap</dd><dt>Sprawdź</dt><dd>Czy funkcje i teksty aplikacji zgadzają się z nim słowo w słowo?</dd></dl></div>
+		<div data-detail="qualification"><h4>2. Wyrób czy nie?</h4><dl><dt>Kto</dt><dd>Decyduje klient (wytwórca) razem z ekspertem od regulacji; ty przygotowujesz fakty</dd><dt>Wejście</dt><dd>Cel, lista funkcji</dd><dt>Wyjście</dt><dd>Jednostronicowa notatka o kwalifikacji, z uzasadnieniem</dd><dt>Sprawdź</dt><dd>Czy któraś funkcja interpretuje, ocenia, alarmuje albo zaleca?</dd></dl></div>
+		<div data-detail="classification"><h4>3. Klasa i ścieżka</h4><dl><dt>Kto</dt><dd>Ty i eksperci od regulacji; przy większości klas jednostka notyfikowana</dd><dt>Wejście</dt><dd>Notatka o kwalifikacji</dd><dt>Wyjście</dt><dd>Klasa według reguły 11 MDR i ścieżka oceny zgodności</dd><dt>Sprawdź</dt><dd>Pomiń tylko wtedy, gdy etap 2 stwierdził na piśmie: „nie wyrób”</dd></dl></div>
+		<div data-detail="privacy"><h4>4. Dane i RODO</h4><dl><dt>Kto</dt><dd>Ty wypisujesz dane; klient (administrator danych) decyduje o podstawie prawnej i DPIA</dd><dt>Wejście</dt><dd>Kod, baza danych, telefon, logi</dd><dt>Wyjście</dt><dd>Inwentaryzacja danych z celem dla każdej pozycji; otwarte pytania do administratora danych</dd><dt>Sprawdź</dt><dd>Każdy wiersz ma dowód albo jest oznaczony jako nieznany</dd></dl></div>
+		<div data-detail="risk"><h4>5. Ryzyko i bezpieczeństwo</h4><dl><dt>Kto</dt><dd>Ty</dd><dt>Wejście</dt><dd>Cel, inwentaryzacja danych, aplikacja</dd><dt>Wyjście</dt><dd>Tabela ryzyka (najpierw szkoda) i przegląd bezpieczeństwa według OWASP MASVS i API Top 10</dd><dt>Sprawdź</dt><dd>Każda kontrola ma sposób weryfikacji, który naprawdę da się przeprowadzić</dd></dl></div>
+		<div data-detail="evidence"><h4>6. Pakiet dowodów</h4><dl><dt>Kto</dt><dd>Ty</dd><dt>Wejście</dt><dd>Ślad w dokumentach z części 2: cele, kryteria, testy, pull requesty</dd><dt>Wyjście</dt><dd>Śledzalność, lista SOUP, raporty z testów</dd><dt>Sprawdź</dt><dd>Każde wymaganie ma test; lista SOUP zgadza się z plikami lock</dd></dl></div>
+		<div data-detail="release"><h4>7. Release</h4><dl><dt>Kto</dt><dd>Ty go przygotowujesz; sklepy robią review</dd><dt>Wejście</dt><dd>Build, cel, inwentaryzacja danych</dd><dt>Wyjście</dt><dd>Opis w sklepie, privacy labels, deklaracja dotycząca zdrowia, kanał beta</dd><dt>Sprawdź</dt><dd>Nic w opisie nie obiecuje więcej niż cel</dd></dl></div>
+		<div data-detail="pilot"><h4>8. Pilotaż</h4><dl><dt>Kto</dt><dd>Klient go prowadzi; ty wspierasz i mierzysz</dd><dt>Wejście</dt><dd>Kryteria sukcesu uzgodnione <b>przed</b> startem</dd><dt>Wyjście</dt><dd>Raport z pilotażu w odniesieniu do tych kryteriów</dd><dt>Sprawdź</dt><dd>Czy kryteria ustalono, zanim ktokolwiek zobaczył wyniki?</dd></dl></div>
+		<div data-detail="decision"><h4>9. Go / no-go</h4><dl><dt>Kto</dt><dd>Klient</dd><dt>Wejście</dt><dd>Raport z pilotażu, business case</dd><dt>Wyjście</dt><dd>Decyzja: wprowadzić, zmienić albo zatrzymać</dd><dt>Sprawdź</dt><dd>„Nie” było prawdziwą opcją</dd></dl></div>
+		<div data-detail="after"><h4>10. Po wprowadzeniu</h4><dl><dt>Kto</dt><dd>Klient, ty i świat zewnętrzny (sklepy, urzędy, użytkownicy)</dd><dt>Wejście</dt><dd>Feedback, incydenty, aktualizacje platform i bibliotek</dd><dt>Wyjście</dt><dd>Dziennik monitorowania, aktualizacje, zgłoszenia, gdy są wymagane, i plan na koniec</dd><dt>Sprawdź</dt><dd>Kto się tym zajmie w piątek wieczorem i jak długo?</dd></dl></div>
+		<div data-detail="kb"><h4>Dokumentacja techniczna</h4><dl><dt>Co</dt><dd>Zapisy, które pokazują, czym jest produkt, co mu wolno robić i skąd wiesz, że jest wystarczająco bezpieczny</dd><dt>Po co</dt><dd>Poza salą zajęć „u mnie na telefonie działa” to nie jest odpowiedź. Recenzenci, audytorzy i klienci proszą o zapisy.</dd><dt>Spróbuj</dt><dd>Kliknij dokument, żeby zobaczyć, które etapy go potrzebują.</dd></dl></div>
+	</div>
+
+	<div class="sdlc-kb-details">
+		<div data-kb="purpose"><h4>Intended purpose</h4><dl><dt>Co zawiera</dt><dd>Dla kogo, w jakiej sytuacji, do jakiego działania, z jaką konsekwencją; cytat za klientem</dd><dt>Kto czyta</dt><dd>Prawie każdy etap i każda osoba sprawdzająca aplikację w sklepie</dd></dl></div>
+		<div data-kb="data"><h4>Inwentaryzacja danych i DPIA</h4><dl><dt>Co zawiera</dt><dd>Każda dana: gdzie jest, kto ją widzi, jak długo jest przechowywana, po co; ocena skutków przygotowana przez administratora danych</dd><dt>Kto czyta</dt><dd>Prywatność, release (privacy labels), czas po wprowadzeniu</dd></dl></div>
+		<div data-kb="risk"><h4>Dokumentacja ryzyka</h4><dl><dt>Co zawiera</dt><dd>Zagrożenia, szkody, kontrole i sposób weryfikacji każdej kontroli</dd><dt>Kto czyta</dt><dd>Ryzyko, release, czas po wprowadzeniu</dd></dl></div>
+		<div data-kb="trace"><h4>Śledzalność i SOUP</h4><dl><dt>Co zawiera</dt><dd>Wymaganie → projekt → kod → test; każda zewnętrzna biblioteka z wersją</dd><dt>Kto czyta</dt><dd>Pakiet dowodów, czas po wprowadzeniu (aktualizacje)</dd></dl></div>
+		<div data-kb="tests"><h4>Raporty z testów</h4><dl><dt>Co zawiera</dt><dd>Wyniki testów automatycznych i uruchomień na prawdziwych urządzeniach</dd><dt>Kto czyta</dt><dd>Pakiet dowodów, pilotaż</dd></dl></div>
+		<div data-kb="store"><h4>Opis w sklepie</h4><dl><dt>Co zawiera</dt><dd>Opis, zrzuty ekranu, privacy labels, deklaracja dotycząca zdrowia, release notes</dd><dt>Kto czyta</dt><dd>Release, czas po wprowadzeniu</dd></dl></div>
+	</div>
+
+	<div class="sdlc-audits">
+		<div data-audit="purpose"><h4>Zapis: intended purpose</h4><dl><dt>Zapis</dt><dd>Cztery linijki w <code>docs/product.md</code>, cytowane za dziennikiem klienta</dd></dl></div>
+		<div data-audit="qualification"><h4>Zapis: notatka o kwalifikacji</h4><dl><dt>Zapis</dt><dd>Jedna strona: funkcje, uzasadnienie, potwierdzenie eksperta, data</dd></dl></div>
+		<div data-audit="classification"><h4>Zapis: plan ścieżki</h4><dl><dt>Zapis</dt><dd>Klasa, ścieżka oceny zgodności, wymagane normy; albo „nie dotyczy”, z odwołaniem do notatki</dd></dl></div>
+		<div data-audit="privacy"><h4>Zapis: inwentaryzacja danych</h4><dl><dt>Zapis</dt><dd>Tabela, decyzje administratora danych, DPIA, jeśli jest wymagana</dd></dl></div>
+		<div data-audit="risk"><h4>Zapis: dokumentacja ryzyka</h4><dl><dt>Zapis</dt><dd>Tabela ryzyka i przegląd bezpieczeństwa, z dowodami</dd></dl></div>
+		<div data-audit="evidence"><h4>Zapis: dokumentacja techniczna</h4><dl><dt>Zapis</dt><dd>Tabela śledzalności, lista SOUP, raporty z testów</dd></dl></div>
+		<div data-audit="release"><h4>Zapis: release notes</h4><dl><dt>Zapis</dt><dd>Wersja, numer buildu, co się zmieniło, wynik review w sklepie</dd></dl></div>
+		<div data-audit="pilot"><h4>Zapis: raport z pilotażu</h4><dl><dt>Zapis</dt><dd>Kryteria ustalone z góry, wyniki w odniesieniu do nich, czego nie mierzono</dd></dl></div>
+		<div data-audit="decision"><h4>Zapis: business case</h4><dl><dt>Zapis</dt><dd>Całkowity koszt, koszt na uczestnika na miesiąc, decyzja i kto ją podjął</dd></dl></div>
+		<div data-audit="after"><h4>Zapis: dziennik monitorowania</h4><dl><dt>Zapis</dt><dd>Incydenty, aktualizacje, zgłoszenia i plan na koniec badania</dd></dl></div>
+	</div>
+
+	<ol class="sdlc-walk">
+		<li data-stage="purpose">Anna: <em>„Następna grupa startuje w styczniu: 50 uczestników, pół roku. Mogą korzystać z aplikacji?”</em> Wszystko zaczyna się od celu w <code>docs/product.md</code>: <em>dziennik nastroju prowadzony samodzielnie przez uczestników, nie służy do diagnozy ani leczenia.</em></li>
+		<li data-stage="qualification">Przy takim celu aplikacja przechowuje i pokazuje to, co wpisują ludzie: najpewniej <b>nie jest wyrobem medycznym</b>. Piszesz jednostronicową notatkę; Anna prosi doradcę kliniki do spraw regulacji, żeby to potwierdził. Nie ty i nie Copilot.</li>
+		<li data-stage="classification">A gdyby cel brzmiał <em>„pomaga pacjentom radzić sobie z depresją”</em>? Wtedy najpewniej byłby to wyrób: reguła 11 MDR, jednostka notyfikowana, system zarządzania jakością. Miesiące pracy. Tutaj ten etap jest pomijany, a uzasadnieniem jest notatka.</li>
+		<li data-stage="privacy">To, że aplikacja nie jest wyrobem, nie znaczy, że nie ma zasad. Wpisy o nastroju to <b>dane o zdrowiu</b> (RODO, art. 9). Copilot wypisuje, gdzie są dane; ty sprawdzasz każdy wiersz. Klinika jako administrator danych decyduje o podstawie prawnej i o tym, czy potrzebna jest DPIA.</li>
+		<li data-stage="risk">Najpierw szkoda: co może pójść źle <em>dla człowieka</em>? Potem kod: tokeny w bezpiecznym magazynie, tylko TLS, żadnych sekretów w aplikacji. Każda kontrola dostaje sposób sprawdzenia.</li>
+		<li data-stage="evidence">Ślad w dokumentach z części 2 staje się pakietem dowodów: cele, kryteria, testy, pull requesty, lista SOUP.</li>
+		<li data-stage="release" data-result="fail">Review bety <b>odrzuca</b> opis: według tekstu Copilota aplikacja <em>„wspiera twoje zdrowie psychiczne”</em>. To brzmi jak twierdzenie medyczne, a w celu go nie ma.</li>
+		<li data-stage="evidence">Poprawiasz opis na podstawie celu, słowo w słowo, uczciwie wypełniasz deklarację dotyczącą zdrowia i tworzysz privacy labels na podstawie inwentaryzacji danych.</li>
+		<li data-stage="release" data-result="pass">Zatwierdzone. Uczestnicy dostają aplikację przez TestFlight i closed testing w Google Play. Build w TestFlight wygasa po 90 dniach, więc w półrocznym badaniu trzeba zaplanować nowy build.</li>
+		<li data-stage="pilot">30-dniowy pilotaż z dziesięcioma uczestnikami. Kryteria sukcesu ustalone z Anną <b>przed</b> startem: uczestnicy znajdują kontakt bez pomocy, zero incydentów z danymi, mniej telefonów do wsparcia w sprawie wersji.</li>
+		<li data-stage="decision">Pilotaż spełnia kryteria. Jedna strona: koszt na uczestnika na miesiąc w porównaniu z wersją papierową. Anna decyduje: <b>go</b>.</li>
+		<li data-stage="after">Życie po starcie: jeden nowy build, zanim minie 90 dni, aktualizacje, gdy zmieniają się Android i iOS, plan na incydenty, a na koniec badania decyzja, co dzieje się z danymi.</li>
+		<li data-stage="kb">Dokumentacja techniczna jest na bieżąco aktualizowana. Kiedy następna wersja zaczyna się w części 1, zaczyna się od tych zapisów.</li>
+	</ol>
+</div>
+
+<script>
+	import '../../scripts/sdlc.js';
+</script>

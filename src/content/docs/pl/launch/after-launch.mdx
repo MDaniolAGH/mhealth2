@@ -1,0 +1,98 @@
+---
+title: '5. Po wprowadzeniu na rynek'
+description: Monitorowanie i incydenty, aktualizacje, gdy zmieniają się platformy i biblioteki, zmiany, które wymagają ponownego sprawdzenia, mierzenie bez wycieku danych o zdrowiu i koniec badania.
+---
+
+import Sorter from '../../../../components/Sorter.astro';
+import Quiz from '../../../../components/Quiz.astro';
+import Predict from '../../../../components/Predict.astro';
+import Checklist from '../../../../components/Checklist.astro';
+import Tldr from '../../../../components/Tldr.astro';
+import AtWork from '../../../../components/AtWork.astro';
+import Done from '../../../../components/Done.astro';
+
+<Tldr minutes={6} items={["Start aplikacji to początek pracy, a nie jej koniec.", "Platformy, biblioteki i sklepy zmieniają się co roku; twoja aplikacja musi za nimi nadążać.", "Zaplanuj też koniec: co stanie się z danymi, gdy badanie się skończy."]} />
+
+## Incydenty
+
+Coś na pewno pójdzie nie tak: błąd w kodzie, zgubiony telefon, log, który wyciekł. Liczy się to, żeby **z góry** wiedzieć, kto co robi.
+
+- **Jeśli to wyrób medyczny:** nadzór po wprowadzeniu do obrotu jest obowiązkiem prawnym (art. 83–86 MDR), a poważne incydenty trzeba zgłaszać (art. 87).
+- **W każdej aplikacji z danymi osobowymi:** administrator danych musi zgłosić naruszenie ochrony danych osobowych organowi ochrony danych w ciągu **72 godzin** od chwili, gdy się o nim dowiedział (art. 33 RODO), a czasem zawiadomić też osoby, których ono dotyczy. W Polsce tym organem jest UODO.
+
+Zapisz, kto zauważa, kto decyduje, kto zgłasza i z kim da się skontaktować w piątek wieczorem. Potem zaktualizuj dokumentację ryzyka: każdy incydent to zagrożenie, o którym teraz już wiesz.
+
+## Aktualizacje nigdy się nie kończą
+
+<Predict id="drift" question="Przez rok nic nie zmieniasz w Mood Trackerze. Czy będzie działał tak jak teraz?">
+
+Raczej nie. W ciągu roku Android i iOS dostaną nowe wersje, a sklepy podniosą wymagania (Google Play wymaga, żeby aplikacje były kierowane na niedawną wersję Androida, a ta granica przesuwa się co roku). Biblioteki dostaną poprawki bezpieczeństwa, a część z nich musisz wdrożyć. Buildy w TestFlight wygasają po 90 dniach. Aplikacja, którą nikt się nie opiekuje, powoli przestaje działać albo staje się niebezpieczna. Zaplanuj w business case budżet na utrzymanie.
+
+</Predict>
+
+- **Platformy:** nowe wersje Androida i iOS, nowe zasady sklepów, coroczne przesunięcie docelowego API level Androida.
+- **Biblioteki (SOUP):** śledź komunikaty o bezpieczeństwie, aktualizuj świadomie, uruchamiaj cały gate i testy, aktualizuj listę SOUP.
+- **Twoje własne narzędzia:** przypięte wersje Fluttera i Pythona, żeby build za pół roku był tym samym buildem.
+
+## Które zmiany wymagają ponownego sprawdzenia?
+
+<Sorter
+	title="Po starcie klinika prosi o zmiany. Które z nich wymagają ponownego przyjrzenia się intended purpose (i może kwalifikacji)?"
+	bins={[
+		{ key: 'yes', label: 'Nowe sprawdzenie celu', tone: 'you' },
+		{ key: 'no', label: 'Zwykły proces zmiany', tone: 'tool' },
+	]}
+	items={[
+		{ text: 'Nowy motyw kolorystyczny', bin: 'no', why: 'Zmienia to, jak aplikacja wygląda, a nie to, do czego służy.' },
+		{ text: 'Komunikat, który na podstawie wpisów uczestnika sugeruje kontakt z lekarzem', bin: 'yes', why: 'Zalecanie działania na podstawie danych o zdrowiu to dokładnie ten rodzaj funkcji, który może zrobić z oprogramowania wyrób medyczny.' },
+		{ text: 'Aktualizacja biblioteki, która łata lukę bezpieczeństwa', bin: 'no', why: 'Zwykła zmiana, ale nie mała: lista SOUP, pełne testy, release notes.' },
+		{ text: 'Nowy opis w sklepie napisany przez dział marketingu', bin: 'yes', why: 'Cel jest deklarowany także w sklepie. Nowy tekst może deklarować nowy cel.' },
+		{ text: 'Wymiana modelu AI w funkcji, która podsumowuje wpisy', bin: 'yes', why: 'Inny model może się inaczej zachowywać: oceń go ponownie jako zmianę produktu, mając na uwadze cel.' },
+	]}
+/>
+
+## Mierzenie bez wycieku
+
+Zespoły produktowe mierzą wszystko: aktywację, retencję, lejki, testy A/B, nagrania sesji. Przy danych o zdrowiu większość typowych narzędzi to problem: wysyłają to, co dzieje się w aplikacji, do zewnętrznej firmy. Mierz to, czego potrzebujesz do decyzji, przy jak najmniejszej ilości danych: liczniki na własnym serwerze, zagregowane, bez treści wpisów, uzgodnione z administratorem danych. Test A/B funkcji związanej ze zdrowiem na uczestnikach zaczyna przypominać badanie naukowe i może wymagać tych samych zgód co badanie.
+
+## Koniec badania
+
+Badanie kończy się w lipcu. Zdecyduj wcześnie, razem z administratorem danych:
+
+<Checklist
+	id="end-of-study"
+	title="Plan na koniec badania"
+	items={[
+		'Co dzieje się z danymi: zostają (gdzie, jak długo, po co) albo są usuwane (jak i z jakim dowodem)',
+		'Uczestnicy wiedzą, co stanie się z ich danymi i z aplikacją',
+		'Aplikacja usunięta z kanału beta albo buildy celowo zostawione do wygaśnięcia',
+		'Serwer i kopie zapasowe wyłączone albo przekazane, a dostępy odebrane',
+		'Dokumentacja techniczna zarchiwizowana, żeby następne badanie mogło od niej zacząć',
+	]}
+/>
+
+<Quiz
+	question="Cztery miesiące po starcie uczestnik zgłasza, że aplikacja przez chwilę pokazała mu wpisy innego uczestnika. Co robisz najpierw?"
+	options={[
+		'Szybko naprawiasz błąd i wypuszczasz nowy build',
+		'Od razu informujesz administratora danych, żeby zdążył w ciągu 72 godzin z ewentualnym zgłoszeniem naruszenia',
+		'Pytasz Copilota, czy to się liczy jako naruszenie',
+		'Czekasz na drugie zgłoszenie, żeby mieć pewność',
+	]}
+	answer={1}
+	why={[
+		'Naprawa jest ważna, ale termin na zgłoszenie liczy się od chwili, gdy administrator danych się o tym dowie. Zrób jedno i drugie, w tej kolejności.',
+		'',
+		'To, czy naruszenie trzeba zgłosić, ocenia administrator danych razem ze swoim inspektorem ochrony danych. Agent nie może wziąć na siebie tej odpowiedzialności.',
+		'Czekanie może sprawić, że klinika nie zmieści się w 72 godzinach.',
+	]}
+	explain="Zobaczenie cudzych danych o zdrowiu to możliwe naruszenie ochrony danych osobowych. O zgłoszeniu decyduje administrator danych, w ciągu 72 godzin; twoje zadanie to natychmiast go poinformować, zabezpieczyć dowody, a dopiero potem naprawić i przetestować."
+/>
+
+<AtWork>Zespoły ufają ludziom, którzy myślą o utrzymaniu, incydentach i końcu projektu, zanim ktokolwiek o to zapyta. To też właśnie odróżnia demo od produktu.</AtWork>
+
+:::tip[Zrób to w swoim projekcie]
+Napisz dla klienta pół strony pod tytułem „Po wprowadzeniu na rynek”: kto zajmuje się incydentami i jak szybko, jakich aktualizacji spodziewasz się w ciągu roku, które zmiany wymagałyby ponownego sprawdzenia celu i jaki jest plan na koniec badania. Wpisz koszt tego wszystkiego do swojego business case'u.
+:::
+
+<Done />

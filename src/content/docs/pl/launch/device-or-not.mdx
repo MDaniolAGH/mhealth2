@@ -1,0 +1,117 @@
+---
+title: '1. Wyrób medyczny czy nie?'
+description: Jak intended purpose decyduje o tym, czy aplikacja zdrowotna jest wyrobem medycznym, jaką miałaby klasę i czego wymaga każda ścieżka.
+---
+
+import Picker from '../../../../components/Picker.astro';
+import Quiz from '../../../../components/Quiz.astro';
+import Predict from '../../../../components/Predict.astro';
+import Scene from '../../../../components/Scene.astro';
+import Tldr from '../../../../components/Tldr.astro';
+import AtWork from '../../../../components/AtWork.astro';
+import Done from '../../../../components/Done.astro';
+
+<Tldr minutes={7} items={["Kwalifikacja: czy to w ogóle wyrób medyczny? Decydują cel i funkcje.", "Klasyfikacja: jeśli tak, reguła 11 MDR wyznacza klasę, a klasa – ścieżkę.", "Decyduje klient, razem z ekspertem. Ty przygotowujesz fakty."]} />
+
+Intended purpose znasz już z [części 1](../../product/purpose/). Tutaj zobaczysz, co z niego wynika. Dwa pytania, w tej kolejności:
+
+1. **Kwalifikacja:** czy oprogramowanie jest w ogóle wyrobem medycznym?
+2. **Klasyfikacja:** jeśli tak, to jakiej klasy? Klasa decyduje o tym, kto musi je sprawdzić, zanim będzie można je sprzedać albo dać pacjentom.
+
+## Kwalifikacja
+
+Według unijnego rozporządzenia w sprawie wyrobów medycznych (MDR) oprogramowanie jest wyrobem medycznym, jeśli wytwórca przeznacza je do **celu medycznego**: między innymi do diagnozy, zapobiegania, monitorowania, przewidywania, prognozowania, leczenia albo łagodzenia choroby. Liczy się deklarowany cel i to, co oprogramowanie **robi**:
+
+| Zwykle samo nie robi z aplikacji wyrobu | Może zrobić z aplikacji wyrób |
+|---|---|
+| przechowywanie tego, co wpisał użytkownik | interpretowanie tego (wyniki punktowe, poziomy ryzyka) |
+| pokazywanie tego z powrotem, tak jak zostało wpisane | alarmowanie kogoś na tej podstawie |
+| proste wyszukiwanie i sortowanie | zalecanie działania dotyczącego czyjegoś zdrowia |
+| ogólne treści o dobrym samopoczuciu i stylu życia | wszystko, co jest skierowane na konkretną chorobę |
+
+To **klient** jest wytwórcą i to on podejmuje decyzję, zwykle razem z ekspertem od regulacji. Twoje zadanie to dać mu fakty: cel w czterech linijkach, listę funkcji i to, co każda funkcja robi z danymi o zdrowiu. W Polsce organem właściwym w sprawach wyrobów medycznych jest URPL (*Urząd Rejestracji Produktów Leczniczych, Wyrobów Medycznych i Produktów Biobójczych*).
+
+<Scene
+	title="Piątek: notatka o kwalifikacji"
+	messages={[
+		{ who: 'you', name: 'Ty', text: '@Copilot czy Mood Tracker jest wyrobem medycznym?' },
+		{ who: 'agent', name: 'Copilot', text: 'Nie. To aplikacja wellness, więc nie podlega regulacjom dla wyrobów medycznych.' },
+		{ who: 'you', name: 'Ty', text: 'Takiego werdyktu nie możesz wydać. Wypisz funkcje aplikacji i przy każdej napisz, czy przechowuje, pokazuje, interpretuje, alarmuje czy zaleca, z plikiem i linią.' },
+		{ who: 'agent', name: 'Copilot', text: 'Funkcje: zapisanie nastroju (przechowuje), lista wpisów (pokazuje), ekran About (pokazuje)… Żadna funkcja nie interpretuje, nie alarmuje i nie zaleca.' },
+		{ who: 'you', name: 'Ty', text: 'Dobrze. To trafia do notatki jako fakty. Decyzję podejmie doradca Anny do spraw regulacji.' },
+	]}
+/>
+
+<span id="route" class="stage-anchor"></span>
+
+## Klasyfikacja i ścieżka
+
+Jeśli oprogramowanie jest wyrobem, jego klasę wyznacza **reguła 11** z załącznika VIII do MDR:
+
+- Oprogramowanie, które dostarcza informacji używanych do podejmowania decyzji diagnostycznych lub terapeutycznych: **klasa IIa**, albo **IIb**, jeśli te decyzje mogą spowodować poważne pogorszenie stanu zdrowia lub interwencję chirurgiczną, albo **III**, jeśli mogą spowodować śmierć lub nieodwracalne pogorszenie stanu zdrowia.
+- Oprogramowanie, które monitoruje procesy fizjologiczne: **IIa**, albo **IIb** dla parametrów życiowych, których zmiana może oznaczać bezpośrednie zagrożenie.
+- Całe pozostałe oprogramowanie: **klasa I**.
+
+Klasa wyznacza ścieżkę. Wybierz jedną i zobacz, co ze sobą niesie:
+
+<Picker
+	title="Czego wymaga każda ścieżka"
+	intro="Uproszczony przegląd do planowania, nie porada prawna. Prawdziwe projekty opierają się na MDR i wytycznych do niego (MDCG 2019-11 dla oprogramowania), z ekspertem od regulacji."
+	initial="no"
+	paths={[
+		{ key: 'no', label: 'To nie wyrób', tone: 'client', summary: 'Żadnych obowiązków z MDR. Cała reszta nadal obowiązuje.', items: [
+			'Zachowaj notatkę o kwalifikacji i powtórz kwalifikację przy każdej zmianie funkcji albo celu',
+			'RODO: wpisy o nastroju to dane o zdrowiu (art. 9); inwentaryzacja danych, podstawa prawna, może DPIA',
+			'Bezpieczeństwo: OWASP MASVS dla aplikacji, API Top 10 dla serwera',
+			'Opis w sklepie i deklaracje zdrowotne, które nie obiecują nic ponad cel',
+			'Plan na incydenty, aktualizacje i koniec badania',
+		] },
+		{ key: 'one', label: 'Klasa I', tone: 'audit', summary: 'Zgodność deklarujesz samodzielnie, bez jednostki notyfikowanej. To nadal mnóstwo pracy.', items: [
+			'System zarządzania jakością (MDR go wymaga; zwykle według normy ISO 13485)',
+			'Dokumentacja techniczna (załączniki II i III do MDR)',
+			'Zarządzanie ryzykiem (ISO 14971), cykl życia oprogramowania (IEC 62304), inżynieria użyteczności (IEC 62366-1)',
+			'Ocena kliniczna: dowody, że oprogramowanie robi to, co obiecuje',
+			'Deklaracja zgodności UE i oznakowanie CE; rejestracja (EUDAMED, UDI)',
+			'Osoba odpowiedzialna za zgodność regulacyjną; nadzór po wprowadzeniu do obrotu i obserwacja (vigilance)',
+		] },
+		{ key: 'two', label: 'Klasa IIa lub wyższa', tone: 'you', summary: 'Jednostka notyfikowana ocenia system jakości i dokumentację techniczną, zanim wyrób będzie mógł trafić na rynek.', items: [
+			'Wszystko z listy dla klasy I',
+			'Ocena przez jednostkę notyfikowaną, z certyfikatami i regularnymi audytami',
+			'Okresowe raporty o bezpieczeństwie (PSUR)',
+			'Czas i koszt liczone w miesiącach albo latach, nie w tygodniach',
+			'Każda istotna zmiana może wymagać ponownej oceny przez jednostkę notyfikowaną',
+		] },
+	]}
+/>
+
+<Predict id="narrow" question="Klinika bardzo chciałaby funkcję, która proponuje ćwiczenie oddechowe za każdym razem, gdy uczestnik zgłasza niepokój. Zalecanie działania na podstawie danych o zdrowiu może przesunąć aplikację w stronę wyrobu. Jakie opcje ma klient?">
+
+Co najmniej trzy. **Pójść ścieżką wyrobu medycznego**, z jej kosztem i czasem. **Zawęzić funkcję** tak, żeby nie reagowała na dane o zdrowiu – na przykład ćwiczenie oddechowe, które każdy może otworzyć w dowolnej chwili, takie samo dla wszystkich. Albo **oddać decyzję człowiekowi**: zespół badawczy przegląda wpisy według własnych procedur klinicznych, poza aplikacją. Która opcja jest właściwa, decyduje klient razem z ekspertem, ale wszystkie trzy powinny trafić na stół – i to twoje zadanie. To pętla „wyrób? → zawęź cel” na mapie.
+
+</Predict>
+
+<Quiz
+	question="Aplikacja zapisuje, jak czują się uczestnicy, i raz w tygodniu pokazuje im listę ich wpisów, dokładnie tak, jak je wpisali. W opisie w sklepie stoi „pomaga pacjentom radzić sobie z depresją”. Co jest najważniejsze dla kwalifikacji?"
+	options={[
+		'To, że kod tylko przechowuje i pokazuje dane',
+		'To, że zespół badawczy nie będzie czytał wpisów',
+		'To, że opis w sklepie deklaruje cel medyczny',
+		'To, że aplikację można pobrać za darmo',
+	]}
+	answer={2}
+	why={[
+		'Funkcje mają znaczenie, ale deklarowany cel też się liczy. Tutaj tekst obiecuje więcej, niż robi kod.',
+		'To, kto czyta wpisy, nie zmienia tego, do czego według wytwórcy służy aplikacja.',
+		'',
+		'Cena nie ma nic wspólnego z kwalifikacją.',
+	]}
+	explain="Kwalifikacja patrzy na cel deklarowany przez wytwórcę – wszędzie, gdzie go deklaruje, także w sklepie. Popraw tekst, bo inaczej ten sam kod może zostać uznany za wyrób medyczny."
+/>
+
+<AtWork>W firmach digital health cenią ludzi, którzy potrafią napisać jasną, jednostronicową notatkę o kwalifikacji (cel, funkcje, uzasadnienie, otwarte pytania). Taka notatka oszczędza też czas ekspertów.</AtWork>
+
+:::tip[Zrób to w swoim projekcie]
+Uruchom `/mh-intended-purpose` dla głównej funkcji ze swojego briefu. Zrób z wyniku jednostronicową notatkę: cel w czterech linijkach, tabelę funkcji (przechowuje, pokazuje, interpretuje, alarmuje, zaleca) i pytania do klienta. Nie pisz werdyktu.
+:::
+
+<Done />

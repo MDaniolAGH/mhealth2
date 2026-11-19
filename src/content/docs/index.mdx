@@ -1,55 +1,79 @@
 ---
 title: 'Mobile Apps in Medicine - From Idea to Market'
-description: 'Mobile apps in medicine, from idea to market: how to build software with coding agents, from a client''s brief to a merged pull request.'
+description: 'Mobile apps in medicine, from idea to market: discover what to build, build it with coding agents, and take it to market, step by step with one running example.'
 template: splash
 hero:
   title: 'Mobile Apps in Medicine'
   image:
     file: ../../assets/hero.svg
-  tagline: '<b>From Idea to Market</b> · A coding agent writes a Flutter screen in minutes. This guide is about everything else: deciding what to build and why, giving the agent what it needs, checking what it did, and explaining it months later.'
+  tagline: '<b>From Idea to Market</b> · How a health app goes from a client''s email to people''s phones: deciding what to build, building it with an agent at your side, and launching it safely. One running example: Anna''s clinic and the Mood Tracker.'
   actions:
-    - text: Start with the map
-      link: ai-sdlc/overview/
+    - text: Start with Part 1
+      link: product/overview/
       icon: right-arrow
-    - text: Jump to the templates
-      link: ai-sdlc/templates/
+    - text: How LLMs work
+      link: extra/how-llms-work/
       variant: minimal
 ---
 
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 import Progress from '../../components/Progress.astro';
 
-## Part 1 · The AI SDLC: from idea to merge
+## Part 1 · Discover: from brief to decision
 
-The guide follows **one feature**, an About screen for the Mood Tracker you took over, from a sketch to a merged pull request. At every stage it shows who does the work, what goes in, what comes out, and what checks it. Each page has something to try, a few questions to check yourself, and a task for your own project.
-
-<CardGrid>
-	<LinkCard title="The pipeline at a glance" description="The whole process on one interactive map. Start here. (5 min)" href="ai-sdlc/overview/" />
-	<LinkCard title="1. From a prompt to an agent" description="Model, harness, tools, and why every tool is also a way in. (6 min)" href="ai-sdlc/agents/" />
-	<LinkCard title="2. Context" description="What the agent knows, and what it costs. Build a context. (5 min)" href="ai-sdlc/context/" />
-	<LinkCard title="3. Project knowledge" description="What the plan is built on: architecture, decisions, notes, the client's words. (5 min)" href="ai-sdlc/knowledge/" />
-	<LinkCard title="4. AGENTS.md" description="The project's rules for agents, from a request to enforcement. (4 min)" href="ai-sdlc/agents-md/" />
-	<LinkCard title="5. Stage by stage" description="The worked example in three parts: idea to plan, code and the gate, tests to merge. (20 min)" href="ai-sdlc/idea-to-plan/" />
-	<LinkCard title="6. Auditability" description="Walk back from a line of code to the goal. Break a link and see what is lost. (4 min)" href="ai-sdlc/auditability/" />
-	<LinkCard title="7. Templates" description="AGENTS.md, ARCHITECTURE.md, ADR, NOTES.md, spec, commit, pull request: ready to copy." href="ai-sdlc/templates/" />
-</CardGrid>
-
-## Part 2 · Product development with agents
-
-The business side: from a client's message to user stories and a one-page recommendation, with an agent drafting and you deciding. Meet Anna, the study coordinator, and follow her request on an interactive map: this is where issue #7 comes from.
+From a client's message to user stories and a one-page recommendation. Meet Anna, the study coordinator, and follow her request on an interactive map, with an agent drafting and you deciding.
 
 <CardGrid>
-	<LinkCard title="From brief to backlog" description="The product map: follow Anna's request from an email to a decision. (6 min)" href="product/overview/" />
+	<LinkCard title="From brief to decision: the map" description="Follow Anna's request from an email to a decision. Start here. (6 min)" href="product/overview/" />
 	<LinkCard title="1. Decision, facts, people" description="The decision before the solution; facts, assumptions, synthetic users; stakeholders. (7 min)" href="product/decision-and-facts/" />
 	<LinkCard title="2. Intended purpose" description="Diary or medical device? One sentence decides. (5 min)" href="product/purpose/" />
-	<LinkCard title="3. Questions and observations" description="Questions that change the answer; what the app really does. (5 min)" href="product/questions-and-observation/" />
+	<LinkCard title="3. Questions and observations" description="Questions that change the answer; the client meeting; what the app really does. (6 min)" href="product/questions-and-observation/" />
 	<LinkCard title="4. User stories" description="From need to story, with a source for each. Fix an agent-written story. (5 min)" href="product/user-stories/" />
 	<LinkCard title="5. Testable, ranked, split" description="Given/When/Then, INVEST, MoSCoW, splitting, words with one meaning. (6 min)" href="product/testable-stories/" />
 	<LinkCard title="6. Options and recommendation" description="Hard limits, total cost, three-point estimates, one page. (8 min)" href="product/options-and-recommendation/" />
 </CardGrid>
 
+## Part 2 · Build: the AI SDLC
+
+The chosen feature, an About screen, from a sketch to a merged pull request: who does the work at every stage, what goes in, what comes out, and what checks it.
+
+<CardGrid>
+	<LinkCard title="The pipeline at a glance" description="The whole process on one interactive map. (5 min)" href="ai-sdlc/overview/" />
+	<LinkCard title="1. From a prompt to an agent" description="Model, harness, tools, and why every tool is also a way in. (6 min)" href="ai-sdlc/agents/" />
+	<LinkCard title="2. Context" description="What the agent knows, and what it costs. Build a context. (5 min)" href="ai-sdlc/context/" />
+	<LinkCard title="3. Project knowledge" description="What the plan is built on: architecture, decisions, notes, the client's words. (5 min)" href="ai-sdlc/knowledge/" />
+	<LinkCard title="4. AGENTS.md" description="The project's rules for agents, from a request to enforcement. (4 min)" href="ai-sdlc/agents-md/" />
+	<LinkCard title="5. Stage by stage" description="Idea to plan, code and the gate, tests to merge. (20 min)" href="ai-sdlc/idea-to-plan/" />
+	<LinkCard title="6. Auditability" description="Walk back from a line of code to the goal. (4 min)" href="ai-sdlc/auditability/" />
+	<LinkCard title="7. Templates" description="AGENTS.md, ARCHITECTURE.md, ADR, NOTES.md, spec, commit, pull request: ready to copy." href="ai-sdlc/templates/" />
+</CardGrid>
+
+## Part 3 · Launch: to market and after
+
+From "it works on my phone" to fifty participants using it safely for six months: medical device or not, health data and security, release, the business case, and life after launch.
+
+<CardGrid>
+	<LinkCard title="The route to market: the map" description="Take the Mood Tracker to the clinic's next group, including a store rejection. (6 min)" href="launch/overview/" />
+	<LinkCard title="1. Medical device or not?" description="Qualification, MDR Rule 11 classes, and what each route requires. (7 min)" href="launch/device-or-not/" />
+	<LinkCard title="2. Data, risk and security" description="Health data and the GDPR, a risk file from harm, MASVS, the evidence pack. (8 min)" href="launch/privacy-and-security/" />
+	<LinkCard title="3. Release" description="Beta channels, store review, privacy labels, builds, a release checklist. (7 min)" href="launch/release/" />
+	<LinkCard title="4. Business case and pilot" description="A cost calculator, a pilot with criteria fixed first, go or no-go. (6 min)" href="launch/business-case/" />
+	<LinkCard title="5. After launch" description="Incidents, updates, changes that need a new check, the end of the study. (6 min)" href="launch/after-launch/" />
+</CardGrid>
+
+<LinkCard title="Extra · How LLMs work" description="A visual tour after Andrej Karpathy's lecture: a live tokenizer, a next-token sampler, base models and assistants, hallucinations. (15 min)" href="extra/how-llms-work/" />
+
 <Progress parts={[
-	{ title: 'Part 1 · AI SDLC', pages: [
+	{ title: 'Part 1 · Discover', pages: [
+		{ slug: 'product/overview/', label: 'From brief to decision: the map' },
+		{ slug: 'product/decision-and-facts/', label: '1. Decision, facts, people' },
+		{ slug: 'product/purpose/', label: '2. Intended purpose' },
+		{ slug: 'product/questions-and-observation/', label: '3. Questions and observations' },
+		{ slug: 'product/user-stories/', label: '4. User stories' },
+		{ slug: 'product/testable-stories/', label: '5. Testable, ranked, split' },
+		{ slug: 'product/options-and-recommendation/', label: '6. Options and recommendation' },
+	] },
+	{ title: 'Part 2 · Build', pages: [
 		{ slug: 'ai-sdlc/overview/', label: 'The pipeline at a glance' },
 		{ slug: 'ai-sdlc/agents/', label: '1. From a prompt to an agent' },
 		{ slug: 'ai-sdlc/context/', label: '2. Context' },
@@ -60,25 +84,27 @@ The business side: from a client's message to user stories and a one-page recomm
 		{ slug: 'ai-sdlc/tests-to-merge/', label: '5c. Tests to merge' },
 		{ slug: 'ai-sdlc/auditability/', label: '6. Auditability' },
 	] },
-	{ title: 'Part 2 · Product development', pages: [
-		{ slug: 'product/overview/', label: 'From brief to backlog' },
-		{ slug: 'product/decision-and-facts/', label: '1. Decision, facts, people' },
-		{ slug: 'product/purpose/', label: '2. Intended purpose' },
-		{ slug: 'product/questions-and-observation/', label: '3. Questions and observations' },
-		{ slug: 'product/user-stories/', label: '4. User stories' },
-		{ slug: 'product/testable-stories/', label: '5. Testable, ranked, split' },
-		{ slug: 'product/options-and-recommendation/', label: '6. Options and recommendation' },
+	{ title: 'Part 3 · Launch', pages: [
+		{ slug: 'launch/overview/', label: 'The route to market: the map' },
+		{ slug: 'launch/device-or-not/', label: '1. Medical device or not?' },
+		{ slug: 'launch/privacy-and-security/', label: '2. Data, risk and security' },
+		{ slug: 'launch/release/', label: '3. Release' },
+		{ slug: 'launch/business-case/', label: '4. Business case and pilot' },
+		{ slug: 'launch/after-launch/', label: '5. After launch' },
+	] },
+	{ title: 'Extra', pages: [
+		{ slug: 'extra/how-llms-work/', label: 'How LLMs work' },
 	] },
 ]} />
 
 ## How to use this guide
 
 <CardGrid>
-	<Card title="Before W3" icon="open-book">
-		Read the map and sections 1 to 4 of Part 1. They build on W2: how a model works, context, and your pair's `AGENTS.md`.
+	<Card title="Follow the lifecycle" icon="open-book">
+		Discover, build, launch: the parts follow the course from W1 to W6. Each page starts with a TL;DR and ends with a task for your own project.
 	</Card>
 	<Card title="During the labs" icon="laptop">
-		Keep section 5 open while you work on your client's brief. Each stage says what it should leave behind.
+		Keep the map of the part you are working on open. Each stage says what it should leave behind for your dossier.
 	</Card>
 	<Card title="Predict, then check" icon="pencil">
 		Boxes marked **Predict first** ask you to commit to an answer before you see ours. Your answers stay in your browser only.

@@ -1,0 +1,91 @@
+---
+/**
+ * Live tokenizer: the real GPT-4o (o200k_base) and GPT-4 (cl100k_base)
+ * encodings, run in the browser (gpt-tokenizer). The encoding tables are
+ * loaded only on the page that uses this component.
+ */
+import { t } from '../i18n/ui';
+interface Props {
+	presets: { label: string; text: string }[];
+}
+const { presets } = Astro.props;
+const T = t(Astro);
+---
+
+<div class="biz-widget tok not-content" data-loading={T.tokLoading}>
+	<div class="biz-head">
+		<p class="biz-kicker">{T.tokKicker}</p>
+		<label class="tok__enc">
+			{T.tokEncoding}
+			<select>
+				<option value="o200k">GPT-4o · o200k_base</option>
+				<option value="cl100k">GPT-4 · cl100k_base</option>
+			</select>
+		</label>
+	</div>
+	<div class="tok__presets">
+		{presets.map((p) => <button type="button" class="tok__preset" data-text={p.text}>{p.label}</button>)}
+	</div>
+	<textarea class="tok__input" rows="3" placeholder={T.tokPlaceholder} aria-label={T.tokPlaceholder}>{presets[0]?.text}</textarea>
+	<div class="tok__stats">
+		<span><b data-s="tokens">–</b> {T.tokTokens}</span>
+		<span><b data-s="chars">–</b> {T.tokChars}</span>
+		<span><b data-s="ratio">–</b> {T.tokPerToken}</span>
+		<label class="tok__idsw"><input type="checkbox" /> {T.tokIds}</label>
+	</div>
+	<div class="tok__out" aria-live="polite"></div>
+</div>
+
+<script>
+	type Enc = { encode: (s: string) => number[]; decode: (t: number[]) => string };
+	const cache: Record<string, Promise<Enc>> = {};
+	const load = (name: string) =>
+		(cache[name] ??= (name === 'cl100k'
+			? import('gpt-tokenizer/encoding/cl100k_base')
+			: import('gpt-tokenizer/encoding/o200k_base')) as Promise<Enc>);
+
+	document.querySelectorAll<HTMLElement>('.tok').forEach((box) => {
+		const input = box.querySelector<HTMLTextAreaElement>('.tok__input')!;
+		const select = box.querySelector<HTMLSelectElement>('select')!;
+		const out = box.querySelector<HTMLElement>('.tok__out')!;
+		const ids = box.querySelector<HTMLInputElement>('.tok__idsw input')!;
+		const stat = (k: string, v: string) => (box.querySelector<HTMLElement>(`[data-s="${k}"]`)!.textContent = v);
+		let seq = 0;
+		const render = async () => {
+			const my = ++seq;
+			out.textContent = box.dataset.loading || '…';
+			const enc = await load(select.value);
+			if (my !== seq) return;
+			const text = input.value;
+			const tokens = enc.encode(text);
+			out.textContent = '';
+			tokens.forEach((id, i) => {
+				const span = document.createElement('span');
+				span.className = `tok__t c${i % 6}`;
+				const piece = enc.decode([id]);
+				span.textContent = piece.replace(/ /g, '·').replace(/\n/g, '↵') || '∅';
+				span.title = `#${i + 1} · id ${id}`;
+				if (ids.checked) {
+					const small = document.createElement('small');
+					small.textContent = String(id);
+					span.appendChild(small);
+				}
+				out.appendChild(span);
+			});
+			const chars = [...text].length;
+			stat('tokens', String(tokens.length));
+			stat('chars', String(chars));
+			stat('ratio', tokens.length ? (chars / tokens.length).toFixed(1) : '–');
+		};
+		input.addEventListener('input', render);
+		select.addEventListener('change', render);
+		ids.addEventListener('change', render);
+		box.querySelectorAll<HTMLButtonElement>('.tok__preset').forEach((b) =>
+			b.addEventListener('click', () => {
+				input.value = b.dataset.text || '';
+				render();
+			}),
+		);
+		render();
+	});
+</script>

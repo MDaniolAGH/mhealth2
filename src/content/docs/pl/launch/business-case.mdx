@@ -1,0 +1,84 @@
+---
+title: '4. Business case i pilotaż'
+description: Całkowity koszt posiadania, koszt na uczestnika na miesiąc, pilotaż z kryteriami sukcesu ustalonymi z góry i decyzja go/no-go, w której „nie” to prawdziwa opcja.
+---
+
+import CostCalc from '../../../../components/CostCalc.astro';
+import Quiz from '../../../../components/Quiz.astro';
+import Predict from '../../../../components/Predict.astro';
+import Scene from '../../../../components/Scene.astro';
+import Tldr from '../../../../components/Tldr.astro';
+import AtWork from '../../../../components/AtWork.astro';
+import Done from '../../../../components/Done.astro';
+
+<Tldr minutes={6} items={["Całkowity koszt = jednorazowa praca + koszty działania + czas samego klienta.", "Koszt na uczestnika na miesiąc pozwala porównywać opcje.", "Ustal kryteria sukcesu pilotażu, zanim się zacznie. „Nie” to pełnoprawny wynik."]} />
+
+## Ile to naprawdę kosztuje?
+
+Zbudowanie aplikacji to część widoczna. O kosztach działania ludzie zapominają: hosting, wsparcie, aktualizacje, gdy zmieniają się Android i iOS, opłaty w sklepach i czas pracowników klienta. **Całkowity koszt posiadania** (TCO) sumuje je przez cały okres używania, a **koszt na uczestnika na miesiąc** pozwala porównać go z alternatywami z [części 1](../../product/options-and-recommendation/), łącznie z papierem.
+
+<Predict id="running" question="Badanie kliniki: 50 uczestników przez pół roku. Jak dużą część całkowitego kosztu stanowią według ciebie koszty działania, już po zbudowaniu aplikacji?">
+
+Przy przykładowych liczbach poniżej około **40%** – i to tylko przez pół roku. Dłuższe badania, więcej wsparcia albo więcej aktualizacji podbijają ten udział. Sprawdź: zmień liczbę miesięcy na 24 albo godziny wsparcia na 15 i zobacz, jak zmienia się udział i koszt na uczestnika.
+
+</Predict>
+
+<CostCalc title="Mood Tracker dla następnej grupy kliniki (przykładowe liczby; zmień je)" oneOff={60} rate={150} hosting={50} support={6} fees={500} people={50} months={6} />
+
+Każda liczba tutaj to założenie, więc tak ją traktuj: zapisz, skąd się wzięła (wycena, log, zgadywanie), i podaj wynik jako **przedział**, korzystając z estymacji trzypunktowych z części 1. Linijki *Time* w twoim logu agenta to prawdziwe dane do pola „jednorazowa praca”.
+
+<span id="pilot" class="stage-anchor"></span>
+
+## Pilotaż: najpierw kryteria
+
+Pilotaż to małe, ograniczone w czasie wprowadzenie aplikacji, które odpowiada na jedno pytanie: **czy idziemy dalej?** Odpowiada na nie uczciwie tylko wtedy, gdy kryteria sukcesu zostaną uzgodnione, **zanim** ktokolwiek zobaczy wyniki. W przeciwnym razie każdy wynik da się odczytać jako sukces.
+
+<Scene
+	title="Poniedziałek: uzgadniamy pilotaż"
+	messages={[
+		{ who: 'you', name: 'Ty', text: 'Zanim pilotaż się zacznie: co sprawi, że po 30 dniach powiesz „idziemy dalej”? A co sprawi, że powiesz „stop”?' },
+		{ who: 'client', name: 'Anna', text: 'Idziemy dalej, jeśli uczestnicy znajdą kontakt bez pytania nas, a Tomek dostanie mniej telefonów o wersje. Stop przy jakimkolwiek incydencie z danymi.' },
+		{ who: 'other', name: 'Tomek', text: 'Dziś to około pięciu telefonów o wersję tygodniowo. Poniżej dwóch to byłby sukces.' },
+		{ who: 'you', name: 'Ty', text: 'Zapisane, z datą. Dziesięciu uczestników, 30 dni, te trzy kryteria. Raportujemy według nich, nawet jeśli wyjdzie „nie”.' },
+	]}
+/>
+
+```text title="docs/pilot.md (przykład)"
+Pilotaż       10 uczestników, 30 dni, od 2026-12-01
+Pytanie       Czy następna grupa 50 osób ma korzystać z aplikacji?
+Go, jeśli     8 z 10 uczestników znajduje kontakt bez pomocy (krótki telefon kontrolny)
+              pytania o wersję do zespołu wsparcia: mniej niż 2 tygodniowo
+Stop, jeśli   jakikolwiek incydent z danymi osobowymi
+Nie mierzymy  długotrwałego używania; uczestników bez smartfona
+Uzgodnione    Anna (koordynatorka), 2026-11-24
+```
+
+## Go, zmiana czy no-go
+
+Business case to jedna strona: decyzja, całkowity koszt i koszt na uczestnika na miesiąc, wyniki pilotażu w odniesieniu do kryteriów, ryzyka i alternatywy. **„Nie” to pełnoprawny wynik**: jeśli papier robi to samo taniej, rekomendacja papieru to dobra inżynieria, a nie porażka.
+
+<Quiz
+	question="Pilotaż się kończy: 6 z 10 uczestników znalazło kontakt bez pomocy (kryterium wynosiło 8), nie było incydentów, a telefonów do wsparcia jest dużo mniej. Co raportujesz?"
+	options={[
+		'Sukces: pozostałe wyniki były bardzo dobre, więc to się równoważy',
+		'Wyniki dla każdego kryterium tak, jak je uzgodniono: jedno niespełnione; potem opcje naprawy, a decyzja należy do klienta',
+		'Zmianę kryterium na 6 z 10, bo tyle osiąga większość pilotaży',
+		'Na razie nic: powtarzasz pilotaż, aż wyjdzie pozytywnie',
+	]}
+	answer={1}
+	why={[
+		'Uśrednianie dobrych i złych wyników po fakcie to dokładnie to, czemu mają zapobiegać kryteria ustalone z góry.',
+		'',
+		'Przesuwanie celu po zobaczeniu wyników odbiera pilotażowi sens.',
+		'Powtarzanie do skutku ukrywa wynik. Zaraportuj go, potem zdecydujcie.',
+	]}
+	explain="Raportuj uczciwie według kryteriów uzgodnionych z góry, zaproponuj, co mogłoby naprawić niespełnione kryterium (na przykład wyraźniejsze miejsce na kontakt), i zostaw decyzję klientowi. Dzięki temu twój następny pilotaż będzie wiarygodny."
+/>
+
+<AtWork>Business case z przedziałem, pilotaż z kryteriami ustalonymi z góry i odwaga, żeby zarekomendować „nie”: to właśnie klienci i menedżerowie zapamiętują o programiście.</AtWork>
+
+:::tip[Zrób to w swoim projekcie]
+Wpisz do kalkulatora liczby swojego klienta i przy każdej zapisz jej źródło. Naszkicuj pilotaż dla swojego briefu: jedno pytanie, dwa albo trzy kryteria sukcesu, jedno kryterium stopu, czego nie będziesz mierzyć. Zanim zrobisz cokolwiek innego, wyślij go klientowi do akceptacji.
+:::
+
+<Done />

@@ -1,0 +1,160 @@
+---
+/**
+ * The route-to-market map: ten stages from the intended purpose to life after
+ * launch, in three lanes (client, you, the outside world), with the technical
+ * file on the left and the accountability rail. Engine: src/scripts/sdlc.js.
+ */
+import { link } from '../lib/url';
+
+const s = {
+	purpose: link('product/purpose/'),
+	qualification: link('launch/device-or-not/'),
+	classification: link('launch/device-or-not/#route'),
+	privacy: link('launch/privacy-and-security/'),
+	risk: link('launch/privacy-and-security/#risk'),
+	evidence: link('launch/privacy-and-security/#evidence'),
+	release: link('launch/release/'),
+	pilot: link('launch/business-case/#pilot'),
+	decision: link('launch/business-case/'),
+	after: link('launch/after-launch/'),
+	file: link('launch/privacy-and-security/#evidence'),
+};
+
+const flows = {
+	loops: [
+		{ from: 'release', to: 'evidence', label: 'rejected → fix', kind: 'fail', layer: 'base', lane: 0.3, dy: 6 },
+		{ from: 'qualification', to: 'purpose', kind: 'loop', layer: 'loops', lane: 'near' },
+		{ from: 'pilot', to: 'purpose', label: 'criteria missed → rethink', kind: 'loop', layer: 'loops', lane: 0.62, dy: 6, wideOnly: true },
+		{ from: 'after', to: 'risk', label: 'incident → update', kind: 'loop', layer: 'loops', lane: 0.9, dy: -6, labelDy: 40, wideOnly: true },
+	],
+	kb: [
+		{ from: 'evidence', layer: 'base' },
+		{ to: 'release', layer: 'base' },
+		{ from: 'privacy', layer: 'knowledge' },
+		{ from: 'risk', layer: 'knowledge' },
+		{ to: 'decision', layer: 'knowledge' },
+		{ from: 'after', layer: 'knowledge', label: 'kept current' },
+		{ to: 'purpose', layer: 'knowledge', label: 'next version' },
+	],
+};
+---
+
+<div class="sdlc lmap not-content" data-i18n={JSON.stringify({ traced: 'Highlighted: every stage this record can be traced back through, up to the intended purpose.' })}>
+	<div class="sdlc-toolbar">
+		<div class="sdlc-toolbar__group" role="group" aria-label="Walk through the map">
+			<button type="button" class="sdlc-btn" data-action="prev" aria-label="Previous step">◀</button>
+			<button type="button" class="sdlc-btn sdlc-btn--primary" data-action="play">▶ Walk through</button>
+			<button type="button" class="sdlc-btn" data-action="next" aria-label="Next step">▶</button>
+			<span class="sdlc-toolbar__status" aria-live="polite"></span>
+		</div>
+		<div class="sdlc-toolbar__group" role="group" aria-label="Layers">
+			<span class="sdlc-legend__hint">Show:</span>
+			<button type="button" class="sdlc-chip is-loop" data-layer="loops" aria-pressed="false">Feedback loops</button>
+			<button type="button" class="sdlc-chip is-knowledge" data-layer="knowledge" aria-pressed="false">Evidence flows</button>
+			<button type="button" class="sdlc-chip is-audit" data-layer="audit" aria-pressed="false">Records</button>
+		</div>
+	</div>
+
+	<div class="sdlc-legend">
+		<span class="sdlc-legend__hint">Who:</span>
+		<button type="button" class="sdlc-chip is-client" data-actor="client" aria-pressed="false">Client (the clinic)</button>
+		<button type="button" class="sdlc-chip is-you" data-actor="you" aria-pressed="false">You and your pair</button>
+		<button type="button" class="sdlc-chip is-tool" data-actor="outside" aria-pressed="false">Outside world</button>
+	</div>
+
+	<div class="sdlc-map" role="group" aria-label="Route to market: ten stages from the intended purpose to life after launch, with the technical file on the left" data-flows={JSON.stringify(flows)}>
+		<div class="sdlc-lane is-client" style="grid-column:4" aria-hidden="true"></div>
+		<div class="sdlc-lane is-you" style="grid-column:5" aria-hidden="true"></div>
+		<div class="sdlc-lane is-tool" style="grid-column:6" aria-hidden="true"></div>
+		<div class="sdlc-lane-title is-knowledge" style="grid-column:2">File</div>
+		<div class="sdlc-lane-title is-client" style="grid-column:4">Client</div>
+		<div class="sdlc-lane-title is-you" style="grid-column:5">You</div>
+		<div class="sdlc-lane-title is-tool" style="grid-column:6">Outside</div>
+		<div class="sdlc-rail" aria-hidden="true"><span>Accountability</span><i class="sdlc-rail__fill"></i></div>
+
+		<div class="sdlc-kb is-knowledge" style="grid-row:3 / 11">
+			<a class="sdlc-kb__title" href={s.file}>Tech&shy;nical file</a>
+			<a class="sdlc-kb__doc" href={s.purpose} data-doc="purpose" data-feeds="purpose qualification classification privacy risk release">Intended purpose</a>
+			<a class="sdlc-kb__doc" href={s.privacy} data-doc="data" data-feeds="privacy release after">Data inventory &amp; DPIA</a>
+			<a class="sdlc-kb__doc" href={s.risk} data-doc="risk" data-feeds="risk release after">Risk file</a>
+			<a class="sdlc-kb__doc" href={s.evidence} data-doc="trace" data-feeds="evidence after">Traceability &amp; SOUP</a>
+			<a class="sdlc-kb__doc" href={s.evidence} data-doc="tests" data-feeds="evidence pilot">Test reports</a>
+			<a class="sdlc-kb__doc" href={s.release} data-doc="store" data-feeds="release after">Store listing</a>
+		</div>
+
+		<a class="sdlc-stage is-client-you" href={s.purpose} data-stage="purpose" data-order="1" data-actors="client you" style="--row:2;--col:4 / 6"><span class="sdlc-stage__n">1</span><span class="sdlc-stage__t">Intended purpose</span><span class="sdlc-stage__s">four lines, from Part 1</span><span class="sdlc-stage__rec">product.md</span></a>
+		<a class="sdlc-stage is-client-you" href={s.qualification} data-stage="qualification" data-order="2" data-actors="client you" style="--row:3;--col:4 / 6"><span class="sdlc-stage__n">2</span><span class="sdlc-stage__t">Device or not?</span><span class="sdlc-stage__s">qualification, with an expert</span><span class="sdlc-stage__rec">qualification memo</span></a>
+		<a class="sdlc-stage is-you-tool" href={s.classification} data-stage="classification" data-order="3" data-actors="you outside" style="--row:4;--col:5 / 7"><span class="sdlc-stage__n">3</span><span class="sdlc-stage__t">Class and route</span><span class="sdlc-stage__s">only if it is a device</span><span class="sdlc-stage__rec">route plan</span></a>
+		<a class="sdlc-stage is-client-you" href={s.privacy} data-stage="privacy" data-order="4" data-actors="client you" style="--row:5;--col:4 / 6"><span class="sdlc-stage__n">4</span><span class="sdlc-stage__t">Data and GDPR</span><span class="sdlc-stage__s">inventory · legal basis · DPIA</span><span class="sdlc-stage__rec">data inventory</span></a>
+		<a class="sdlc-stage is-you" href={s.risk} data-stage="risk" data-order="5" data-actors="you" style="--row:6;--col:5"><span class="sdlc-stage__n">5</span><span class="sdlc-stage__t">Risk and security</span><span class="sdlc-stage__s">harm first, then code</span><span class="sdlc-stage__rec">risk file</span></a>
+		<a class="sdlc-stage is-you" href={s.evidence} data-stage="evidence" data-order="6" data-actors="you" style="--row:7;--col:5"><span class="sdlc-stage__n">6</span><span class="sdlc-stage__t">Evidence pack</span><span class="sdlc-stage__s">trace, SOUP, tests</span><span class="sdlc-stage__rec">technical file</span></a>
+		<a class="sdlc-stage is-you-tool" href={s.release} data-stage="release" data-order="7" data-actors="you outside" style="--row:8;--col:5 / 7"><span class="sdlc-stage__n">7</span><span class="sdlc-stage__t">Release</span><span class="sdlc-stage__s">store listing, privacy labels, beta</span><span class="sdlc-stage__rec">release notes</span></a>
+		<a class="sdlc-stage is-client-you" href={s.pilot} data-stage="pilot" data-order="8" data-actors="client you" style="--row:9;--col:4 / 6"><span class="sdlc-stage__n">8</span><span class="sdlc-stage__t">Pilot</span><span class="sdlc-stage__s">success criteria set in advance</span><span class="sdlc-stage__rec">pilot report</span></a>
+		<a class="sdlc-stage is-client" href={s.decision} data-stage="decision" data-order="9" data-actors="client" style="--row:10;--col:4"><span class="sdlc-stage__n">9</span><span class="sdlc-stage__t">Go&nbsp;/ no&#8209;go</span><span class="sdlc-stage__s">business case, one page</span><span class="sdlc-stage__rec">business case</span></a>
+		<a class="sdlc-stage is-client-tool" href={s.after} data-stage="after" data-order="10" data-actors="client you outside" style="--row:11;--col:4 / 7"><span class="sdlc-stage__n">10</span><span class="sdlc-stage__t">After launch</span><span class="sdlc-stage__s">monitor · update · report · retire</span><span class="sdlc-stage__rec">monitoring log</span></a>
+	</div>
+
+	<div class="sdlc-panel" aria-live="polite"><p class="sdlc-panel__empty">Click a stage or a document in the technical file, or press <b>Walk through</b> to take the Mood Tracker to the clinic's next group of participants.</p></div>
+
+	<div class="sdlc-layer-info">
+		<div data-layer-info="audit"><h4>Records</h4><p>Launching is mostly about being able to show what you did and why. Every stage leaves a record someone outside can ask for: an auditor, a data protection officer, a store reviewer, the client. Click a stage to see its record.</p></div>
+		<div data-layer-info="loops"><h4>Feedback loops</h4><dl><dt>Rejected → fix</dt><dd>A store or beta review rejects the release (often for the description, not the code): fix the evidence and try again.</dd><dt>Device? Narrow the purpose</dt><dd>If the purpose makes the app a medical device, the client may narrow the purpose instead of taking the device route.</dd><dt>Criteria missed</dt><dd>The pilot misses the success criteria agreed in advance: back to the purpose and the decision, not "launch anyway".</dd><dt>Incident → update</dt><dd>Something goes wrong after launch: update the risk file and the controls.</dd></dl></div>
+		<div data-layer-info="knowledge"><h4>Evidence flows</h4><p>The technical file is the folder of records that launching depends on: purpose, data inventory, risk file, traceability, tests, store listing. The stages write into it; the release and the go/no-go decision read from it; after launch, it is kept current, and the next version starts from it.</p></div>
+	</div>
+
+	<div class="sdlc-details">
+		<div data-detail="purpose"><h4>1. Intended purpose</h4><dl><dt>Who</dt><dd>The client states it; you keep it in <code>docs/product.md</code></dd><dt>In</dt><dd>The four lines from Part 1</dd><dt>Out</dt><dd>The sentence every later stage is checked against</dd><dt>Check</dt><dd>Do the app's functions and texts match it, word for word?</dd></dl></div>
+		<div data-detail="qualification"><h4>2. Device or not?</h4><dl><dt>Who</dt><dd>The client (the manufacturer) decides, with a regulatory expert; you prepare the facts</dd><dt>In</dt><dd>The purpose, the list of functions</dd><dt>Out</dt><dd>A one-page qualification memo, with the reasoning</dd><dt>Check</dt><dd>Does any function interpret, score, alert or recommend?</dd></dl></div>
+		<div data-detail="classification"><h4>3. Class and route</h4><dl><dt>Who</dt><dd>You and regulatory experts; a notified body for most classes</dd><dt>In</dt><dd>The qualification memo</dd><dt>Out</dt><dd>The class under MDR Rule 11 and the conformity route</dd><dt>Check</dt><dd>Skip only if stage 2 said "not a device", in writing</dd></dl></div>
+		<div data-detail="privacy"><h4>4. Data and GDPR</h4><dl><dt>Who</dt><dd>You list the data; the client (the controller) decides the legal basis and the DPIA</dd><dt>In</dt><dd>The code, the database, the phone, the logs</dd><dt>Out</dt><dd>A data inventory with a purpose for every item; open questions for the controller</dd><dt>Check</dt><dd>Every row has evidence, or is marked unknown</dd></dl></div>
+		<div data-detail="risk"><h4>5. Risk and security</h4><dl><dt>Who</dt><dd>You</dd><dt>In</dt><dd>The purpose, the data inventory, the app</dd><dt>Out</dt><dd>A risk table (harm first) and a security check against OWASP MASVS and the API Top 10</dd><dt>Check</dt><dd>Every control has a way to verify it that you can actually run</dd></dl></div>
+		<div data-detail="evidence"><h4>6. Evidence pack</h4><dl><dt>Who</dt><dd>You</dd><dt>In</dt><dd>The paper trail from Part 2: goals, criteria, tests, pull requests</dd><dt>Out</dt><dd>Traceability, the SOUP list, test reports</dd><dt>Check</dt><dd>Every requirement has a test; the SOUP list matches the lock files</dd></dl></div>
+		<div data-detail="release"><h4>7. Release</h4><dl><dt>Who</dt><dd>You prepare it; the stores review it</dd><dt>In</dt><dd>The build, the purpose, the data inventory</dd><dt>Out</dt><dd>Store listing, privacy labels, health declaration, a beta channel</dd><dt>Check</dt><dd>Nothing in the listing claims more than the purpose</dd></dl></div>
+		<div data-detail="pilot"><h4>8. Pilot</h4><dl><dt>Who</dt><dd>The client runs it; you support and measure</dd><dt>In</dt><dd>Success criteria agreed <b>before</b> the start</dd><dt>Out</dt><dd>A pilot report against those criteria</dd><dt>Check</dt><dd>Were the criteria fixed before anyone saw the results?</dd></dl></div>
+		<div data-detail="decision"><h4>9. Go / no-go</h4><dl><dt>Who</dt><dd>The client</dd><dt>In</dt><dd>The pilot report, the business case</dd><dt>Out</dt><dd>A decision: launch, change, or stop</dd><dt>Check</dt><dd>"No" was a real option</dd></dl></div>
+		<div data-detail="after"><h4>10. After launch</h4><dl><dt>Who</dt><dd>The client, you, and the outside world (stores, authorities, users)</dd><dt>In</dt><dd>Feedback, incidents, platform and library updates</dd><dt>Out</dt><dd>A monitoring log, updates, reports when required, and a plan for the end</dd><dt>Check</dt><dd>Who does this on a Friday evening, and for how long?</dd></dl></div>
+		<div data-detail="kb"><h4>Technical file</h4><dl><dt>What</dt><dd>The records that show what the product is, what it may do, and how you know it is safe enough</dd><dt>Why</dt><dd>Outside the classroom, "it works on my phone" is not an answer. Reviewers, auditors and clients ask for records.</dd><dt>Try</dt><dd>Click a document to see which stages need it.</dd></dl></div>
+	</div>
+
+	<div class="sdlc-kb-details">
+		<div data-kb="purpose"><h4>Intended purpose</h4><dl><dt>Records</dt><dd>For whom, in what situation, for which action, with what consequence; quoted from the client</dd><dt>Read by</dt><dd>Almost every stage, and every store reviewer</dd></dl></div>
+		<div data-kb="data"><h4>Data inventory and DPIA</h4><dl><dt>Records</dt><dd>Every data item, where it lives, who sees it, how long it is kept, why; the controller's impact assessment</dd><dt>Read by</dt><dd>Privacy, release (privacy labels), after launch</dd></dl></div>
+		<div data-kb="risk"><h4>Risk file</h4><dl><dt>Records</dt><dd>Hazards, harms, controls and how each control is verified</dd><dt>Read by</dt><dd>Risk, release, after launch</dd></dl></div>
+		<div data-kb="trace"><h4>Traceability and SOUP</h4><dl><dt>Records</dt><dd>Requirement → design → code → test; every third-party library with its version</dd><dt>Read by</dt><dd>Evidence pack, after launch (updates)</dd></dl></div>
+		<div data-kb="tests"><h4>Test reports</h4><dl><dt>Records</dt><dd>Automated results and runs on real devices</dd><dt>Read by</dt><dd>Evidence pack, pilot</dd></dl></div>
+		<div data-kb="store"><h4>Store listing</h4><dl><dt>Records</dt><dd>Description, screenshots, privacy labels, health declaration, release notes</dd><dt>Read by</dt><dd>Release, after launch</dd></dl></div>
+	</div>
+
+	<div class="sdlc-audits">
+		<div data-audit="purpose"><h4>Record: the intended purpose</h4><dl><dt>Record</dt><dd>Four lines in <code>docs/product.md</code>, quoted from the client log</dd></dl></div>
+		<div data-audit="qualification"><h4>Record: the qualification memo</h4><dl><dt>Record</dt><dd>One page: functions, reasoning, the expert's confirmation, date</dd></dl></div>
+		<div data-audit="classification"><h4>Record: the route plan</h4><dl><dt>Record</dt><dd>Class, conformity route, required standards; or "not applicable", with a reference to the memo</dd></dl></div>
+		<div data-audit="privacy"><h4>Record: data inventory</h4><dl><dt>Record</dt><dd>The table, the controller's decisions, the DPIA if required</dd></dl></div>
+		<div data-audit="risk"><h4>Record: risk file</h4><dl><dt>Record</dt><dd>The risk table and the security check, with evidence</dd></dl></div>
+		<div data-audit="evidence"><h4>Record: technical file</h4><dl><dt>Record</dt><dd>Traceability table, SOUP list, test reports</dd></dl></div>
+		<div data-audit="release"><h4>Record: release notes</h4><dl><dt>Record</dt><dd>Version, build number, what changed, store review outcome</dd></dl></div>
+		<div data-audit="pilot"><h4>Record: pilot report</h4><dl><dt>Record</dt><dd>Criteria fixed in advance, results against them, what was not measured</dd></dl></div>
+		<div data-audit="decision"><h4>Record: business case</h4><dl><dt>Record</dt><dd>Total cost, cost per participant per month, the decision and who took it</dd></dl></div>
+		<div data-audit="after"><h4>Record: monitoring log</h4><dl><dt>Record</dt><dd>Incidents, updates, reports, and the end-of-study plan</dd></dl></div>
+	</div>
+
+	<ol class="sdlc-walk">
+		<li data-stage="purpose">Anna: <em>"The next group starts in January: 50 participants, six months. Can they use the app?"</em> Everything starts from the purpose in <code>docs/product.md</code>: <em>a self-report mood diary, not used for diagnosis or treatment.</em></li>
+		<li data-stage="qualification">With that purpose, the app stores and shows what people type: most likely <b>not a medical device</b>. You write a one-page memo; Anna asks the clinic's regulatory advisor to confirm it. Not you, and not Copilot.</li>
+		<li data-stage="classification">What if the purpose said <em>"helps patients manage depression"</em>? Then it would most likely be a device: MDR Rule 11, a notified body, a quality management system. Months of work. Here, this stage is skipped, with the memo as the reason.</li>
+		<li data-stage="privacy">Not a device does not mean no rules. Mood entries are <b>health data</b> (GDPR Article 9). Copilot lists where data lives; you check every row. The clinic, as the controller, decides the legal basis and whether a DPIA is needed.</li>
+		<li data-stage="risk">Harm first: what could go wrong <em>for a person</em>? Then the code: tokens in secure storage, TLS only, no secrets inside the app. Each control gets a way to check it.</li>
+		<li data-stage="evidence">The paper trail from Part 2 becomes the evidence pack: goals, criteria, tests, pull requests, the SOUP list.</li>
+		<li data-stage="release" data-result="fail">Beta review <b>rejects</b> the listing: Copilot's description says the app <em>"supports your mental health"</em>. A medical-sounding claim, and not in the purpose.</li>
+		<li data-stage="evidence">You fix the listing from the purpose, word for word, fill in the health declaration honestly, and build the privacy labels from the data inventory.</li>
+		<li data-stage="release" data-result="pass">Approved. Participants get the app through TestFlight and a closed test on Google Play. A TestFlight build expires after 90 days, so a six-month study needs a new build planned in.</li>
+		<li data-stage="pilot">A 30-day pilot with ten participants. Success criteria fixed with Anna <b>before</b> the start: they find the contact without help, no data incidents, fewer support calls about the version.</li>
+		<li data-stage="decision">The pilot meets the criteria. One page: cost per participant per month, compared with the paper option. Anna decides: <b>go</b>.</li>
+		<li data-stage="after">Life after launch: one new build before the 90 days run out, updates when Android and iOS change, a plan for incidents, and at the end of the study, what happens to the data.</li>
+		<li data-stage="kb">The technical file is kept current. When the next version starts in Part 1, it starts from these records.</li>
+	</ol>
+</div>
+
+<script>
+	import '../scripts/sdlc.js';
+</script>

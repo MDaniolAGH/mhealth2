@@ -1,0 +1,117 @@
+---
+title: '1. Medical device or not?'
+description: How the intended purpose decides whether a health app is a medical device, which class it would be, and what each route requires.
+---
+
+import Picker from '../../../components/Picker.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+import Scene from '../../../components/Scene.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={7} items={["Qualification: is it a medical device at all? The purpose and the functions decide.", "Classification: if it is, MDR Rule 11 sets the class, and the class sets the route.", "The client decides, with an expert. You prepare the facts."]} />
+
+You met the intended purpose in [Part 1](../../product/purpose/). Here is what it sets in motion. Two questions, in this order:
+
+1. **Qualification:** is the software a medical device at all?
+2. **Classification:** if it is, which class? The class decides who has to check it before it can be sold or given to patients.
+
+## Qualification
+
+Under the EU Medical Device Regulation (MDR), software is a medical device when its manufacturer intends it for a **medical purpose**: diagnosis, prevention, monitoring, prediction, prognosis, treatment or alleviation of a disease, among others. What counts is the stated purpose and what the software **does**:
+
+| Usually not a device on its own | May make it a device |
+|---|---|
+| storing what a user typed | interpreting it (scores, risk levels) |
+| showing it back, as entered | alerting someone based on it |
+| simple search and sorting | recommending an action for a person's health |
+| general wellbeing and lifestyle content | anything aimed at a specific disease |
+
+The **client** is the manufacturer and makes the decision, normally with a regulatory expert. Your job is to give them the facts: the purpose in four lines, the list of functions, and what each function does with health data. In Poland, the competent authority for medical devices is URPL (*Urząd Rejestracji Produktów Leczniczych, Wyrobów Medycznych i Produktów Biobójczych*).
+
+<Scene
+	title="Friday: the qualification memo"
+	messages={[
+		{ who: 'you', name: 'You', text: '@Copilot is the Mood Tracker a medical device?' },
+		{ who: 'agent', name: 'Copilot', text: 'No. It is a wellness app, so it is not regulated as a medical device.' },
+		{ who: 'you', name: 'You', text: 'That is a verdict you cannot give. List the app\'s functions, and for each one say whether it stores, shows, interprets, alerts or recommends, with file and line.' },
+		{ who: 'agent', name: 'Copilot', text: 'Functions: log a mood entry (stores), list entries (shows), About screen (shows)… No function interprets, alerts or recommends.' },
+		{ who: 'you', name: 'You', text: 'Good. That goes into the memo as facts. Anna\'s regulatory advisor makes the call.' },
+	]}
+/>
+
+<span id="route" class="stage-anchor"></span>
+
+## Classification and route
+
+If the software is a device, **Rule 11** in Annex VIII of the MDR sets its class:
+
+- Software that gives information used to take decisions for diagnosis or therapy: **class IIa**, or **IIb** if those decisions could cause a serious deterioration of health or a surgical intervention, or **III** if they could cause death or irreversible deterioration.
+- Software that monitors physiological processes: **IIa**, or **IIb** for vital parameters where a change could mean immediate danger.
+- All other software: **class I**.
+
+The class sets the route. Pick one to see what it brings:
+
+<Picker
+	title="What each route requires"
+	intro="A simplified overview for planning, not legal advice. Real projects follow the MDR and its guidance (MDCG 2019-11 for software), with a regulatory expert."
+	initial="no"
+	paths={[
+		{ key: 'no', label: 'Not a device', tone: 'client', summary: 'No MDR obligations. Everything else still applies.', items: [
+			'Keep the qualification memo, and repeat it whenever a function or the purpose changes',
+			'GDPR: mood entries are health data (Article 9); data inventory, legal basis, maybe a DPIA',
+			'Security: OWASP MASVS for the app, the API Top 10 for the server',
+			'Store text and health declarations that claim nothing beyond the purpose',
+			'A plan for incidents, updates and the end of the study',
+		] },
+		{ key: 'one', label: 'Class I', tone: 'audit', summary: 'You declare conformity yourself, without a notified body. Still a lot of work.', items: [
+			'A quality management system (the MDR requires one; ISO 13485 is the usual standard)',
+			'Technical documentation (MDR Annexes II and III)',
+			'Risk management (ISO 14971), software life cycle (IEC 62304), usability engineering (IEC 62366-1)',
+			'Clinical evaluation: evidence that the software does what it claims',
+			'EU declaration of conformity and the CE mark; registration (EUDAMED, UDI)',
+			'A person responsible for regulatory compliance; post-market surveillance and vigilance',
+		] },
+		{ key: 'two', label: 'Class IIa or higher', tone: 'you', summary: 'A notified body assesses the quality system and the technical documentation before the device can go on the market.', items: [
+			'Everything listed for class I',
+			'Assessment by a notified body, with certificates and regular audits',
+			'Periodic safety update reports (PSUR)',
+			'Time and cost on a scale of months to years, not weeks',
+			'Every significant change may need to go back to the notified body',
+		] },
+	]}
+/>
+
+<Predict id="narrow" question="The clinic would love a feature that suggests a breathing exercise whenever a participant reports feeling anxious. Recommending an action based on health data could push the app towards a device. What options does the client have?">
+
+At least three. **Take the device route**, with its cost and time. **Narrow the feature** so it no longer reacts to health data, for example a breathing exercise that anyone can open at any time, for everyone the same. Or **move the decision to a person**: the study team reviews entries under its own clinical procedures, outside the app. Which one is right is the client's decision, made with an expert, but you should put all three on the table. This is the "device? → narrow the purpose" loop on the map.
+
+</Predict>
+
+<Quiz
+	question="An app records how participants feel and shows them a weekly list of their entries, exactly as entered. The store text says &quot;helps patients manage depression&quot;. What matters most for qualification?"
+	options={[
+		'That the code only stores and shows data',
+		'That the study team will not read the entries',
+		'That the store text states a medical purpose',
+		'That the app is free to download',
+	]}
+	answer={2}
+	why={[
+		'The functions matter, but the stated purpose counts too. Here the text claims more than the code does.',
+		'Who reads the entries does not change what the manufacturer says the app is for.',
+		'',
+		'Price has nothing to do with qualification.',
+	]}
+	explain="Qualification looks at the purpose the manufacturer states, everywhere it is stated, including the store. Fix the text, or the same code may count as a medical device."
+/>
+
+<AtWork>Being able to write a clear one-page qualification memo (purpose, functions, reasoning, open questions) is valued in digital-health companies, and saves the experts' time.</AtWork>
+
+:::tip[Do this in your project]
+Run `/mh-intended-purpose` on your brief's main feature. Turn the result into a one-page memo: purpose in four lines, a table of functions (stores, shows, interprets, alerts, recommends), and the questions for your client. Do not write a verdict.
+:::
+
+<Done />

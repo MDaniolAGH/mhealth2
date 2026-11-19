@@ -1,0 +1,147 @@
+---
+title: '2. Data, risk and security'
+description: Health data under the GDPR, a risk file that starts from harm, mobile and API security, and the evidence pack that shows it all.
+---
+
+import Sorter from '../../../components/Sorter.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+import Scene from '../../../components/Scene.astro';
+import Checklist from '../../../components/Checklist.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={8} items={["Mood entries are health data. List every place data lives, with a reason for each.", "Risk starts from harm to a person, then goes to the code.", "Nothing secret can live inside a mobile app."]} />
+
+## Health data and the GDPR
+
+Self-reported mood is **health data**, a special category under Article 9 of the GDPR, whether or not the app is a medical device. Two roles matter:
+
+- The **controller** (the clinic) decides why and how data is processed: the legal basis, whether a data protection impact assessment (**DPIA**, Article 35) is needed, how long data is kept.
+- **You** build what makes compliance possible, or impossible. You do not decide the legal basis; you make sure the system can do what the controller promises.
+
+Start with a **data inventory**: every data item, where it lives, who can see it, how long it is kept, and **why** it exists. Data lives in more places than the database: the phone's storage, caches, logs, backups, crash reports, test fixtures, and anything you paste into an AI tool.
+
+<Sorter
+	title="Which kind of data is this?"
+	intro="Items from a mood-tracking app like the Mood Tracker."
+	bins={[
+		{ key: 'health', label: 'Health data (Art. 9)', tone: 'you' },
+		{ key: 'personal', label: 'Personal data', tone: 'client' },
+		{ key: 'none', label: 'Not personal on its own', tone: 'neutral' },
+	]}
+	items={[
+		{ text: 'A mood score of 3 with the note &quot;bad night again&quot;', bin: 'health', why: 'Self-reported wellbeing about an identifiable person is health data.' },
+		{ text: 'A participant\'s e-mail address', bin: 'personal', why: 'It identifies a person. In a study app it also reveals that this person takes part in the study, which may itself say something about their health.' },
+		{ text: 'The app version <code>1.3.0 (12)</code>', bin: 'none', why: 'On its own it says nothing about a person. Next to a participant ID, it becomes part of their record.' },
+		{ text: 'A server log line with an IP address and a time', bin: 'personal', why: 'IP addresses can identify people. Logs are personal data, and often forgotten in the inventory.' },
+		{ text: 'A crash report that includes the screen content of an entry', bin: 'health', why: 'Crash and analytics tools can quietly copy health data to a third party. Check what they send.' },
+	]}
+/>
+
+The rights of the participants have to work **technically**: access, rectification, erasure, restriction, portability. For each one, ask: can the system do it, and how long does it take? Write what only the controller can decide as **questions**, not answers. And never claim that a system "is GDPR compliant": compliance is not a property of code alone. In Poland, the data protection authority is UODO (*Urząd Ochrony Danych Osobowych*).
+
+:::caution[AI tools are processors too]
+Pasting participants' data into an AI tool sends it to another company. In this course, use synthetic data only. In a real project, any service that processes personal data on your behalf (hosting, crash reporting, an AI API) needs a contract and a place in the data inventory.
+:::
+
+<span id="risk" class="stage-anchor"></span>
+
+## Risk: harm first, then code
+
+Risk management for medical software (ISO 14971) asks first **what could go wrong for a person**, and only then what could go wrong in the code. It is good practice for any health app.
+
+- **Hazard**: a source of harm (wrong information shown).
+- **Sequence of events → hazardous situation**: how a person gets exposed.
+- **Harm**: injury or damage to health, or, more broadly, to privacy.
+- **Risk control**, in this order: a safer design first, then protective measures, then information. Every control needs a way to **verify** it.
+
+```text title="Risk table (excerpt, About screen, illustrative)"
+# | Hazard                 | Sequence → hazardous situation                 | Harm
+1 | Wrong contact shown    | contact was guessed or outdated → a participant | delayed help in a
+  |                        | in distress calls a number nobody answers       | crisis (serious)
+2 | Purpose claims too     | store text says "helps manage depression" →     | wrong reliance on
+  | much                   | a participant uses the app instead of care      | the app (serious)
+
+Controls
+1 | Contact only from the client log; "not yet confirmed" until then (AC-5);
+  | the line "In an emergency, call 112" on the screen        → verified by AC-5 test, review
+2 | Store text copied from the purpose; review checklist item → verified by release checklist
+```
+
+<Predict id="worst" question="Of all the About screen's fields, which one could cause the most serious harm if it were wrong: the app version, the server version, the purpose, or the contact?">
+
+The **contact**. A wrong version annoys support. A wrong contact can leave a person in distress without help. That is why AC-5 forbids invented contacts, and why the risk table adds an emergency line. Risk analysis often moves your attention from the most complex code to the simplest text.
+
+</Predict>
+
+## Mobile and API security
+
+Two OWASP checklists cover most of it: **MASVS** for the app and the **API Security Top 10** for the server. Course skills: `/mh-owasp-masvs`, `/mh-owasp-api`, `/mh-secrets-and-config`.
+
+| MASVS group | The question for a health app |
+|---|---|
+| STORAGE | Where does the app keep health data and tokens? Encrypted? Copied into cloud backups? |
+| CRYPTO | Platform crypto and sound key handling, not home-made? |
+| AUTH | What happens on logout and when a token expires? |
+| NETWORK | TLS everywhere? Any cleartext left from debugging? |
+| PLATFORM | Deep links, WebViews, screenshots of sensitive screens? |
+| CODE | Dependencies current? Input validated? |
+| RESILIENCE | Does the threat model justify anti-tampering? Often not for a pilot; say why |
+| PRIVACY | Data collection minimal, transparent, under the user's control? |
+
+:::danger[A mobile app cannot keep a secret]
+Anything inside the app (constants, `--dart-define` values, assets) can be extracted by anyone who has the app. API keys for paid services, the server's JWT secret, database passwords: never in the app. A development default that "only works locally" is a finding if nothing stops it from reaching production.
+:::
+
+For the API, check the way an attacker would, with requests and two synthetic users. The first question is almost always: **can user A read or change user B's data by changing an ID?** (API1, broken object-level authorisation).
+
+<span id="evidence" class="stage-anchor"></span>
+
+## The evidence pack
+
+Everything from Part 2 becomes evidence here: goals, acceptance criteria, tests, pull requests, decision records. For medical software, IEC 62304 asks for this **traceability**: requirement → design → code → test, and for every risk control a test. It also asks for a **SOUP** list: every third-party library, with its version, why it is there, and its known problems. Its **safety class** (A, B or C) depends on the worst harm a software failure could contribute to, and decides how much process is required.
+
+Even for a diary, the same pack answers the questions a client, an auditor or the next team will ask.
+
+<Checklist
+	id="evidence-pack"
+	title="Evidence pack: what to have before a release"
+	items={[
+		'Intended purpose in four lines, quoted from the client',
+		'Qualification memo (and the route plan if it is a device)',
+		'Data inventory, with the controller\'s decisions and open questions',
+		'Risk table, with a verification for every control',
+		'Security check (MASVS, API Top 10), with evidence or reasons for skipping',
+		'Traceability: every requirement has a test, or is marked “not verified”',
+		'SOUP list that matches the lock files exactly',
+		'Test reports, including runs on real devices',
+	]}
+/>
+
+<Quiz
+	question="Which is the best answer to &quot;Is the Mood Tracker GDPR compliant?&quot;"
+	options={[
+		'Yes: the data is encrypted in transit and at rest',
+		'Yes: we only use synthetic data, so the GDPR does not apply',
+		'Here is what the system can do technically, and here are the decisions only the controller can make',
+		'No: health apps cannot be GDPR compliant',
+	]}
+	answer={2}
+	why={[
+		'Encryption is one control. Compliance also depends on the legal basis, purposes, retention and rights, which are not properties of code.',
+		'In the course, yes. A real deployment with real participants processes real health data.',
+		'',
+		'They can be, with the right decisions and controls. It just is not something code can promise on its own.',
+	]}
+	explain="Engineers make compliance possible: they show what the system can do and list what the controller must decide. Compliance itself is the controller's responsibility."
+/>
+
+<AtWork>Data inventories and threat checks are where junior developers in health tech most often start contributing to compliance work. They are concrete, they need code reading, and few people enjoy doing them well.</AtWork>
+
+:::tip[Do this in your project]
+Run `/mh-data-inventory` on the part of the app your brief touches, and check every row it gives you. Then run `/mh-secrets-and-config`. Bring the open questions (legal basis, retention, DPIA) to your client as questions.
+:::
+
+<Done />

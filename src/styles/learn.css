@@ -280,3 +280,5 @@
 .progress__pages a { color: var(--sdlc-ink); text-decoration: none; }
 .progress__pages a:hover { text-decoration: underline; }
 @media screen and (max-width: 44em) { .progress__parts { grid-template-columns: 1fr; } }
+.is-you-tool { --chip: var(--sdlc-tool); --chip-tint: var(--sdlc-tool-tint); --chip-a: var(--sdlc-you); --chip-b: var(--sdlc-tool); }
+.is-client-tool { --chip: var(--sdlc-tool); --chip-tint: var(--sdlc-tool-tint); --chip-a: var(--sdlc-client); --chip-b: var(--sdlc-tool); }

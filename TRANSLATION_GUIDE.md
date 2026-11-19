@@ -48,3 +48,11 @@ Keys (values may contain `{n}`, `{total}`, `{k}`, `{x}`, `{p}`, `{what}` placeho
 - `.ctx-lab` root: `used` "wykorzystane: około {k}", `over`, `belowLean`, `xLean` "≈ {x}× minimum", `relevant` "{p}% istotnych", `nOf` "{n} z {total}", `none`, `stop`, `and`, `notFit`, `missing`, `noise`, `lean`, `segTitle` (see the English fallbacks in `src/scripts/sdlc.js`, function `initCtxLab`).
 - `.gate-lab` root: `following`, `passes`, `stopped`, `unreached`.
 - `.audit-walk` root: `step`, `complete`, `lost`.
+
+## Part 3 (Launch) and the LLM page
+
+Translate: Launch → Wprowadź na rynek; route to market → droga na rynek; technical file → dokumentacja techniczna; accountability → rozliczalność; outside world → świat zewnętrzny; records → zapisy; qualification → kwalifikacja; classification → klasyfikacja; notified body → jednostka notyfikowana; manufacturer → wytwórca; controller → administrator danych; data protection authority → organ ochrony danych; post-market surveillance → nadzór po wprowadzeniu do obrotu; serious incident → poważny incydent; pilot → pilotaż; success criteria → kryteria sukcesu; stop criterion → kryterium stopu; store → sklep; store listing → opis w sklepie; risk file → plik zarządzania ryzykiem (or „dokumentacja ryzyka”); harm → szkoda; hazard → zagrożenie; hallucination → halucynacja; temperature → temperatura; sampling → losowanie (próbkowanie); parameters (weights) → parametry (wagi); training → trening; base model → model bazowy; assistant → asystent; working memory → pamięć robocza.
+
+Keep in English: GDPR article numbers (write "RODO, art. 9"), DPIA, MDR, Rule 11 (reguła 11 MDR), CE, ISO/IEC numbers, SOUP, MASVS, OWASP, API Top 10, TestFlight, Google Play, App Store, closed testing, beta, build, release, release notes, staged rollout, phased release, privacy labels (Data safety, App Privacy), go/no-go, business case, TCO, token, tokenizer, byte-pair encoding, pre-training, supervised fine-tuning, reinforcement learning, RLHF, reward model, context window, Swiss cheese (as Karpathy's term, explain it in Polish once), FineWeb.
+
+URPL and UODO are Polish institutions: in Polish write their names normally (no translation needed).

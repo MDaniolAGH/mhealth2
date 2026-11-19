@@ -22,7 +22,7 @@ export default defineConfig({
 				pl: { label: 'Polski', lang: 'pl' },
 			},
 			description:
-				'Mobile apps in medicine, from idea to market: building software with coding agents, from a client\'s brief to a merged pull request.',
+				'Mobile apps in medicine, from idea to market: discover what to build, build it with coding agents, and launch it safely.',
 			logo: { src: './src/assets/logo.svg', alt: '' },
 			favicon: '/favicon.svg',
 			social: [
@@ -34,7 +34,19 @@ export default defineConfig({
 			sidebar: [
 				{ label: 'Start here', translations: { pl: 'Zacznij tutaj' }, link: '/' },
 				{
-					label: 'AI SDLC', translations: { pl: 'AI SDLC' },
+					label: 'Part 1 · Discover', translations: { pl: 'Część 1 · Odkryj' },
+					items: [
+						{ label: 'From brief to decision: the map', translations: { pl: 'Od briefu do decyzji: mapa' }, slug: 'product/overview' },
+						{ label: '1. Decision, facts, people', translations: { pl: '1. Decyzja, fakty, ludzie' }, slug: 'product/decision-and-facts' },
+						{ label: '2. Intended purpose', translations: { pl: '2. Intended purpose' }, slug: 'product/purpose' },
+						{ label: '3. Questions and observations', translations: { pl: '3. Pytania i obserwacje' }, slug: 'product/questions-and-observation' },
+						{ label: '4. User stories', translations: { pl: '4. User stories' }, slug: 'product/user-stories' },
+						{ label: '5. Testable, ranked, split', translations: { pl: '5. Testowalne, z priorytetem, podzielone' }, slug: 'product/testable-stories' },
+						{ label: '6. Options and recommendation', translations: { pl: '6. Opcje i rekomendacja' }, slug: 'product/options-and-recommendation' },
+					],
+				},
+				{
+					label: 'Part 2 · Build', translations: { pl: 'Część 2 · Zbuduj' },
 					items: [
 						{ label: 'The pipeline at a glance', translations: { pl: 'Pipeline w pigułce' }, slug: 'ai-sdlc/overview' },
 						{ label: '1. From a prompt to an agent', translations: { pl: '1. Od promptu do agenta' }, slug: 'ai-sdlc/agents' },
@@ -54,17 +66,17 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'Product development with agents', translations: { pl: 'Rozwój produktu z agentami' },
+					label: 'Part 3 · Launch', translations: { pl: 'Część 3 · Wprowadź na rynek' },
 					items: [
-						{ label: 'From brief to backlog', translations: { pl: 'Od briefu do backlogu' }, slug: 'product/overview' },
-						{ label: '1. Decision, facts, people', translations: { pl: '1. Decyzja, fakty, ludzie' }, slug: 'product/decision-and-facts' },
-						{ label: '2. Intended purpose', translations: { pl: '2. Intended purpose' }, slug: 'product/purpose' },
-						{ label: '3. Questions and observations', translations: { pl: '3. Pytania i obserwacje' }, slug: 'product/questions-and-observation' },
-						{ label: '4. User stories', translations: { pl: '4. User stories' }, slug: 'product/user-stories' },
-						{ label: '5. Testable, ranked, split', translations: { pl: '5. Testowalne, z priorytetem, podzielone' }, slug: 'product/testable-stories' },
-						{ label: '6. Options and recommendation', translations: { pl: '6. Opcje i rekomendacja' }, slug: 'product/options-and-recommendation' },
+						{ label: 'The route to market: the map', translations: { pl: 'Droga na rynek: mapa' }, slug: 'launch/overview' },
+						{ label: '1. Medical device or not?', translations: { pl: '1. Wyrób medyczny czy nie?' }, slug: 'launch/device-or-not' },
+						{ label: '2. Data, risk and security', translations: { pl: '2. Dane, ryzyko i bezpieczeństwo' }, slug: 'launch/privacy-and-security' },
+						{ label: '3. Release', translations: { pl: '3. Release' }, slug: 'launch/release' },
+						{ label: '4. Business case and pilot', translations: { pl: '4. Business case i pilotaż' }, slug: 'launch/business-case' },
+						{ label: '5. After launch', translations: { pl: '5. Po wprowadzeniu' }, slug: 'launch/after-launch' },
 					],
 				},
+				{ label: 'Extra: how LLMs work', translations: { pl: 'Dodatek: jak działają LLM-y' }, slug: 'extra/how-llms-work' },
 				{ label: 'Glossary', translations: { pl: 'Słowniczek' }, slug: 'glossary' },
 				{ label: 'Sources', translations: { pl: 'Źródła' }, slug: 'ai-sdlc/sources' },
 			],

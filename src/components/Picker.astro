@@ -1,0 +1,65 @@
+---
+/**
+ * Pick one path and see what it brings with it: a summary and a list of
+ * obligations. Without JavaScript all paths are shown one under another.
+ */
+import { t } from '../i18n/ui';
+interface Path {
+	key: string;
+	label: string;
+	tone?: 'you' | 'agent' | 'tool' | 'knowledge' | 'audit' | 'client' | 'neutral';
+	summary: string;
+	items: string[];
+}
+interface Props {
+	title: string;
+	intro?: string;
+	paths: Path[];
+	initial?: string;
+	kicker?: string;
+}
+const { title, intro, paths, initial, kicker } = Astro.props;
+const T = t(Astro);
+const start = initial ?? paths[0].key;
+---
+
+<div class="biz-widget picker not-content">
+	<p class="biz-kicker">{kicker ?? T.choosePath}</p>
+	<p class="biz-title" set:html={title} />
+	{intro && <p class="biz-intro" set:html={intro} />}
+	<div class="picker__tabs" role="tablist">
+		{
+			paths.map((p) => (
+				<button type="button" role="tab" class={`picker__tab is-${p.tone ?? 'neutral'}`} data-key={p.key} aria-selected={p.key === start ? 'true' : 'false'}>
+					{p.label}
+				</button>
+			))
+		}
+	</div>
+	{
+		paths.map((p) => (
+			<section class={`picker__panel is-${p.tone ?? 'neutral'}`} data-key={p.key} role="tabpanel" hidden={p.key !== start}>
+				<p class="picker__summary" set:html={p.summary} />
+				<ul>
+					{p.items.map((i) => (
+						<li set:html={i} />
+					))}
+				</ul>
+			</section>
+		))
+	}
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.picker').forEach((box) => {
+		box.classList.add('is-js');
+		const tabs = Array.from(box.querySelectorAll<HTMLButtonElement>('.picker__tab'));
+		const panels = Array.from(box.querySelectorAll<HTMLElement>('.picker__panel'));
+		tabs.forEach((tab) =>
+			tab.addEventListener('click', () => {
+				tabs.forEach((x) => x.setAttribute('aria-selected', x === tab ? 'true' : 'false'));
+				panels.forEach((p) => (p.hidden = p.dataset.key !== tab.dataset.key));
+			}),
+		);
+	});
+</script>
