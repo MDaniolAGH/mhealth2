@@ -1,0 +1,138 @@
+---
+/**
+ * The interactive pipeline map: ten stages in three lanes (you, agent, tools),
+ * the project knowledge on the left and the auditability rail. Behaviour is in
+ * src/scripts/sdlc.js. Without JavaScript, every stage is a plain link.
+ */
+import { link } from '../lib/url';
+
+const s = {
+	idea: link('ai-sdlc/idea-to-plan/#stage-idea'),
+	analysis: link('ai-sdlc/idea-to-plan/#stage-analysis'),
+	requirements: link('ai-sdlc/idea-to-plan/#stage-requirements'),
+	plan: link('ai-sdlc/idea-to-plan/#stage-plan'),
+	implementation: link('ai-sdlc/code-and-gate/#stage-implementation'),
+	gate: link('ai-sdlc/code-and-gate/#stage-gate'),
+	tests: link('ai-sdlc/tests-to-merge/#stage-tests'),
+	docs: link('ai-sdlc/tests-to-merge/#stage-docs'),
+	pr: link('ai-sdlc/tests-to-merge/#stage-pr'),
+	review: link('ai-sdlc/tests-to-merge/#stage-review'),
+	knowledge: link('ai-sdlc/knowledge/'),
+	agentsMd: link('ai-sdlc/agents-md/'),
+};
+---
+
+<div class="sdlc not-content">
+	<div class="sdlc-toolbar">
+		<div class="sdlc-toolbar__group" role="group" aria-label="Walk through the pipeline">
+			<button type="button" class="sdlc-btn" data-action="prev" aria-label="Previous step">◀</button>
+			<button type="button" class="sdlc-btn sdlc-btn--primary" data-action="play">▶ Walk through</button>
+			<button type="button" class="sdlc-btn" data-action="next" aria-label="Next step">▶</button>
+			<span class="sdlc-toolbar__status" aria-live="polite"></span>
+		</div>
+		<div class="sdlc-toolbar__group" role="group" aria-label="Layers">
+			<span class="sdlc-legend__hint">Show:</span>
+			<button type="button" class="sdlc-chip is-loop" data-layer="loops" aria-pressed="false">Feedback loops</button>
+			<button type="button" class="sdlc-chip is-knowledge" data-layer="knowledge" aria-pressed="false">Knowledge flows</button>
+			<button type="button" class="sdlc-chip is-audit" data-layer="audit" aria-pressed="false">Audit trail</button>
+		</div>
+	</div>
+
+	<div class="sdlc-legend">
+		<span class="sdlc-legend__hint">Who:</span>
+		<button type="button" class="sdlc-chip is-you" data-actor="you" aria-pressed="false">You and your pair</button>
+		<button type="button" class="sdlc-chip is-agent" data-actor="agent" aria-pressed="false">Coding agent</button>
+		<button type="button" class="sdlc-chip is-tool" data-actor="tool" aria-pressed="false">Deterministic tools</button>
+	</div>
+
+	<div class="sdlc-map" role="group" aria-label="AI SDLC pipeline: ten stages from idea to merge, with the project knowledge on the left">
+		<div class="sdlc-lane sdlc-lane--you is-you" aria-hidden="true"></div>
+		<div class="sdlc-lane sdlc-lane--agent is-agent" aria-hidden="true"></div>
+		<div class="sdlc-lane sdlc-lane--tool is-tool" aria-hidden="true"></div>
+		<div class="sdlc-lane-title is-knowledge" style="grid-column:2">Knowledge</div>
+		<div class="sdlc-lane-title is-you" style="grid-column:4">You</div>
+		<div class="sdlc-lane-title is-agent" style="grid-column:5">Agent</div>
+		<div class="sdlc-lane-title is-tool" style="grid-column:6">Tools</div>
+		<div class="sdlc-rail" aria-hidden="true"><span>Auditability</span><i class="sdlc-rail__fill"></i></div>
+
+		<div class="sdlc-kb is-knowledge">
+			<a class="sdlc-kb__title" href={s.knowledge}>Project know&shy;ledge</a>
+			<a class="sdlc-kb__doc" href={s.knowledge} data-doc="architecture" data-feeds="analysis requirements plan implementation review">Archi&shy;tecture</a>
+			<a class="sdlc-kb__doc" href={s.knowledge} data-doc="decisions" data-feeds="plan review">Deci&shy;sions</a>
+			<a class="sdlc-kb__doc" href={s.knowledge} data-doc="notes" data-feeds="plan implementation">Notes &amp; log</a>
+			<a class="sdlc-kb__doc" href={s.knowledge} data-doc="product" data-feeds="analysis requirements plan review">Product &amp; client</a>
+			<a class="sdlc-kb__doc" href={s.knowledge} data-doc="api" data-feeds="requirements plan implementation">README &amp; API</a>
+			<a class="sdlc-kb__doc" href={s.agentsMd} data-doc="agents" data-feeds="requirements plan implementation gate tests review">AGENTS<wbr />.md</a>
+		</div>
+
+		<a class="sdlc-stage is-you" href={s.idea} data-stage="idea" data-order="1" data-actors="you" style="--row:2;--col:4"><span class="sdlc-stage__n">1</span><span class="sdlc-stage__t">Idea</span><span class="sdlc-stage__s">a sketch, one sentence</span><span class="sdlc-stage__rec">issue #7</span></a>
+		<a class="sdlc-stage is-you" href={s.analysis} data-stage="analysis" data-order="2" data-actors="you" style="--row:3;--col:4"><span class="sdlc-stage__n">2</span><span class="sdlc-stage__t">Analysis</span><span class="sdlc-stage__s">define the goal</span><span class="sdlc-stage__rec">GOAL-1</span></a>
+		<a class="sdlc-stage is-you-agent" href={s.requirements} data-stage="requirements" data-order="3" data-actors="you agent" style="--row:4;--col:4 / 6"><span class="sdlc-stage__n">3</span><span class="sdlc-stage__t">Technical requirements</span><span class="sdlc-stage__s">criteria you can check</span><span class="sdlc-stage__rec">AC-1…AC-6</span></a>
+		<a class="sdlc-stage is-you-agent is-kb-reader" href={s.plan} data-stage="plan" data-order="4" data-actors="you agent" style="--row:5;--col:4 / 6"><span class="sdlc-stage__n">4</span><span class="sdlc-stage__t">Plan</span><span class="sdlc-stage__s">reads the project knowledge · you approve</span><span class="sdlc-stage__rec">plan + answers</span></a>
+		<a class="sdlc-stage is-agent" href={s.implementation} data-stage="implementation" data-order="5" data-actors="agent" style="--row:6;--col:5"><span class="sdlc-stage__n">5</span><span class="sdlc-stage__t">Imple&shy;mentation</span><span class="sdlc-stage__s">a branch, small commits</span><span class="sdlc-stage__rec">Refs: GOAL-1</span></a>
+		<a class="sdlc-stage is-tool" href={s.gate} data-stage="gate" data-order="6" data-actors="tool" style="--row:7;--col:6"><span class="sdlc-stage__n">6</span><span class="sdlc-stage__t">Quality gate</span><span class="sdlc-stage__s">same input, same verdict</span><span class="sdlc-stage__rec">CI log</span></a>
+		<a class="sdlc-stage is-agent-tool" href={s.tests} data-stage="tests" data-order="7" data-actors="agent tool you" style="--row:8;--col:5 / 7"><span class="sdlc-stage__n">7</span><span class="sdlc-stage__t">Tests</span><span class="sdlc-stage__s">unit, widget, end-to-end, a real run</span><span class="sdlc-stage__rec">test report</span></a>
+		<a class="sdlc-stage is-you-agent" href={s.docs} data-stage="docs" data-order="8" data-actors="you agent" style="--row:9;--col:4 / 6"><span class="sdlc-stage__n">8</span><span class="sdlc-stage__t">Documentation</span><span class="sdlc-stage__s">update what the next plan reads</span><span class="sdlc-stage__rec">ADR-0003</span></a>
+		<a class="sdlc-stage is-you-agent" href={s.pr} data-stage="pr" data-order="9" data-actors="you agent" style="--row:10;--col:4 / 6"><span class="sdlc-stage__n">9</span><span class="sdlc-stage__t">Pull request</span><span class="sdlc-stage__s">agent drafts, you own it</span><span class="sdlc-stage__rec">PR #12</span></a>
+		<a class="sdlc-stage is-you" href={s.review} data-stage="review" data-order="10" data-actors="you" style="--row:11;--col:4"><span class="sdlc-stage__n">10</span><span class="sdlc-stage__t">Review and merge</span><span class="sdlc-stage__s">a person decides</span><span class="sdlc-stage__rec">approval</span></a>
+	</div>
+
+	<div class="sdlc-panel" aria-live="polite"><p class="sdlc-panel__empty">Click a stage or a document, or press <b>Walk through</b>.</p></div>
+
+	<div class="sdlc-details">
+		<div data-detail="idea"><h4>1. Idea</h4><dl><dt>Who</dt><dd>You, or the client who wants the feature</dd><dt>In</dt><dd>A user need</dd><dt>Out</dt><dd>A sketch and one sentence, recorded as an issue</dd><dt>Check</dt><dd>Can you say who it is for?</dd></dl></div>
+		<div data-detail="analysis"><h4>2. Analysis</h4><dl><dt>Who</dt><dd>You: business and technical view together</dd><dt>In</dt><dd>The idea; the product card and the architecture, to see what it touches</dd><dt>Out</dt><dd>A goal with an ID: what the screen does, its value, what it integrates with, constraints, what is out of scope</dd><dt>Check</dt><dd>Could two pairs build the same thing from it?</dd></dl></div>
+		<div data-detail="requirements"><h4>3. Technical requirements</h4><dl><dt>Who</dt><dd>You decide; the agent may draft and ask questions</dd><dt>In</dt><dd>Goal, client log, architecture and API docs, <code>AGENTS.md</code></dd><dt>Out</dt><dd><code>docs/spec-about.md</code>: numbered, observable criteria AC-1…AC-6</dd><dt>Check</dt><dd>Every criterion can be shown true or false by a test or a run</dd></dl></div>
+		<div data-detail="plan"><h4>4. Plan</h4><dl><dt>Who</dt><dd>The agent proposes; you approve, correct or ask for an alternative</dd><dt>In</dt><dd>Criteria and the <b>project knowledge</b>: architecture, decision records, notes, product card, API docs, <code>AGENTS.md</code></dd><dt>Out</dt><dd>An approved plan: files, approach, the documents it relied on, contradictions found, questions answered</dd><dt>Check</dt><dd>Each criterion maps to a step; the plan fits the architecture and the recorded decisions</dd></dl></div>
+		<div data-detail="implementation"><h4>5. Implementation</h4><dl><dt>Who</dt><dd>The agent, inside its harness</dd><dt>In</dt><dd>The approved plan, notes, <code>AGENTS.md</code></dd><dt>Out</dt><dd>Small changes on a branch, with commit messages that say why</dd><dt>Check</dt><dd>The diff matches the plan; no unrelated edits</dd></dl></div>
+		<div data-detail="gate"><h4>6. Quality gate</h4><dl><dt>Who</dt><dd>Deterministic tools: analyzer and lints, formatter, architecture rules, secret scan, dependency scan, golden tests</dd><dt>In</dt><dd>The changed code</dd><dt>Out</dt><dd>Pass, or an exact error the agent must fix</dd><dt>Check</dt><dd>A pass means well-formed code, not a correct feature</dd></dl></div>
+		<div data-detail="tests"><h4>7. Tests</h4><dl><dt>Who</dt><dd>The agent writes them, tools run them; you check they test the criteria and run the app yourself</dd><dt>In</dt><dd>Criteria and code</dd><dt>Out</dt><dd>Unit, widget and end-to-end results, and what you saw on a device</dd><dt>Check</dt><dd>Would the test fail if the feature were broken?</dd></dl></div>
+		<div data-detail="docs"><h4>8. Documentation</h4><dl><dt>Who</dt><dd>The agent drafts; you check</dd><dt>In</dt><dd>The change, the decisions made in the plan, what went wrong on the way</dd><dt>Out</dt><dd>Updated architecture, a decision record, a notes entry, <code>AGENTS.md</code> if a rule changed</dd><dt>Check</dt><dd>The documents describe the code as it now is</dd></dl></div>
+		<div data-detail="pr"><h4>9. Pull request</h4><dl><dt>Who</dt><dd>The agent drafts the description; you correct it and submit it</dd><dt>In</dt><dd>Commits, test and gate results, documentation changes</dd><dt>Out</dt><dd>What and why, how to review, evidence, documents changed, AI assistance</dd><dt>Check</dt><dd>Every claim in it is backed by output you saw</dd></dl></div>
+		<div data-detail="review"><h4>10. Review and merge</h4><dl><dt>Who</dt><dd>A person: your partner or another pair reviews, the owner merges</dd><dt>In</dt><dd>The pull request, the architecture, the decision records, the client log</dd><dt>Out</dt><dd>A review record and the merge; the knowledge now describes the new feature</dd><dt>Check</dt><dd>The review checklist; the author can explain every line</dd></dl></div>
+		<div data-detail="kb"><h4>Project knowledge</h4><dl><dt>What</dt><dd>The documents in the repository that describe the system and why it is the way it is</dd><dt>Why</dt><dd>A coding agent starts every session knowing nothing about your project. These documents are how it learns the architecture, the client's words and earlier decisions instead of guessing them.</dd><dt>Try</dt><dd>Click one document on the map to see which stages read it.</dd></dl></div>
+	</div>
+
+	<div class="sdlc-kb-details">
+		<div data-kb="architecture"><h4>Architecture: <code>ARCHITECTURE.md</code></h4><dl><dt>Records</dt><dd>The containers (app, API, database), the app's layers (screens, providers, services, data, models), what may import what, how data flows</dd><dt>Read by</dt><dd>Analysis, requirements, <b>plan</b> (where the change goes), implementation, review (does the change respect it?)</dd><dt>Updated</dt><dd>In stage 8, whenever the structure changes</dd></dl></div>
+		<div data-kb="decisions"><h4>Decisions: <code>docs/adr/</code></h4><dl><dt>Records</dt><dd>One architecture decision record (ADR) per decision: context, decision, consequences. Example: ADR-0002, build settings come from <code>--dart-define</code></dd><dt>Read by</dt><dd><b>Plan</b> and review</dd><dt>Why</dt><dd>Stops the agent, and new team members, from silently re-deciding settled questions</dd></dl></div>
+		<div data-kb="notes"><h4>Notes and work log: <code>NOTES.md</code></h4><dl><dt>Records</dt><dd>What was done, what is in progress, known problems and traps, such as "golden images were recorded on macOS: never regenerate them to make a test pass"</dd><dt>Read by</dt><dd><b>Plan</b> and implementation</dd><dt>Why</dt><dd>The agent's context ends with the session; the notes stay</dd></dl></div>
+		<div data-kb="product"><h4>Product and client: <code>docs/product.md</code>, <code>docs/client-log.md</code></h4><dl><dt>Records</dt><dd>The product card (client, users, intended purpose, constraints, scope) and what the client actually said</dd><dt>Read by</dt><dd>Analysis, requirements, <b>plan</b>, review</dd><dt>Why</dt><dd>The client log is the only source of client facts. Anything else, from you or from an agent, is an assumption</dd></dl></div>
+		<div data-kb="api"><h4>README and API docs</h4><dl><dt>Records</dt><dd>How to build and run the app and the server; the backend contract: endpoints, fields, errors (Swagger at <code>/docs</code>)</dd><dt>Read by</dt><dd>Requirements, <b>plan</b>, implementation</dd></dl></div>
+		<div data-kb="agents"><h4><code>AGENTS.md</code></h4><dl><dt>Records</dt><dd>The rules for <em>working</em>: the cycle, commands, architecture rules, boundaries, reporting, and where the other documents are</dd><dt>Read by</dt><dd>Almost every stage: it is the agent's entry point</dd></dl></div>
+	</div>
+
+	<div class="sdlc-audits">
+		<div data-audit="idea"><h4>Audit record: the issue</h4><dl><dt>Record</dt><dd>Issue #7, "About screen", with the sketch</dd><dt>Lives in</dt><dd>The issue tracker</dd><dt>Points back to</dt><dd>The client who asked, and the client log entry</dd></dl></div>
+		<div data-audit="analysis"><h4>Audit record: GOAL-1</h4><dl><dt>Record</dt><dd>The goal definition, with an ID everything else can cite</dd><dt>Lives in</dt><dd>The issue, or <code>docs/goals/</code></dd><dt>Points back to</dt><dd>Issue #7</dd></dl></div>
+		<div data-audit="requirements"><h4>Audit record: the specification</h4><dl><dt>Record</dt><dd><code>docs/spec-about.md</code>, criteria AC-1…AC-6, headed with GOAL-1</dd><dt>Lives in</dt><dd>The repository, next to the code</dd><dt>Points back to</dt><dd>GOAL-1 and <code>docs/client-log.md</code></dd></dl></div>
+		<div data-audit="plan"><h4>Audit record: the approved plan</h4><dl><dt>Record</dt><dd>The plan, the documents it relied on, and <b>your written answers</b> to its questions</dd><dt>Lives in</dt><dd>The pull request, or <code>docs/plans/</code></dd><dt>Points back to</dt><dd>AC-1…AC-6, ADR-0002, <code>ARCHITECTURE.md</code></dd></dl></div>
+		<div data-audit="implementation"><h4>Audit record: commits</h4><dl><dt>Record</dt><dd>Small commits with <code>Refs: GOAL-1</code> and <code>AI-assisted:</code> trailers</dd><dt>Lives in</dt><dd>Git history</dd><dt>Find it</dt><dd><code>git log --grep="GOAL-1"</code></dd></dl></div>
+		<div data-audit="gate"><h4>Audit record: the CI log</h4><dl><dt>Record</dt><dd>The quality-gate run for each commit: tool versions, results</dd><dt>Lives in</dt><dd>GitHub Actions, linked from the pull request</dd><dt>Points back to</dt><dd>The exact commit it checked</dd></dl></div>
+		<div data-audit="tests"><h4>Audit record: the test report</h4><dl><dt>Record</dt><dd>Test names that cite criteria (<code>AC-4: …</code>), their results, and your device check</dd><dt>Lives in</dt><dd>CI and the pull request's Evidence section</dd><dt>Points back to</dt><dd>AC-1…AC-6</dd></dl></div>
+		<div data-audit="docs"><h4>Audit record: decision and notes</h4><dl><dt>Record</dt><dd>ADR-0003, a dated <code>NOTES.md</code> entry, the <code>ARCHITECTURE.md</code> diff</dd><dt>Lives in</dt><dd>The repository, in the same pull request as the code</dd><dt>Points back to</dt><dd>GOAL-1 and the plan's questions</dd></dl></div>
+		<div data-audit="pr"><h4>Audit record: pull request #12</h4><dl><dt>Record</dt><dd>What and why, evidence, documents changed, AI assistance; a row in your agent log</dd><dt>Lives in</dt><dd>GitHub and <code>dossier/agent_log.csv</code></dd><dt>Points back to</dt><dd>GOAL-1, the plan, the CI runs</dd></dl></div>
+		<div data-audit="review"><h4>Audit record: review and merge</h4><dl><dt>Record</dt><dd>Review comments, the approval, the merge commit</dd><dt>Lives in</dt><dd>GitHub and Git history</dd><dt>Find it</dt><dd><code>gh pr view 12 --comments</code></dd></dl></div>
+	</div>
+
+	<ol class="sdlc-walk">
+		<li data-stage="idea">The study coordinator at the rehabilitation clinic sketches a screen: <em>"Participants ask which version they have, and our ethics committee wants the app to say what it is for."</em> You record it as issue #7. It is an idea, not yet a specification.</li>
+		<li data-stage="analysis">You and your pair turn it into <b>GOAL-1</b>: what the screen does, why it matters, what it touches, what is out of scope.</li>
+		<li data-stage="requirements">You write <code>docs/spec-about.md</code>: six criteria, including a server that does not answer and a contact the client has not given yet. The agent may ask questions; you decide.</li>
+		<li data-stage="kb">Before planning, the agent reads the <b>project knowledge</b>: <code>ARCHITECTURE.md</code> (<em>screens never import http</em>), ADR-0002 (<em>build settings come from --dart-define</em>) and <code>docs/product.md</code> (<em>the purpose wording; the contact is still a TODO</em>). Without them it would have to guess all three.</li>
+		<li data-stage="plan">The agent proposes a plan: files, approach, the documents it used, <b>one contradiction</b> it found between the documents and the code, and two open questions. You answer in writing and approve.</li>
+		<li data-stage="implementation">On a branch, the agent implements the first step and runs the checks.</li>
+		<li data-stage="gate" data-result="fail">The gate <b>fails</b>: the architecture test reports <code>lib/screens/about_screen.dart</code> imports <code>package:http</code>. Same input, same verdict, every time.</li>
+		<li data-stage="implementation">The error goes back to the agent, which moves the call into <code>lib/services/</code>. Nobody had to copy and paste anything.</li>
+		<li data-stage="gate" data-result="pass">The gate <b>passes</b>. That proves the code is well-formed and in the right layer, not that the feature does what you asked.</li>
+		<li data-stage="tests">The tests run against the criteria, including the AC-4 test you read before the code existed: <em>no answer within 5 s shows "Server: unavailable"</em>. You also run the app on a phone with the server switched off.</li>
+		<li data-stage="docs">The agent drafts the documentation: the new screen and service in <code>ARCHITECTURE.md</code>, ADR-0003 (<em>the version comes from the build, not from a package</em>), a <code>NOTES.md</code> entry with what is left. You check that it matches the code.</li>
+		<li data-stage="pr">You open pull request #12: what and why, how to review, real evidence, documents changed, AI assistance. A row goes into your agent log.</li>
+		<li data-stage="review">Another pair reviews against the checklist, compares the purpose text with <code>docs/client-log.md</code>, asks one question, and approves. You merge.</li>
+		<li data-stage="kb">Merged. The project knowledge now describes the About screen, so the <b>next</b> plan starts from it. That loop is what makes the next feature cheaper.</li>
+	</ol>
+</div>
+
+<script>
+	import '../scripts/sdlc.js';
+</script>

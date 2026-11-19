@@ -1,0 +1,191 @@
+---
+title: 'Stages 7–10: from tests to merge'
+description: 'The worked example, part three: tests against the criteria, documentation, the pull request and a human review.'
+---
+
+import StageFacts from '../../../components/StageFacts.astro';
+import StageStrip from '../../../components/StageStrip.astro';
+import Checklist from '../../../components/Checklist.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+
+<StageStrip />
+
+<span id="stage-tests" class="stage-anchor"></span>
+
+## 7. Tests
+
+<StageFacts tone="tool" who={'<span class="sdlc-chip is-agent">Agent</span> writes · <span class="sdlc-chip is-tool">Tools</span> run · <span class="sdlc-chip is-you">You</span> check that they test the criteria, and run the app'} input="<code>docs/spec-about.md</code> and the code" output="Tests and their real results, and what you saw on a device" />
+
+There are three levels of automated test, from fast and narrow to slow and broad, plus your own run of the app:
+
+| Level | In Flutter | Runs on | For the About screen |
+|---|---|---|---|
+| **Unit** | `test(...)` on plain Dart code | your computer, milliseconds | the version service with a fake server (`MockClient` from `package:http/testing.dart`): a reply, an error (AC-3, AC-4) |
+| **Widget** | `testWidgets(...)` with `flutter_test` | your computer, a simulated screen | the button opens the screen; "checking…", "unavailable", "not yet confirmed" (AC-1…AC-5) |
+| **End-to-end** | `integration_test` package | a device or emulator | open About with the real server running, then with it stopped |
+| **Your run** | the app itself | a phone or emulator | server switched off, very large font, dark mode, a narrow screen |
+
+Here is the widget test for the riskiest criterion. Note how the plan's decision, a timeout passed in as a parameter and a service the test can replace, makes it possible. Widget tests run on a fake clock, so the 5 seconds take no real time:
+
+```dart title="test/screens/about_screen_test.dart (illustrative)"
+testWidgets('AC-4: no answer within 5 s shows "Server: unavailable"',
+    (tester) async {
+  // A server that answers only after 6 s: too late.
+  final slowServer = MockClient((request) async {
+    await Future<void>.delayed(const Duration(seconds: 6));
+    return http.Response('{"version": "1.0.0"}', 200);
+  });
+  await tester.pumpWidget(aboutScreenWith(client: slowServer));
+
+  await tester.pump(const Duration(milliseconds: 4900));
+  expect(find.text('Server: checking…'), findsOneWidget);
+
+  await tester.pump(const Duration(milliseconds: 200));
+  expect(find.text('Server: unavailable'), findsOneWidget);
+
+  await tester.pump(const Duration(seconds: 1)); // the late reply is ignored
+});
+```
+
+`aboutScreenWith` is a small helper in the same file that wraps the screen in a `ProviderScope` with the service overridden. The criterion ID is in the test name, as `AGENTS.md` asks, so a failing test points straight at a criterion.
+
+<Predict id="same-mistake" question="The agent wrote both the About screen and its tests, and everything passes. What could still be wrong?">
+
+The agent can make the same wrong assumption in the code and in the test. If it believed the purpose sentence it invented, the test checks that sentence and passes. If it thought "unavailable" should appear after 30 s, the test waits 30 s. Passing tests show that the code and the tests agree with each other, not that either agrees with your criteria.
+
+</Predict>
+
+:::tip[Who writes the test that matters most?]
+For the riskiest criterion, write the test yourself, or at least read it closely **before** the implementation exists. Then ask: *would this test fail if the feature were broken?* Break the code on purpose and run it. In W4, mutation testing asks the same question automatically, for every line.
+:::
+
+<span id="stage-docs" class="stage-anchor"></span>
+
+## 8. Documentation: update what the next plan reads
+
+<StageFacts tone="agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts · <span class="sdlc-chip is-you">You</span> check against the code'} input="The change, the plan's answers and contradictions, what went wrong on the way" output="Updated project knowledge, in the same pull request as the code" />
+
+This stage closes the loop that makes the next plan good. Whatever was decided or learned during this feature must be written down now, while it is fresh, or the next session (yours or the agent's) starts without it.
+
+| What happened in this feature | Where it goes |
+|---|---|
+| A new screen, service and provider | `ARCHITECTURE.md`: add them to the layers |
+| "The version comes from the build, not from a package" was settled in the plan | `docs/adr/0003-app-version-from-build.md` (ADR) |
+| `lib/repositories/` was listed but does not exist | `ARCHITECTURE.md`: fix the contradiction the plan found |
+| iOS was not verified; debug builds show "dev" | `NOTES.md`: a dated entry |
+| "Screens never import `http`" is now checked by a test | `AGENTS.md`: the rule moves from "not checked" to "checked by `test/architecture_test.dart`" |
+| The client has not given a contact yet | your list of questions for the client; `docs/client-log.md` once answered |
+
+Agents are good at drafting these updates from the diff and the plan: ask for them explicitly. Your job is to check that the documents describe the code **as it now is**, not as it was planned.
+
+:::caution[What goes wrong here]
+- "We'll document it later." Later never comes, and the documents slowly turn false.
+- Documentation in a separate pull request that nobody reviews.
+- The agent describes what it *intended* to build. Check the documents against the diff.
+:::
+
+<span id="stage-pr" class="stage-anchor"></span>
+
+## 9. Pull request
+
+<StageFacts tone="agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts · <span class="sdlc-chip is-you">You</span> correct, own and submit'} input="The commits, the gate and test results, the documentation changes" output="A pull request a reviewer can check in minutes" />
+
+A pull request asks another person to accept your change. Its description is written for that reviewer. It says what was done and why, where to look first, what evidence exists, which documents changed, which AI tools helped, and which standards apply. The course's AI rules ask you to disclose AI help in a commit trailer or here.
+
+```markdown title="Pull request #12 (illustrative)"
+## What and why
+Adds an About screen: app and server version, intended purpose, contact
+(GOAL-1, AC-1…AC-6). Closes #7.
+
+## How to review
+- Start with `lib/services/version_service.dart`: the timeout is there.
+- AC-4 (the server that does not answer) is the risky part; see its test.
+- Compare the purpose text with docs/client-log.md, 2026-11-12.
+
+## Evidence
+- [ ] `flutter analyze`: <paste the real result>
+- [ ] `flutter test`: <paste the real summary line>
+- [ ] Android emulator, server running and stopped: <two screenshots>
+- Not verified: iOS simulator.
+
+## Documentation
+- ARCHITECTURE.md: new screen, service, provider; removed lib/repositories/
+- docs/adr/0003-app-version-from-build.md (new)
+- NOTES.md: entry for 2026-11-20
+- AGENTS.md: the screens/http rule is now checked by a test
+
+## Open questions for the client
+- Contact for the About screen (shown as "not yet confirmed" until then).
+
+## AI assistance
+GitHub Copilot (agent), <model>. The agent proposed the plan, wrote the
+service and the screen, a first draft of the tests and the documentation.
+I rewrote the AC-4 test and checked the purpose text against the client log.
+Agent log: row added to dossier/agent_log.csv.
+
+## Standards
+AGENTS.md rev. 2026-11-19 · docs/commits.md
+```
+
+:::caution[Every line in Evidence must come from output you saw]
+An agent can write "all tests pass" without running them. Paste the real result, or leave the box unticked and say what you did not verify.
+:::
+
+<span id="stage-review" class="stage-anchor"></span>
+
+## 10. Review and merge
+
+<StageFacts tone="you" who={'<span class="sdlc-chip is-you">A person</span> your partner or another pair reviews; the owner merges'} input="The pull request, <code>ARCHITECTURE.md</code>, the decision records, the client log" output="A review record (comments, approval) and the merged change" />
+
+The reviewer checks the pull request against the review checklist and leaves a record: comments, questions, and finally an approval or a request for changes. An AI reviewer can add useful comments. In W5 you add Copilot as a reviewer in CI, and see how text planted in an issue can steer it. But an AI reviewer cannot take responsibility. A person approves, and the author must be able to explain every line. "The AI wrote it" is not an answer in a review.
+
+<Checklist
+	id="review"
+	title="Review checklist"
+	items={[
+		'Every criterion is met, with evidence in the pull request',
+		'The diff matches the approved plan; nothing unrelated changed',
+		'The change fits <code>ARCHITECTURE.md</code> and the decision records',
+		'The tests would fail if the feature were broken',
+		'Every client fact (purpose, contact, wording) is in <code>docs/client-log.md</code>',
+		'The documentation describes the code as it now is',
+		'No secrets, no real personal or health data; no new package without a SOUP row and agreement',
+		'You could explain any line of it if asked',
+	]}
+/>
+
+When the pull request is merged, the project knowledge describes the new feature. The next idea starts from there: the pipeline is a loop, not a line.
+
+<Quiz
+	question="When should <code>ARCHITECTURE.md</code>, the decision records and <code>NOTES.md</code> be updated for a feature?"
+	options={[
+		'At the end of the semester',
+		'Only when the teacher asks',
+		'In the same pull request as the code, so reviewers check them together and the next plan reads the current state',
+		'Never: the code is the documentation',
+	]}
+	answer={2}
+/>
+
+<Quiz
+	question="What belongs in a pull request's Evidence section?"
+	options={[
+		"The agent's statement that all tests pass",
+		'Real results you saw, plus what you did not verify',
+		'The full chat transcript',
+		'Nothing; the reviewer will run the tests',
+	]}
+	answer={1}
+/>
+
+<Quiz
+	question="The AI reviewer in CI approves the pull request with no comments. Can you merge?"
+	options={[
+		'Yes: two checks passed',
+		'No: a person must review and approve, and be able to explain every line; the AI review is one more input',
+		'Yes, if the gate also passed',
+		'Yes, if your partner has no time to review',
+	]}
+	answer={1}
+/>

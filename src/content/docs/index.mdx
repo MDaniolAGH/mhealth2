@@ -1,0 +1,50 @@
+---
+title: 'AI SDLC: From Idea to Merge'
+description: How to build software with a coding agent, one stage at a time, in the Digital Health Engineering Studio.
+template: splash
+hero:
+  image:
+    file: ../../assets/hero.svg
+  tagline: A coding agent can write a Flutter screen in minutes. This guide is about everything else. You decide what to build, give the agent what it needs to know, check what it did, and stay able to explain the change months later.
+  actions:
+    - text: Start with the map
+      link: ai-sdlc/overview/
+      icon: right-arrow
+    - text: Jump to the templates
+      link: ai-sdlc/templates/
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## One feature, ten stages
+
+The guide follows **one feature**, an About screen for the Mood Tracker you took over, from a client's sketch to a merged pull request. At every stage it shows who does the work, what goes in, what comes out, and what checks it. Each page has something to try and a few questions to check yourself.
+
+<CardGrid>
+	<LinkCard title="The pipeline at a glance" description="The whole process on one interactive map. Start here. (5 min)" href="ai-sdlc/overview/" />
+	<LinkCard title="1. From a prompt to an agent" description="Model, harness, tools. Take the harness apart. (5 min)" href="ai-sdlc/agents/" />
+	<LinkCard title="2. Context" description="What the agent knows, and what it costs. Build a context. (5 min)" href="ai-sdlc/context/" />
+	<LinkCard title="3. Project knowledge" description="What the plan is built on: architecture, decisions, notes, the client's words. (5 min)" href="ai-sdlc/knowledge/" />
+	<LinkCard title="4. AGENTS.md" description="The project's rules for agents. (3 min)" href="ai-sdlc/agents-md/" />
+	<LinkCard title="5. Stage by stage" description="The worked example in three parts: idea to plan, code and the gate, tests to merge. (15 min)" href="ai-sdlc/idea-to-plan/" />
+	<LinkCard title="6. Auditability" description="Walk back from a line of code to the goal. Break a link and see what is lost. (4 min)" href="ai-sdlc/auditability/" />
+	<LinkCard title="7. Templates" description="AGENTS.md, ARCHITECTURE.md, ADR, NOTES.md, spec, commit, pull request: ready to copy." href="ai-sdlc/templates/" />
+</CardGrid>
+
+## How to use this guide
+
+<CardGrid>
+	<Card title="Before W3" icon="open-book">
+		Read the map and sections 1 to 4. They build on W2: how a model works, context, and your pair's `AGENTS.md`.
+	</Card>
+	<Card title="During the labs" icon="laptop">
+		Keep section 5 open while you work on your client's brief. Each stage says what it should leave behind.
+	</Card>
+	<Card title="Predict, then check" icon="pencil">
+		Boxes marked **Predict first** ask you to commit to an answer before you see ours. Your answers stay in your browser only.
+	</Card>
+	<Card title="Synthetic data only" icon="warning">
+		Everything here uses the Mood Tracker's synthetic data. Never put real personal or health data into the app, or into an agent's context.
+	</Card>
+</CardGrid>

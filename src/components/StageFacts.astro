@@ -1,0 +1,16 @@
+---
+/** The Who / In / Out strip at the top of each stage. */
+interface Props {
+	tone: 'you' | 'agent' | 'tool';
+	who: string;
+	input: string;
+	output: string;
+}
+const { tone, who, input, output } = Astro.props;
+---
+
+<div class={`stage-facts is-${tone} not-content`}>
+	<span>Who</span><span set:html={who} />
+	<span>In</span><span set:html={input} />
+	<span>Out</span><span set:html={output} />
+</div>

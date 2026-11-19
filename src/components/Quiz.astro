@@ -1,0 +1,64 @@
+---
+/**
+ * One multiple-choice question. A wrong answer is marked and the reader tries
+ * again; the explanation appears only with the right answer. Without
+ * JavaScript, the options are listed and the answer is in a <details>.
+ */
+interface Props {
+	question: string;
+	options: string[];
+	answer: number; // index into options
+	explain?: string;
+}
+const { question, options, answer, explain = '' } = Astro.props;
+---
+
+<div class="quiz not-content" data-answer={answer}>
+	<p class="quiz__label">Check yourself</p>
+	<p class="quiz__q" set:html={question} />
+	<ol class="quiz__options">
+		{
+			options.map((o, i) => (
+				<li>
+					<button type="button" class="quiz__opt" data-i={i}>
+						<span class="quiz__letter">{String.fromCharCode(65 + i)}</span>
+						<span set:html={o} />
+					</button>
+				</li>
+			))
+		}
+	</ol>
+	<p class="quiz__feedback" aria-live="polite"></p>
+	<div class="quiz__explain" hidden set:html={explain} />
+	<noscript>
+		<details>
+			<summary>Answer</summary>
+			<p>{String.fromCharCode(65 + answer)}. <Fragment set:html={explain} /></p>
+		</details>
+	</noscript>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.quiz').forEach((quiz) => {
+		const answer = Number(quiz.dataset.answer);
+		const feedback = quiz.querySelector<HTMLElement>('.quiz__feedback')!;
+		const explain = quiz.querySelector<HTMLElement>('.quiz__explain')!;
+		let tries = 0;
+		quiz.querySelectorAll<HTMLButtonElement>('.quiz__opt').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				if (quiz.classList.contains('is-solved')) return;
+				tries++;
+				if (Number(btn.dataset.i) === answer) {
+					btn.classList.add('is-right');
+					quiz.classList.add('is-solved');
+					feedback.textContent = tries === 1 ? 'Correct, first time.' : `Correct, after ${tries} tries.`;
+					explain.hidden = !explain.innerHTML.trim();
+				} else {
+					btn.classList.add('is-wrong');
+					btn.disabled = true;
+					feedback.textContent = 'Not this one. Why not? Think about it, then try again.';
+				}
+			});
+		});
+	});
+</script>

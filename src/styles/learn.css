@@ -1,0 +1,159 @@
+/* Teaching components: quiz, predict-then-reveal, checklist. */
+
+.quiz,
+.predict,
+.checklist {
+	margin-top: 1.5rem;
+	padding: 1rem 1.1rem;
+	border: 1px solid var(--sdlc-line);
+	border-left: 4px solid var(--q, var(--sl-color-accent));
+	border-radius: 0.6rem;
+	background: var(--sdlc-surface);
+	color: var(--sdlc-ink);
+	font-size: var(--sl-text-sm);
+	line-height: 1.5;
+}
+.quiz code,
+.predict code,
+.checklist code,
+.stage-facts code,
+.sdlc code,
+.harness-lab code,
+.race code,
+.ctx-lab code,
+.gate-lab code,
+.audit-walk code {
+	font-family: var(--__sl-font-mono);
+	font-size: 0.9em;
+	padding: 0.05em 0.3em;
+	border-radius: 0.25em;
+	background: var(--sl-color-bg-inline-code);
+}
+
+.quiz__label,
+.predict__label,
+.checklist__title {
+	margin: 0 0 0.3rem;
+	font-size: var(--sl-text-xs);
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--q, var(--sl-color-accent));
+}
+.quiz { --q: var(--course-secondary); }
+.predict { --q: var(--sdlc-audit); }
+.checklist { --q: var(--sdlc-tool); }
+
+.quiz__q,
+.predict__q { margin: 0 0 0.7rem; font-weight: 600; font-size: var(--sl-text-base); }
+
+.quiz__options { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.quiz__opt {
+	display: flex;
+	gap: 0.6rem;
+	align-items: flex-start;
+	width: 100%;
+	padding: 0.5rem 0.7rem;
+	border: 1.5px solid var(--sdlc-line);
+	border-radius: 0.45rem;
+	background: var(--sdlc-card);
+	color: inherit;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+	transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.quiz__opt:hover:not(:disabled) { border-color: var(--q); transform: translateX(2px); }
+.quiz__opt:focus-visible { outline: 2px solid var(--q); outline-offset: 2px; }
+.quiz__letter {
+	flex: none;
+	display: inline-grid;
+	place-items: center;
+	width: 1.5rem;
+	height: 1.5rem;
+	border-radius: 50%;
+	background: var(--sdlc-surface);
+	border: 1px solid var(--sdlc-line);
+	font-weight: 700;
+	font-size: var(--sl-text-xs);
+}
+.quiz__opt.is-wrong { border-color: var(--sdlc-fail); opacity: 0.6; cursor: not-allowed; text-decoration: line-through; text-decoration-color: var(--sdlc-fail); }
+.quiz__opt.is-right { border-color: var(--sdlc-tool); background: var(--sdlc-tool-tint); }
+.quiz__opt.is-right .quiz__letter { background: var(--sdlc-tool); color: var(--sdlc-card); border-color: var(--sdlc-tool); }
+.quiz.is-solved .quiz__opt:not(.is-right) { opacity: 0.45; cursor: default; }
+.quiz__feedback { margin: 0.6rem 0 0; font-weight: 600; min-height: 1.2em; }
+.quiz.is-solved .quiz__feedback { color: var(--sdlc-tool); }
+.quiz__explain { margin-top: 0.3rem; }
+.quiz__explain[hidden] { display: none; }
+
+.predict__input {
+	width: 100%;
+	padding: 0.5rem 0.65rem;
+	border: 1.5px solid var(--sdlc-line);
+	border-radius: 0.45rem;
+	background: var(--sdlc-card);
+	color: inherit;
+	font: inherit;
+	resize: vertical;
+}
+.predict__input:focus { outline: 2px solid var(--q); outline-offset: 1px; }
+.predict__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.8rem; margin-top: 0.5rem; }
+.predict__reveal {
+	padding: 0.35rem 0.9rem;
+	border: 0;
+	border-radius: 999px;
+	background: var(--q);
+	color: var(--sdlc-card);
+	font: inherit;
+	font-weight: 700;
+	cursor: pointer;
+}
+.predict__reveal:disabled { opacity: 0.4; cursor: not-allowed; }
+.predict__hint { color: var(--sdlc-muted); font-size: var(--sl-text-xs); }
+.predict__answer {
+	margin-top: 0.7rem;
+	padding: 0.7rem 0.85rem;
+	border-radius: 0.45rem;
+	background: var(--sdlc-audit-tint);
+	animation: sdlc-rise 0.3s ease;
+}
+.predict__answer[hidden] { display: none; }
+.predict__answer > :first-child { margin-top: 0; }
+.predict__answer > :last-child { margin-bottom: 0; }
+.predict__answer p { margin: 0.4rem 0; }
+
+.checklist ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; }
+.checklist label { display: flex; gap: 0.55rem; align-items: flex-start; cursor: pointer; }
+.checklist input { flex: none; margin-top: 0.25rem; width: 1rem; height: 1rem; accent-color: var(--sdlc-tool); }
+.checklist label:has(input:checked) span { color: var(--sdlc-muted); }
+.checklist__count { margin: 0.5rem 0 0; font-size: var(--sl-text-xs); color: var(--sdlc-muted); }
+.checklist.is-done .checklist__count { color: var(--sdlc-tool); font-weight: 700; }
+.checklist.is-done .checklist__count::before { content: '✓ '; }
+
+/* Stage navigation strip at the top of the stage pages. */
+.stage-strip {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.3rem;
+	margin: 0 0 1.25rem;
+	padding: 0;
+	list-style: none;
+	font-size: var(--sl-text-xs);
+}
+.stage-strip a {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 0.2rem 0.55rem;
+	border-radius: 999px;
+	border: 1.5px solid var(--chip, var(--sdlc-line));
+	background: var(--chip-tint, transparent);
+	color: var(--sdlc-ink);
+	text-decoration: none;
+	font-weight: 600;
+}
+.stage-strip a:hover { background: var(--chip); color: var(--sdlc-card); }
+.stage-strip b { font-variant-numeric: tabular-nums; }
+
+/* Anchors the pipeline map links to; keep the heading below the sticky header. */
+.stage-anchor { display: block; height: 0; scroll-margin-top: calc(var(--sl-nav-height, 3.5rem) + 1rem); }

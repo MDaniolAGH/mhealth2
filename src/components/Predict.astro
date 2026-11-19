@@ -1,0 +1,54 @@
+---
+/**
+ * Predict before you read: the reader writes an answer, then reveals ours.
+ * The prediction is kept in this browser only (localStorage), per page.
+ */
+interface Props {
+	id: string;
+	question: string;
+}
+const { id, question } = Astro.props;
+---
+
+<div class="predict not-content" data-id={id}>
+	<p class="predict__label">Predict first</p>
+	<p class="predict__q" set:html={question} />
+	<textarea class="predict__input" rows="2" placeholder="Your prediction, in a sentence or two" aria-label="Your prediction"></textarea>
+	<div class="predict__bar">
+		<button type="button" class="predict__reveal" disabled>Reveal</button>
+		<span class="predict__hint">Write something first: a guess you commit to teaches more than one you skip.</span>
+	</div>
+	<div class="predict__answer" hidden>
+		<slot />
+	</div>
+	<noscript><div class="predict__answer"><slot /></div></noscript>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.predict').forEach((box) => {
+		const key = `predict:${location.pathname}:${box.dataset.id}`;
+		const input = box.querySelector<HTMLTextAreaElement>('.predict__input')!;
+		const reveal = box.querySelector<HTMLButtonElement>('.predict__reveal')!;
+		const answer = box.querySelector<HTMLElement>('.predict__answer')!;
+		const hint = box.querySelector<HTMLElement>('.predict__hint')!;
+		try {
+			input.value = localStorage.getItem(key) ?? '';
+		} catch {}
+		const update = () => {
+			reveal.disabled = input.value.trim().length < 3;
+		};
+		input.addEventListener('input', () => {
+			update();
+			try {
+				localStorage.setItem(key, input.value);
+			} catch {}
+		});
+		reveal.addEventListener('click', () => {
+			answer.hidden = false;
+			box.classList.add('is-revealed');
+			reveal.hidden = true;
+			hint.textContent = 'Compare: what did you get right, and what did you miss?';
+		});
+		update();
+	});
+</script>

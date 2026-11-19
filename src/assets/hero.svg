@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 400" role="img" aria-label="Ten stages flowing down three lanes: you, the agent and the tools">
+  <defs>
+    <linearGradient id="you-agent" x1="0" x2="1"><stop offset="0.5" stop-color="#9F1239"/><stop offset="0.5" stop-color="#1D4ED8"/></linearGradient>
+    <linearGradient id="agent-tool" x1="0" x2="1"><stop offset="0.5" stop-color="#1D4ED8"/><stop offset="0.5" stop-color="#15803D"/></linearGradient>
+  </defs>
+  <!-- lanes -->
+  <rect x="44" y="8" width="96" height="384" rx="12" fill="#E11D48" fill-opacity="0.10"/>
+  <rect x="144" y="8" width="96" height="384" rx="12" fill="#2563EB" fill-opacity="0.10"/>
+  <rect x="244" y="8" width="96" height="384" rx="12" fill="#16A34A" fill-opacity="0.10"/>
+  <!-- project knowledge, feeding the plan and fed by the docs -->
+  <rect x="8" y="60" width="24" height="290" rx="8" fill="#7C3AED" fill-opacity="0.16" stroke="#7C3AED" stroke-opacity="0.55"/>
+  <path d="M32 161 H48" stroke="#7C3AED" stroke-width="3" stroke-linecap="round"/>
+  <path d="M48 329 H34" stroke="#7C3AED" stroke-width="3" stroke-linecap="round"/>
+  <!-- forward flow -->
+  <g stroke="#64748B" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M90 52 V64"/>
+    <path d="M90 94 V106"/>
+    <path d="M140 136 V146"/>
+    <path d="M190 176 V188"/>
+    <path d="M190 218 V224 H290 V230"/>
+    <path d="M290 260 V272"/>
+    <path d="M190 302 V314"/>
+    <path d="M90 344 V356"/>
+  </g>
+  <!-- the gate's feedback loop -->
+  <path d="M328 245 H342 V203 H232" stroke="#DC2626" stroke-width="2" fill="none" stroke-dasharray="5 4" stroke-linejoin="round"/>
+  <path d="M236 199 L229 203 L236 207 Z" fill="#DC2626"/>
+  <!-- stages -->
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#FFFFFF">
+    <rect x="52" y="22" width="76" height="30" rx="8" fill="#9F1239"/><text x="90" y="42">Idea</text>
+    <rect x="52" y="64" width="76" height="30" rx="8" fill="#9F1239"/><text x="90" y="84">Goal</text>
+    <rect x="52" y="106" width="176" height="30" rx="8" fill="url(#you-agent)"/><text x="140" y="126">Criteria</text>
+    <rect x="52" y="146" width="176" height="30" rx="8" fill="url(#you-agent)"/><text x="140" y="166">Plan</text>
+    <rect x="152" y="188" width="76" height="30" rx="8" fill="#1D4ED8"/><text x="190" y="208">Code</text>
+    <rect x="252" y="230" width="76" height="30" rx="8" fill="#15803D"/><text x="290" y="250">Gate</text>
+    <rect x="152" y="272" width="176" height="30" rx="8" fill="url(#agent-tool)"/><text x="240" y="292">Tests</text>
+    <rect x="52" y="314" width="176" height="30" rx="8" fill="url(#you-agent)"/><text x="140" y="334">Docs · PR</text>
+    <rect x="52" y="356" width="76" height="30" rx="8" fill="#9F1239"/><text x="90" y="376">Merge</text>
+  </g>
+  <!-- the work item on its way to the gate -->
+  <circle cx="246" cy="224" r="7" fill="#F59E0B" stroke="#FFFFFF" stroke-width="2"/>
+</svg>

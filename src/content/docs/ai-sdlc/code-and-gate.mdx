@@ -1,0 +1,232 @@
+---
+title: 'Stages 5–6: implementation and the quality gate'
+description: 'The worked example, part two: small commits on a branch, and the deterministic checks every change must pass.'
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import StageFacts from '../../../components/StageFacts.astro';
+import StageStrip from '../../../components/StageStrip.astro';
+import GateLab from '../../../components/GateLab.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+
+<StageStrip />
+
+<span id="stage-implementation" class="stage-anchor"></span>
+
+## 5. Implementation
+
+<StageFacts tone="agent" who={'<span class="sdlc-chip is-agent">Agent</span> inside its harness'} input="The approved plan, <code>NOTES.md</code>, <code>AGENTS.md</code>" output="Small, reviewable changes on a branch, each with a commit message that says why" />
+
+The agent works on a **branch** (here `feat/about-screen`), never directly on `main`. It implements the plan and follows the standards, the architecture and the interfaces the plan fixed. It runs the checks after every change (stage 6) and loops until they pass. In W4 you ran several agents in parallel, each in its own worktree: a branch per attempt keeps them apart.
+
+Each change ends in a **commit**, and the commit message is part of the record. Besides *what* changed, a good message says *why*, how it was *verified*, and how it was *made*. This is the course's format (`docs/commits.md`):
+
+```text title="Commit message (illustrative)"
+feat(app): add About screen with app and server version
+
+Participants and support could not tell which version was installed, and
+the agreed intended purpose was not visible in the app.
+
+Verified: flutter analyze → <paste the real result>
+Verified: flutter test → <paste the real summary line>
+Not verified: iOS simulator
+Refs: GOAL-1
+ADR: ADR-0003
+AI-assisted: GitHub Copilot (agent) / <model>
+Decision: <accepted|revised>
+Time: <minutes> min
+Cost: <premium requests|unknown>
+```
+
+The `Key: value` lines at the end are **Git trailers**. Git and other tools can read them, so `git log --grep="GOAL-1"` lists every commit for the goal, and the AI lines feed your pair's agent log. The agent never fills in *Decision*, *Time* or *Cost*: those are yours.
+
+:::note[You make the commit]
+The Mood Tracker's `AGENTS.md` says: *do not commit, push or open pull requests unless asked.* You review the diff first, then commit using a message like the one above. Rejected attempts are not commits; they go into `dossier/rejected.csv`.
+:::
+
+:::caution[What goes wrong here]
+- One huge commit called "add about".
+- Edits to files the plan did not mention.
+- "Fixing" a failing test by weakening it, or regenerating a golden image to make it pass. `AGENTS.md` forbids both, and the diff shows them.
+:::
+
+<span id="stage-gate" class="stage-anchor"></span>
+
+## 6. Quality gate: what must be true before anyone reads the code
+
+<StageFacts tone="tool" who={'<span class="sdlc-chip is-tool">Deterministic tools</span>'} input="The changed code" output="Pass, or an exact error message that goes back to the agent" />
+
+A **quality gate** is a set of automatic checks that every change must pass before it moves on. Do not start from a list of tools. Start from the questions: **what do we need to be sure of about every change, every time, whoever or whatever wrote it?** Each tool is just one way to answer one of those questions.
+
+### What we want to be sure about
+
+| # | The question | Why it matters | Kind of check | One way to do it in the Mood Tracker |
+|---|---|---|---|---|
+| 1 | **Is the code well-formed?** | Code that does not compile, or has type errors, wastes everyone's time from here on | static analysis | `flutter analyze` |
+| 2 | **Is it written the way we write code?** | Consistent code is cheaper to read, and style stops being a review topic | lint rules, formatting | `flutter_lints`, `dart format` |
+| 3 | **Does it respect the architecture?** | Layers erode one "small exception" at a time, and agents copy whatever pattern they see | dependency rules | `lint-imports` (server); a test for the app (below) |
+| 4 | **Is it safe to share?** | A key or password in Git history is public as soon as the repository is | secret scan | git-secrets, gitleaks |
+| 5 | **Can we trust what it depends on?** | Every package is code you did not write and did not review: a SOUP item | vulnerability scan, register check | OSV-Scanner; `tests/test_soup_register.py` |
+| 6 | **Does the UI still look as approved?** | Small visual changes slip past a code review | screenshot comparison | golden tests (`matchesGoldenFile`) |
+
+Two questions are deliberately **not** in the gate: *does it do what we asked?* is answered by tests against the criteria (stage 7), and *is it the right thing to build?* only by people (stages 7 and 10).
+
+### What makes a check a gate
+
+- **Deterministic.** The same input always gets the same verdict. A language model offers no such promise, and that is exactly why the gate exists.
+- **Automatic and fast.** The agent runs it after every change. Seconds, not minutes, so it can run often.
+- **Binary and binding.** Pass or fail, never "mostly". CI blocks the merge on a failure, and nobody, human or agent, can talk it round.
+- **Fail-closed.** If a check cannot run (the tool is missing, it crashed), that counts as a failure, not a pass.
+- **Independent of the author.** The agent's opinion of its own code is not evidence. The gate's verdict is.
+- **Leaves evidence.** A log of which tool, in which version, said what about which commit. That is part of the audit trail.
+- **A ratchet.** Rules only get stricter. Never weaken a rule, edit `.importlinter` or delete a test to make a change pass; `AGENTS.md` forbids it, and the diff shows it.
+
+### Layers of defence
+
+No single check catches everything. Think of the gate as layers, like the slices in the "Swiss cheese" model from safety science. Each layer asks **one question**, and lets through every defect its question does not cover. A defect reaches the user only if it gets through every layer.
+
+<Predict id="gate-purpose" question="An agent writes an intended purpose the client never stated. Which layer stops it?">
+
+None of the automated ones, and not even the tests, if the agent also wrote the sentence into `docs/product.md`. Only a person comparing the text with `docs/client-log.md` notices. Drop that defect below and watch it fall through every layer.
+
+</Predict>
+
+**Pick a defect** and follow it down: each layer says whether it passes or is stopped.
+
+<GateLab />
+
+The gate is cheap and certain about a few things. The tests are about what you asked for. People are about whether it was worth asking for. You need all three.
+
+### What a gate cannot tell you
+
+:::danger[A passing gate does not mean a correct feature]
+The Mood Tracker you took over passes `flutter analyze` and all of its tests. That tells you the code is well-formed and does what its tests check. It does not tell you that it does what your client needs: finding that out is your job in the labs. The gate proves the code is well-formed, consistent and safe to share. Only tests against your criteria, and running the app, show that it does what you asked.
+:::
+
+### Where the gate runs: as early as possible
+
+The earlier a check runs, the cheaper the fix. The same checks run in three places:
+
+| Where | When | Who sees a failure | Cost of a failure |
+|---|---|---|---|
+| **The agent's loop** | after every edit (`AGENTS.md` says so) | the agent, which fixes it | seconds |
+| **A pre-commit hook** | before each commit | you, before it enters history | a minute |
+| **CI on the pull request** | before merging; cannot be skipped | everyone; the merge is blocked | a round trip |
+
+<Tabs>
+<TabItem label="Run it locally">
+
+```bash
+cd mood_tracker
+dart format --output=none --set-exit-if-changed .   # 2 · our style
+flutter analyze                                      # 1, 2 · well-formed, lint rules
+flutter test                                         # 3, 6 · architecture and golden tests
+
+cd ../mood-tracker-api
+venv/bin/lint-imports                                # 3 · server layers (.importlinter)
+venv/bin/python -m pytest -q                         # 5 · SOUP register
+
+cd ..
+gitleaks git .                                       # 4 · safe to share
+osv-scanner scan source -r .                         # 5 · known vulnerabilities
+```
+
+</TabItem>
+<TabItem label="In CI">
+
+```yaml title=".github/workflows/quality-gate.yml (minimal example)"
+name: quality-gate
+on: pull_request
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mood_tracker
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.35.x
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed .
+      - run: flutter analyze
+      - run: flutter test
+  api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mood-tracker-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt -r requirements-dev.txt
+      - run: lint-imports
+      - run: python -m pytest -q
+```
+
+Golden images recorded on macOS may differ by a few pixels on Linux (see `NOTES.md`). Decide on purpose where the golden tests run; never regenerate them to make CI pass.
+
+</TabItem>
+<TabItem label="An architecture rule">
+
+```dart title="test/architecture_test.dart"
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+
+// AGENTS.md: screens and widgets never import http, sqflite or secure storage.
+const forbidden = [
+  'package:http/',
+  'package:sqflite/',
+  'package:flutter_secure_storage/',
+];
+
+void main() {
+  test('screens and widgets never import http, sqflite or secure storage', () {
+    final offenders = [
+      for (final dir in ['lib/screens', 'lib/widgets'])
+        ...Directory(dir)
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((file) => file.path.endsWith('.dart'))
+            .where((file) => forbidden.any(file.readAsStringSync().contains))
+            .map((file) => file.path),
+    ];
+
+    expect(offenders, isEmpty);
+  });
+}
+```
+
+The handover's `AGENTS.md` lists this rule as "not checked by a test yet". With this file, it is. Checked against the R0 handover (Flutter 3.35): the test passes, and fails with `Actual: ['lib/screens/home_screen.dart']` as soon as that file imports `package:http`.
+
+</TabItem>
+</Tabs>
+
+<Quiz
+	question="The quality gate passes: <code>flutter analyze</code> reports no issues and the formatter is happy. What do you know?"
+	options={[
+		'The feature meets its acceptance criteria',
+		'The code is well-formed and consistent; whether it does what was asked still needs tests and a run',
+		'There are no security problems',
+		'The pull request can be merged',
+	]}
+	answer={1}
+/>
+
+<Quiz
+	question="An agent's change fails the architecture test. It proposes to add the file to an exceptions list in the test &quot;because this screen is special&quot;. What do you do?"
+	options={[
+		'Accept: the agent knows the code',
+		'Reject: the gate is a ratchet. Move the call into <code>lib/services/</code>, or, if the rule really is wrong, propose an ADR and change the rule on purpose',
+		'Delete the test, since it blocks progress',
+		'Merge now and fix it later',
+	]}
+	answer={1}
+	explain="A rule weakened to make one change pass stops protecting every later change. If a rule has to change, that is a decision with a record, not a side effect of a diff."
+/>

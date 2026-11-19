@@ -1,0 +1,52 @@
+---
+/** Stage 6: drop a defect through the layers of defence ("Swiss cheese"). */
+---
+
+<div class="gate-lab not-content">
+	<div class="gate-lab__defects">
+		<span class="sdlc-legend__hint">Drop a defect:</span>
+		<button type="button" class="gate-defect" data-caught="analyze">a missing import</button>
+		<button type="button" class="gate-defect" data-caught="style">code in a different style</button>
+		<button type="button" class="gate-defect" data-caught="arch">a screen that imports <code>http</code></button>
+		<button type="button" class="gate-defect" data-caught="secrets">the JWT secret key in the commit</button>
+		<button type="button" class="gate-defect" data-caught="deps">a package with a known vulnerability</button>
+		<button type="button" class="gate-defect" data-caught="golden">the mood card's padding changes by 8 px</button>
+		<button type="button" class="gate-defect" data-caught="tests">a spinner that never stops when the server is down</button>
+		<button type="button" class="gate-defect" data-caught="human">an intended purpose the client never stated</button>
+	</div>
+	<p class="gate-lab__now" aria-live="polite">Defect: <b>none yet</b></p>
+	<div class="gate-lab__body">
+		<div class="gate-lab__track" aria-hidden="true"><i class="gate-lab__drop"></i></div>
+		<div class="gate-lab__stack">
+			<div class="gate-group gate-group--gate">
+				<p class="gate-group__label">Quality gate (stage 6): automatic, same verdict every time</p>
+				<div class="gate-layer" data-layer="analyze"><span class="gate-layer__n">1</span><span class="gate-layer__q"><b>Is the code well-formed?</b><span>compiler and analyzer</span></span><span class="gate-layer__status"></span></div>
+				<div class="gate-layer" data-layer="style"><span class="gate-layer__n">2</span><span class="gate-layer__q"><b>Is it written our way?</b><span>lint rules and formatter</span></span><span class="gate-layer__status"></span></div>
+				<div class="gate-layer" data-layer="arch"><span class="gate-layer__n">3</span><span class="gate-layer__q"><b>Does it fit the architecture?</b><span>architecture tests, import-linter</span></span><span class="gate-layer__status"></span></div>
+				<div class="gate-layer" data-layer="secrets"><span class="gate-layer__n">4</span><span class="gate-layer__q"><b>Is it safe to share?</b><span>secret scan</span></span><span class="gate-layer__status"></span></div>
+				<div class="gate-layer" data-layer="deps"><span class="gate-layer__n">5</span><span class="gate-layer__q"><b>Can we trust its dependencies?</b><span>vulnerability scan, SOUP register test</span></span><span class="gate-layer__status"></span></div>
+				<div class="gate-layer" data-layer="golden"><span class="gate-layer__n">6</span><span class="gate-layer__q"><b>Does it look as approved?</b><span>golden tests</span></span><span class="gate-layer__status"></span></div>
+			</div>
+			<div class="gate-group gate-group--after">
+				<p class="gate-group__label">Not the gate: these need your criteria and your judgement</p>
+				<div class="gate-layer" data-layer="tests"><span class="gate-layer__n">7</span><span class="gate-layer__q"><b>Does it do what we asked?</b><span>tests against the criteria (stage 7)</span></span><span class="gate-layer__status"></span></div>
+				<div class="gate-layer" data-layer="human"><span class="gate-layer__n">10</span><span class="gate-layer__q"><b>Is it the right thing?</b><span>your run, the review, the client (stages 7 and 10)</span></span><span class="gate-layer__status"></span></div>
+			</div>
+		</div>
+	</div>
+	<div class="gate-lab__result" aria-live="polite"><p>Pick a defect above.</p></div>
+	<div class="gate-lab__data">
+		<div data-defect="analyze"><b>Caught by layer 1, the analyzer:</b> <code>Undefined name 'AboutScreen'</code>. Seconds after the edit, before anyone reads the code, and the agent fixes it itself.</div>
+		<div data-defect="style"><b>Caught by layer 2, the formatter and lint rules.</b> Nobody has to raise it in review, and nobody has to argue about it.</div>
+		<div data-defect="arch"><b>Caught by layer 3, an architecture rule:</b> a small test that fails when a file in <code>lib/screens/</code> or <code>lib/widgets/</code> imports <code>http</code>, <code>sqflite</code> or secure storage. On the server, <code>lint-imports</code> does the same for the layers in <code>.importlinter</code>. Without such rules, layers erode one plausible exception at a time.</div>
+		<div data-defect="secrets"><b>Caught by layer 4, the secret scan,</b> before the key enters Git history, where removing it is hard and it must be treated as leaked: anyone with it can sign valid login tokens.</div>
+		<div data-defect="deps"><b>Caught by layer 5, the dependency scan,</b> which compares <code>pubspec.lock</code> and <code>requirements.txt</code> with a database of known vulnerabilities. A new package with no row in <code>docs/soup.csv</code> is stopped here too, by the SOUP register test.</div>
+		<div data-defect="golden"><b>Caught by layer 6, a golden test:</b> the rendered mood card no longer matches the approved image. In review, an 8 px change is almost invisible.</div>
+		<div data-defect="tests"><b>Passes every gate.</b> The code is well-formed, tidy, in the right layer and looks fine with a running server. Only the <b>test for AC-4</b>, which waits 5 s for a server that never answers, catches it. Gates check properties of the code, not your intent.</div>
+		<div data-defect="human"><b>Passes every check, the tests included.</b> The agent wrote the sentence into <code>docs/product.md</code> as well, and the test only checks that the screen shows what that file says. Only a person comparing it with <code>docs/client-log.md</code> notices that the client never said it. A purpose such as "helps patients manage depression" is a medical claim; it can change how the software is regulated.</div>
+	</div>
+</div>
+
+<script>
+	import '../scripts/sdlc.js';
+</script>

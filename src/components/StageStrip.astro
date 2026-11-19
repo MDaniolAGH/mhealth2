@@ -1,0 +1,29 @@
+---
+/** A row of the ten stages, coloured by who does the work, for the stage pages. */
+import { link } from '../lib/url';
+
+const stages = [
+	['1', 'Idea', 'idea-to-plan/#stage-idea', 'you'],
+	['2', 'Analysis', 'idea-to-plan/#stage-analysis', 'you'],
+	['3', 'Requirements', 'idea-to-plan/#stage-requirements', 'you'],
+	['4', 'Plan', 'idea-to-plan/#stage-plan', 'agent'],
+	['5', 'Implementation', 'code-and-gate/#stage-implementation', 'agent'],
+	['6', 'Gate', 'code-and-gate/#stage-gate', 'tool'],
+	['7', 'Tests', 'tests-to-merge/#stage-tests', 'tool'],
+	['8', 'Docs', 'tests-to-merge/#stage-docs', 'agent'],
+	['9', 'PR', 'tests-to-merge/#stage-pr', 'agent'],
+	['10', 'Review', 'tests-to-merge/#stage-review', 'you'],
+];
+---
+
+<ul class="stage-strip not-content" aria-label="The ten stages">
+	{
+		stages.map(([n, label, path, who]) => (
+			<li>
+				<a class={`is-${who}`} href={link(`ai-sdlc/${path}`)}>
+					<b>{n}</b> {label}
+				</a>
+			</li>
+		))
+	}
+</ul>

@@ -1,0 +1,38 @@
+---
+/** Section 2: build a context for the About-screen task and watch the meters. */
+---
+
+<div class="ctx-lab not-content">
+	<div class="ctx-lab__presets">
+		<span class="sdlc-legend__hint">Try:</span>
+		<button type="button" class="sdlc-btn" data-preset="lean">Lean and complete</button>
+		<button type="button" class="sdlc-btn" data-preset="all">Everything, just in case</button>
+		<button type="button" class="sdlc-btn" data-preset="bare">Just the prompt</button>
+	</div>
+	<div class="ctx-lab__items">
+		<label class="ctx-item" data-kind="rules"><input type="checkbox" data-tokens="1500" data-need="the project's rules" /> <code>AGENTS.md</code></label>
+		<label class="ctx-item" data-kind="rules"><input type="checkbox" data-tokens="1200" data-need="the criteria" /> the task and <code>docs/spec-about.md</code></label>
+		<label class="ctx-item" data-kind="knowledge"><input type="checkbox" data-tokens="4000" data-need="the architecture and the decisions" /> <code>ARCHITECTURE.md</code> and decision records</label>
+		<label class="ctx-item" data-kind="knowledge"><input type="checkbox" data-tokens="800" data-need="the client's wording (intended purpose, contact)" /> <code>docs/product.md</code></label>
+		<label class="ctx-item" data-kind="knowledge"><input type="checkbox" data-tokens="1500" data-need="the known traps (golden images)" /> latest <code>NOTES.md</code> entries</label>
+		<label class="ctx-item" data-kind="code"><input type="checkbox" data-tokens="12000" data-need="the code it will change" /> the 3 files the change touches</label>
+		<label class="ctx-item" data-kind="noise"><input type="checkbox" data-tokens="70000" /> the whole <code>lib/</code> and <code>test/</code> folders</label>
+		<label class="ctx-item" data-kind="stale"><input type="checkbox" data-tokens="45000" /> yesterday's chat session</label>
+		<label class="ctx-item" data-kind="stale"><input type="checkbox" data-tokens="25000" /> last week's full test log</label>
+		<label class="ctx-item" data-kind="noise"><input type="checkbox" data-tokens="380000" /> the entire Flutter documentation</label>
+		<label class="ctx-item" data-kind="danger"><input type="checkbox" data-tokens="200" data-danger="a secret" /> <code>.env</code> with the server's JWT secret key</label>
+		<label class="ctx-item" data-kind="danger"><input type="checkbox" data-tokens="30000" data-danger="real health data" /> an export of real participants' mood entries</label>
+	</div>
+	<div class="ctx-lab__bar" role="img" aria-label="Context window fill"></div>
+	<div class="ctx__scale"><span>0</span><span class="ctx-lab__used"></span><span>window: 200k tokens (illustrative)</span></div>
+	<div class="ctx-lab__meters">
+		<div class="meter" data-meter="cost"><span class="meter__label">Cost per step</span><span class="meter__value"></span><span class="meter__bar"><i></i></span></div>
+		<div class="meter" data-meter="focus"><span class="meter__label">Focus</span><span class="meter__value"></span><span class="meter__bar"><i></i></span></div>
+		<div class="meter" data-meter="gaps"><span class="meter__label">Missing facts</span><span class="meter__value"></span><span class="meter__bar"><i></i></span></div>
+	</div>
+	<div class="ctx-lab__verdict" aria-live="polite"></div>
+</div>
+
+<script>
+	import '../scripts/sdlc.js';
+</script>

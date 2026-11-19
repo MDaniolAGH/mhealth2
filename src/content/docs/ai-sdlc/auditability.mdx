@@ -1,0 +1,58 @@
+---
+title: '6. Auditability: walk back from code to goal'
+description: Every stage leaves a record that points back to the one before it, so any line of code can be traced to the goal and the decision behind it.
+---
+
+import AuditWalk from '../../../components/AuditWalk.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+
+On the [map](../overview/), the auditability rail runs alongside every stage. Each stage leaves a **record** that points back to the one before it, so you can start from any line of merged code and walk back to the goal, and to the decision, that justified it. Switch on **Audit trail** on the map and click a stage to see its record.
+
+Here is the walk itself. A new member of your pair's project opens the About screen code and asks a fair question.
+
+<Predict id="trail-break" question="Below, you can break one link in the trail: the commit, the plan or the decision record. Which break do you think does the most damage, and why?">
+
+The missing decision record. A commit without `Refs:` is annoying, but the pull request may still be found by date. A plan answered only in chat loses who decided. Without the ADR, the **reason** is gone: nobody can tell a decision from an accident, and the next agent session will "fix" it by adding the package most code on the internet uses. Try all three and compare.
+
+</Predict>
+
+Press **Why is this here?** to follow the trail one step at a time. Then break a link and walk again, to see what is lost.
+
+<AuditWalk />
+
+Why it matters:
+
+- **Months later**, the answer to "why?" is in the records, not in someone's memory.
+- **Agents.** The next agent session plans from the same records (section 3). A broken trail for people is a broken context for agents.
+- **Regulated software.** Medical-device software standards, such as IEC 62304, expect requirements to be traceable to the code and the tests that implement them, and every third-party component (SOUP) to be recorded. The Mood Tracker is not a medical device, but it handles health data, and the habit costs little.
+- **AI-assisted work.** The trailers, the pull request and your agent log record which agent and model contributed, what it cost, and who reviewed it. In W6 you add these up for the whole semester.
+
+```bash title="Following the trail with Git"
+git log --oneline --grep="GOAL-1"                        # every commit for the goal
+git log --format='%h %s%n  %(trailers:key=AI-assisted)'  # who assisted each commit
+git blame lib/config.dart                                # which commit wrote each line
+```
+
+<Quiz
+	question="The plan's question &quot;package or <code>--dart-define</code>?&quot; was answered in a chat that is now closed, and no decision record exists. What has been lost?"
+	options={[
+		'Nothing, the code shows the answer',
+		'The reason: the trail from the code back to the decision is broken, so nobody can tell a decision from a guess',
+		'The test results',
+		'The commit',
+	]}
+	answer={1}
+/>
+
+<Quiz
+	question="Which command lists every commit made for GOAL-1?"
+	options={[
+		'<code>git blame GOAL-1</code>',
+		'<code>git log --grep="GOAL-1"</code>',
+		'<code>git show GOAL-1</code>',
+		'<code>gh pr view GOAL-1</code>',
+	]}
+	answer={1}
+	explain="It works only because every commit has a <code>Refs: GOAL-1</code> trailer. Without it, the commits are still there, but nothing connects them to the goal."
+/>

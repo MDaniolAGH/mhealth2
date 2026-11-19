@@ -1,0 +1,72 @@
+---
+title: '2. Context: what the agent knows'
+description: What goes into an agent's context window, what it costs, and why missing facts are filled with plausible guesses.
+---
+
+import ContextLab from '../../../components/ContextLab.astro';
+import Subagents from '../../../components/Subagents.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+
+The model knows nothing about your project except what is in its **context window** for the current task. Everything the agent works from has to fit there.
+
+<Predict id="ctx-more" question="Modern context windows hold hundreds of thousands of tokens. Why not put the whole repository in, just in case?">
+
+Three reasons. **Cost**: every step of the agent's loop sends the whole context again. **Focus**: the facts that matter compete with everything else, and old logs pile up. **Risk**: whatever is in the context is sent to the model's provider, secrets and health data included. Try the "Everything, just in case" preset below and watch the meters.
+
+</Predict>
+
+**Build a context** for the About-screen task (section 5): tick what goes in, or try a preset, and watch the size, the cost, the focus and the gaps.
+
+<ContextLab />
+
+The context of a running agent holds:
+
+- **Rules**: `AGENTS.md` and the task prompt.
+- **Project knowledge**: the architecture, decision records, notes and product card it has read (section 3).
+- **Code** the agent has opened.
+- **Work log**: its own earlier steps and every tool output, such as a long test run.
+- **Changes**: the diffs made so far.
+
+Context windows in current models are large: hundreds of thousands of tokens, and up to about a million for some. Filling them is still a bad idea:
+
+- **Cost.** Every step of the loop sends the context again, and you pay for it in time and money (in Copilot, in premium requests). Less context means lower cost.
+- **Focus.** Irrelevant files and stale tool output compete with what matters. A long session slowly fills with old logs, and in W2 you saw a long session break a rule a fresh one followed.
+- **Sub-agents** help. A large task can be split so that each part starts with a fresh, small context:
+
+<Subagents />
+
+The opposite failure is **missing information**. A model does not stop when it lacks a fact; it fills the gap with something plausible. For the About screen, the most dangerous gap is the client's own words: an agent that has not read `docs/product.md` will write an intended purpose and a contact address, and both will look exactly like real ones.
+
+That is why this pipeline does two things. It gives the agent the facts it needs: the goal, the criteria and, above all, the **project knowledge**. And it demands **evidence**: tests written against your criteria and gates that run without anyone's opinion. A test turns "looks right" into "checked".
+
+:::tip[What to put in the context, and what to leave out]
+- **Include**: the criteria, the files the change touches, the relevant project documents, the project rules.
+- **Leave out**: the whole repository "just in case", old chat history, unrelated logs.
+- **Never include** passwords, API keys, the server's `.env`, or real personal or health data. The context is sent to the model's provider.
+- **Start a fresh session** when a task is finished, after writing down in `NOTES.md` what the next session needs to know.
+:::
+
+<Quiz
+	question="An agent had no access to <code>docs/product.md</code> and wrote an intended purpose for the About screen. What is the most likely outcome?"
+	options={[
+		'It refuses to continue without the file',
+		'It writes a plausible sentence in the same confident tone as the rest of its work',
+		'It leaves a visible placeholder',
+		'It asks the client',
+	]}
+	answer={1}
+	explain="A model fills gaps with the most plausible text. It leaves a placeholder only if the rules tell it to, which is why the Mood Tracker's <code>AGENTS.md</code> says: never invent facts the client must provide; use <code>&lt;TODO: client&gt;</code>."
+/>
+
+<Quiz
+	question="Which of these should never be in an agent's context, whatever the task?"
+	options={[
+		'The three files the change touches',
+		'<code>ARCHITECTURE.md</code>',
+		"The server's <code>.env</code> with the JWT secret key",
+		'The latest <code>NOTES.md</code> entries',
+	]}
+	answer={2}
+	explain="Everything in the context is sent to the model's provider. A JWT secret lets anyone who has it sign valid login tokens for your server. The same goes for real participants' data: health data is a special category under GDPR."
+/>

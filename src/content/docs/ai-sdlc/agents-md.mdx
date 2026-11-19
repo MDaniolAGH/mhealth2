@@ -1,0 +1,47 @@
+---
+title: "4. AGENTS.md: the project's rules for agents"
+description: What a useful AGENTS.md contains, and why a rule a tool can check belongs in the tool.
+---
+
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+
+`AGENTS.md` is a Markdown file in the root of a repository, written for coding agents rather than for people. Many agents read it automatically at the start of each task, so it is their **entry point** into the project. You wrote your pair's first version in W2.
+
+Support still differs between tools and features. GitHub Copilot in VS Code, the Copilot coding agent and Copilot CLI can read `AGENTS.md`. Copilot also has its own files, `.github/copilot-instructions.md` and `.github/instructions/*.instructions.md` (W2). Claude Code reads its own `CLAUDE.md`, which can refer to `AGENTS.md`. Check your tool's documentation rather than assuming, and check in practice: ask the agent what the rules are.
+
+A useful `AGENTS.md` answers seven questions. The examples are from the Mood Tracker's own `AGENTS.md`:
+
+| Section | Question it answers | Example line |
+|---|---|---|
+| **How we work** | What cycle does every change follow? | "Restate the task, plan before editing, make the smallest change, verify, report, stop and ask." |
+| **Project knowledge** | Where are the documents about the system and the client? | "Product card: `docs/product.md`. What the client actually said: `docs/client-log.md`." |
+| **Architecture** | What exists, and what may depend on what? | "Routers never import `app.config` directly." (checked by import-linter) |
+| **Specifications** | What must exist before code? | "One test per acceptance criterion; put the criterion ID (`AC-1`) in the test name." |
+| **Commit standards** | What must a commit say? | "Commit messages and AI attribution follow `docs/commits.md`." |
+| **Boundaries** | What is out of bounds? | "Do not weaken, skip or delete tests to make them pass." |
+| **Reporting** | How must the agent report? | "Label every claim: FACT (with `file:line`), HYPOTHESIS, UNKNOWN." |
+
+<Predict id="agents-md-limits" question="In W2 you compared the agent's claims about the code without and with an <code>AGENTS.md</code>. Whatever the difference was, what can even a very good <code>AGENTS.md</code> <b>not</b> fix?">
+
+It cannot replace checking, and it cannot contain knowledge nobody wrote down. An agent that follows every rule can still be wrong about a fact; that is why the reporting format separates FACT from HYPOTHESIS, and why claims get checked with a command, a test or a call.
+
+</Predict>
+
+Section 7 has a full template.
+
+:::tip[Keep it short, and prefer tools to sentences]
+Every line of `AGENTS.md` is read on every task, so it costs context every time. If a rule can be checked by a tool (a lint rule, a formatter, an architecture test, `import-linter`), put it in the tool and mention the command in `AGENTS.md`. A tool enforces the rule every time; a sentence is only a request. The Mood Tracker's `AGENTS.md` says which rules are checked and which are only conventions: that line tells you where to add the next test.
+:::
+
+<Quiz
+	question="The rule &quot;screens never import <code>http</code>&quot; is written in <code>AGENTS.md</code> but not checked by any tool. What is the best next step?"
+	options={[
+		'Write it in capital letters',
+		'Add a test that fails when a file in <code>lib/screens/</code> imports <code>http</code>, and mention the test in <code>AGENTS.md</code>',
+		'Remove it: agents ignore such rules anyway',
+		'Repeat it in every task prompt',
+	]}
+	answer={1}
+	explain="A sentence is a request; a test is enforcement. Stage 6 shows such a test, and what it catches."
+/>

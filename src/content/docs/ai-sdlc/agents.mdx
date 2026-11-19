@@ -1,0 +1,67 @@
+---
+title: 1. From a prompt to an agent
+description: What a harness adds to a language model, and why the same model behaves differently in a different harness.
+---
+
+import HarnessLab from '../../../components/HarnessLab.astro';
+import Race from '../../../components/Race.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+
+A language model on its own does one thing: given a prompt, it produces text. In a chat window that is the whole loop: **model → prompt → output**. You copy code in, copy the answer out, and you are the one who runs it, tests it and notices what is wrong.
+
+An **agent** closes that loop. It wraps the model in a **harness**: the software that lets the model read files, run commands, look at the results and try again.
+
+<HarnessLab />
+
+## Same task, two ways
+
+A small task in the spirit of the W3 demo: *add an About button to the home screen.* Step through both ways of doing it, and watch who carries the tool output.
+
+<Predict id="race-handoffs" question="In the chat version, how many times will <b>you</b> have to copy something between the chat and your project before the task is done? And with the agent?">
+
+Four with the chat, none with the agent: the code in, the analyzer error back, the fix in, the final run. The model is the same in both columns. What changes is who sees the analyzer's output first.
+
+</Predict>
+
+<Race />
+
+| Part of the harness | What it does | Where you meet it in this course |
+|---|---|---|
+| **Tools** | Let the model act: read and edit files, run commands, search the code | Copilot's agent runs `flutter test` and reads the output itself |
+| **Automation** | Runs the loop: plan, act, observe the result, repeat until done or stuck | The agent fixes an analyzer error without you pasting it back |
+| **Instructions** | Frame each task: the prompt, plus reusable prompt files and skills | The task prompts in W3 and W4; prompt files in `.github/prompts/` |
+| **Standards** | Project rules the agent must follow on every task | `AGENTS.md` in the Mood Tracker and in your pair's repository |
+
+Two consequences matter in practice:
+
+1. **The same model in a different harness is a different agent.** Claude, Gemini or GPT models behave differently in GitHub Copilot, in a command-line agent such as Claude Code or Mistral Vibe, and in a chat window, because they have different tools, loops and rules around them. In the lectures you compare models inside Copilot first: same harness, different model.
+2. **When an agent does poor work, fix the harness first.** Missing standards, missing project knowledge, a vague task or a tool it cannot run are far more common causes than "the model is bad". Changing the model rarely fixes a missing rule.
+
+:::note[MCP: plugging more tools into a harness]
+The **Model Context Protocol (MCP)** is an open protocol for connecting extra tools and data sources to a harness. For example, an agent can read a design or query a database directly instead of you pasting screenshots or results. In W5 you write your own MCP server and connect it to Copilot (`.vscode/mcp.json`), and see why every tool you connect is also a way in for an attacker.
+:::
+
+<Quiz
+	question="What does the harness add to a language model?"
+	options={[
+		'A larger context window',
+		'Tools, the loop that uses them, instructions and standards, so the model can act and see the results',
+		'A better model',
+		'Automatic correctness',
+	]}
+	answer={1}
+	explain="The model is unchanged. The harness lets it act (tools), check the result and try again (automation), and keeps it inside the task and the project's rules (instructions and standards). None of that makes it correct; that still takes your criteria, the gate, the tests and your review."
+/>
+
+<Quiz
+	question="Your agent keeps calling <code>http</code> directly from screens, although the project does not allow it. What do you try first?"
+	options={[
+		'Switch to a bigger model',
+		'Write the rule into <code>AGENTS.md</code>, and better still, add a test that fails when a screen imports <code>http</code>',
+		'Repeat the instruction in every prompt',
+		'Fix it by hand after every task',
+	]}
+	answer={1}
+	explain="Fix the harness first. A rule in <code>AGENTS.md</code> is read on every task; a test enforces it every time, whoever wrote the code. A bigger model does not know a rule nobody wrote down."
+/>

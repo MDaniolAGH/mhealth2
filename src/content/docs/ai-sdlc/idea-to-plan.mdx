@@ -1,0 +1,225 @@
+---
+title: 'Stages 1–4: from idea to plan'
+description: 'The worked example, part one: idea, analysis, technical requirements and an approved plan.'
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import StageFacts from '../../../components/StageFacts.astro';
+import StageStrip from '../../../components/StageStrip.astro';
+import Checklist from '../../../components/Checklist.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+
+<StageStrip />
+
+:::note[The worked example: an About screen]
+The client, a rehabilitation clinic running a six-month study (the fictional client from W1), asks for an About screen in the Mood Tracker: the app's version, the server's version, what the app is for, and whom to contact. It is the neutral task from the W3 demo, so it touches none of the areas the briefs C01–C07 leave for you to discover.
+
+The artefacts below were **written for this guide**. They are not a recording of a real agent session, and the numbers and hashes are invented.
+:::
+
+<span id="stage-idea" class="stage-anchor"></span>
+
+## 1. Idea
+
+<StageFacts tone="you" who={'<span class="sdlc-chip is-you">You</span> or the client who wants the feature'} input="A user need" output="A sketch and one sentence, recorded as an issue" />
+
+> *"Participants keep asking which version they have, and our ethics committee wants the app to say what it is for."*
+
+The study coordinator's sketch shows a screen with the app's name, a version, a sentence about the study and a contact. That is enough to start a conversation, so record it as an issue (here, issue #7). It is not enough to start coding: it does not say where the version comes from, what happens when the server is down, which sentence about the study, or whose contact.
+
+<span id="stage-analysis" class="stage-anchor"></span>
+
+## 2. Analysis: define the goal
+
+<StageFacts tone="you" who={'<span class="sdlc-chip is-you">You</span> the business view and the technical view, together'} input="The idea; the product card and the architecture, to see what the idea touches" output="A short goal definition with an ID" />
+
+Analysis turns an idea into a **goal**. It needs both views. The business side knows why the feature matters; the technical side knows what it costs and what it touches. Answer four questions, and write down what is out of scope:
+
+1. **What does the screen do?**
+2. **What value does it bring?**
+3. **What does it integrate with?**
+4. **What technical constraints apply?**
+
+```text title="GOAL-1: About screen (from issue #7)"
+What it does     An About screen, opened from the home screen, that shows the
+                 app's version, the server's version, the intended purpose and
+                 a contact for questions about the study.
+Value            Support can tell which version a participant runs.
+                 Participants see what the app is for, in words the client
+                 approved.
+Integrates with  The build (version number); GET /version on the server;
+                 docs/product.md (purpose and contact).
+Constraints      No new packages (each is a SOUP item). Works when the server
+                 is down. Shows no personal data. Never shows a client fact
+                 the client has not confirmed.
+Out of scope     A licences page, a changelog, update checks.
+```
+
+:::caution[What goes wrong here]
+Skipping analysis and asking the agent to "add an About screen". In the W3 demo you counted how many decisions the agent then made for the client: where the version comes from, what happens offline, whose contact, whether the screen works before login, which language. Each was a plausible guess.
+:::
+
+<span id="stage-requirements" class="stage-anchor"></span>
+
+## 3. Technical requirements
+
+<StageFacts tone="you" who={'<span class="sdlc-chip is-you">You</span> decide · <span class="sdlc-chip is-agent">Agent</span> may draft and ask questions'} input="The goal, the client log, the architecture and API docs, <code>AGENTS.md</code>" output="<code>docs/spec-about.md</code>: numbered criteria that can be observed" />
+
+Requirements are the goal written so that each sentence can be **shown true or false** by a test or by running the app. Several inputs feed into them:
+
+- **The client's words.** `docs/client-log.md` and the product card; a mock-up if there is one.
+- **The project knowledge.** What the architecture and API docs say, such as which endpoint returns the version.
+- **The work standards.** What `AGENTS.md` already fixes, such as no new packages without asking.
+
+A good way in is to make the agent the critic first, as in the W3 demo: *"Before you write anything, ask me the questions you need for this specification. Separate questions for the client from technical ones."*
+
+```markdown title="docs/spec-about.md"
+# About screen: acceptance criteria (GOAL-1)
+
+AC-1  The home screen's app bar has an About button that opens a screen
+      titled "About".
+AC-2  The screen shows the app version and build number of the build, for
+      example "1.3.0 (12)". A build without them shows "dev".
+AC-3  The screen shows the server's version from GET /version, for example
+      "Server 1.0.0", and "Server: checking…" while it waits.
+AC-4  If the server does not answer within 5 seconds, or answers with an
+      error, the screen shows "Server: unavailable". The rest of the screen
+      works while it waits and afterwards.
+AC-5  The intended purpose and the contact are shown exactly as written in
+      docs/product.md. A value still marked <TODO: client> is shown as
+      "not yet confirmed", never as the placeholder or an invented value.
+AC-6  The existing screens, the login and the mood list do not change.
+
+Out of scope: a licences page, a changelog, update checks.
+```
+
+<Predict id="first-test" question="Which criterion would you test first, and why?">
+
+**AC-4 and AC-5.** Edges are where a plausible guess is most likely to be wrong, and where nobody notices by looking at the screen: on your laptop the server is always running, and the placeholder looks harmless. AC-4 has a boundary you can test exactly (an answer just before 5 s is shown; no answer by 5 s is not). AC-5 protects the client's own words, which an agent will otherwise invent.
+
+</Predict>
+
+:::caution[What goes wrong here]
+- Criteria nobody can observe, such as "the code is clean".
+- Missing edge cases: the server down, a value not yet provided, very long text, a large font.
+- Letting the agent write the criteria it will later be judged by, without reading them.
+:::
+
+<span id="stage-plan" class="stage-anchor"></span>
+
+## 4. Plan: what we will build, and how
+
+<StageFacts tone="agent" who={'<span class="sdlc-chip is-agent">Agent</span> proposes · <span class="sdlc-chip is-you">You</span> approve, correct or ask for an alternative'} input={`<code>docs/spec-about.md</code> and the <a href="../knowledge/"><b>project knowledge</b></a>: <code>ARCHITECTURE.md</code>, decision records, <code>NOTES.md</code>, <code>docs/product.md</code>, API docs, <code>AGENTS.md</code>`} output="An approved plan, with its sources, the contradictions found, and your written answers" />
+
+Ask the agent for a plan **before** it edits anything. The plan says *what* will be built and *how*: which files, which approach, which checks. In W3 you did this with Spec Kit: spec → plan → tasks → implementation.
+
+:::danger[No plan without the project knowledge]
+Point the agent at the architecture, the decision records, the product card and the notes **before** it plans (the planning prompt in section 3), and expect the plan to **name the documents it used**. A plan that cites no sources has guessed. Compare the two versions below: the knowledge kept the code in the right layer, avoided a new package, and kept the client's words the client's.
+:::
+
+<Tabs>
+<TabItem label="Planned with the project knowledge">
+
+```text
+Plan: About screen (GOAL-1)
+
+Based on
+  ARCHITECTURE.md      screens never import http; network calls live in
+                       lib/services/; providers connect screens to services
+  ADR-0002             values that differ between builds use --dart-define
+  docs/product.md      purpose quoted from the client log; contact is
+                       <TODO: client>
+  NOTES.md 2026-11-05  goldens were recorded on macOS: do not regenerate them
+  Contradiction        ARCHITECTURE.md lists lib/repositories/, but
+                       MoodRepository is in lib/data/ (FACT:
+                       lib/data/mood_repository.dart). I will not create the
+                       folder; the document needs fixing.
+
+Files
+  new   lib/services/version_service.dart  fetchServerVersion(timeout:)  AC-3, AC-4
+  new   lib/providers/about_provider.dart  serverVersionProvider         AC-3
+  new   lib/screens/about_screen.dart      the screen                    AC-1..AC-5
+  edit  lib/config.dart                    appVersion                    AC-2
+  edit  lib/screens/home_screen.dart       About button in the app bar   AC-1, AC-6
+  new   test/screens/about_screen_test.dart                             AC-1..AC-5
+  new   test/architecture_test.dart        screens never import http     (rule)
+
+Approach
+  The timeout is a parameter (5 s by default), so a test can use a server
+  that never answers (AC-4). The screen reads the server version through a
+  provider that tests can override.
+
+Questions
+  1. (client)    The contact is <TODO: client>. Show "not yet confirmed", as
+                 AC-5 says, or hide the row until the client answers?
+  2. (technical) Version: package_info_plus (a new SOUP item) or
+                 --dart-define, as in ADR-0002?
+
+Checks
+  flutter analyze and flutter test; I will report the actual output.
+```
+
+</TabItem>
+<TabItem label="Planned without it">
+
+```text
+Plan: about page
+
+Files
+  new   lib/screens/about_screen.dart   calls http.get('/version') directly
+  edit  pubspec.yaml                    add package_info_plus for the version
+
+Approach
+  Purpose: "Mood Tracker helps patients monitor and manage depression."
+  Contact: support@moodtracker.app
+  Show a loading spinner until the server answers.
+
+Checks
+  Run the tests.
+```
+
+Every line is plausible, and five are wrong for this project. A screen that calls `http` breaks the architecture. A new package is an unregistered SOUP item, and `AGENTS.md` says to stop and ask. The intended purpose is one the client never stated, and it is a **medical claim** that could change how the app is regulated. The contact address is invented. And with no timeout, the spinner never stops when the server is down.
+
+</TabItem>
+</Tabs>
+
+Review a plan with these questions. Your ticks are saved in this browser, so you can reuse the list in the labs:
+
+<Checklist
+	id="plan-review"
+	items={[
+		'It <b>names the documents</b> it used, and it read the right ones',
+		'It fits <code>ARCHITECTURE.md</code> and respects every relevant decision record',
+		'Every criterion maps to at least one step',
+		'All files are inside what the task allows; no package is added without asking',
+		'The approach is testable (here: the timeout is a parameter, so AC-4 can be tested)',
+		'Every client fact comes from <code>docs/client-log.md</code>; nothing is invented',
+		'The agent\'s questions are answered <b>in writing</b>, and the contradictions it found are fixed or noted',
+	]}
+/>
+
+Answers to the plan's questions are decisions, so they belong in the record: here, *"1: show 'not yet confirmed'. 2: `--dart-define`, as in ADR-0002; record it as an ADR."* A plan is cheap; an implementation is not. You can reject a plan, or ask for two alternatives and choose one, for a fraction of the cost of undoing code.
+
+<Quiz
+	question="A plan proposes <code>lib/repositories/about_repository.dart</code>. <code>ARCHITECTURE.md</code> lists <code>repositories/</code>, but the folder does not exist. What is the best response?"
+	options={[
+		'Approve it: the document says the layer exists',
+		'Ask which documents and code the plan is based on; decide whether the document or the code is right, fix the document or record a decision, and ask for a plan that fits',
+		'Let it implement first and review the code later',
+		'Delete <code>ARCHITECTURE.md</code> so the plan no longer contradicts it',
+	]}
+	answer={1}
+	explain="A contradiction between the documents and the code is a finding, not a detail. Resolve it on purpose, and write the resolution down; otherwise the next plan meets the same false premise."
+/>
+
+<Quiz
+	question="Which of these is the strongest sign that a plan was guessed rather than built on the project knowledge?"
+	options={[
+		'It is short',
+		'It asks two questions',
+		'It cites no documents, and the intended purpose in it appears nowhere in <code>docs/client-log.md</code>',
+		'It lists the tests it will write',
+	]}
+	answer={2}
+/>

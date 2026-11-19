@@ -1,0 +1,78 @@
+/*
+ * Site colours: crimson (primary) and slate blue (secondary) on slate greys.
+ * Contrast (WCAG): white on #9F1239 7.9:1; #9F1239 on white 7.9:1;
+ * #1D4ED8 on white 6.7:1; #FDA4AF and #93C5FD on #0F172A above 9:1.
+ * Starlight's dark scheme is the default (:root); light is [data-theme='light'].
+ */
+
+:root {
+	--sl-color-accent-low: #4C0519;
+	--sl-color-accent: #E11D48;
+	--sl-color-accent-high: #FDA4AF;
+	--course-secondary: #93C5FD;
+
+	--sl-color-white: #FFFFFF;
+	--sl-color-gray-1: #E2E8F0;
+	--sl-color-gray-2: #CBD5E1;
+	--sl-color-gray-3: #94A3B8;
+	--sl-color-gray-4: #64748B;
+	--sl-color-gray-5: #334155;
+	--sl-color-gray-6: #1E293B;
+	--sl-color-black: #0F172A;
+
+	--course-header-bg: #881337;
+	--course-header-edge: linear-gradient(90deg, #E11D48, #2563EB);
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #FFE4E6;
+	--sl-color-accent: #9F1239;
+	--sl-color-accent-high: #4C0519;
+	--course-secondary: #1D4ED8;
+
+	--sl-color-white: #0F172A;
+	--sl-color-gray-1: #1E293B;
+	--sl-color-gray-2: #334155;
+	--sl-color-gray-3: #475569;
+	--sl-color-gray-4: #94A3B8;
+	--sl-color-gray-5: #CBD5E1;
+	--sl-color-gray-6: #F1F5F9;
+	--sl-color-gray-7: #F8FAFC;
+	--sl-color-black: #FFFFFF;
+
+	--course-header-bg: #9F1239;
+	--course-header-edge: linear-gradient(90deg, #9F1239, #2563EB);
+}
+
+/* Crimson header with light text in both schemes. */
+header.header {
+	background: var(--course-header-bg);
+	border-bottom: 0;
+	box-shadow: inset 0 -3px 0 0 transparent;
+	--sl-color-white: #FFFFFF;
+	--sl-color-gray-1: #FFE4E6;
+	--sl-color-gray-2: #FECDD3;
+	--sl-color-gray-5: rgba(255, 255, 255, 0.35);
+	--sl-color-gray-6: rgba(255, 255, 255, 0.12);
+	--sl-color-text-accent: #FFFFFF;
+	--sl-color-text: #FFE4E6;
+}
+header.header::after {
+	content: '';
+	position: absolute;
+	inset: auto 0 0 0;
+	height: 3px;
+	background: var(--course-header-edge);
+}
+header.header .site-title { color: #FFFFFF; }
+header.header button[data-open-modal] {
+	background: rgba(255, 255, 255, 0.12);
+	color: #FFE4E6;
+}
+header.header kbd { background: rgba(0, 0, 0, 0.25); color: #FFFFFF; }
+
+/* Links in text: slate blue, so they read differently from the crimson UI. */
+.sl-markdown-content a:not(:where(.not-content *)) { color: var(--course-secondary); }
+
+/* Splash page hero. */
+.hero .tagline { max-width: 38rem; }

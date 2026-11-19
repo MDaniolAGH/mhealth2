@@ -1,0 +1,19 @@
+---
+/** Section 2: a main agent delegating to sub-agents with fresh contexts. */
+---
+
+<div class="ctx not-content">
+	<div class="subagents">
+		<div class="subagents__main"><b>Main agent</b>: keeps the plan and the criteria, delegates the parts</div>
+		<div class="subagents__child"><b>Sub-agent A</b><br />find every place that calls the API</div>
+		<div class="subagents__child"><b>Sub-agent B</b><br />write the version service</div>
+		<div class="subagents__child"><b>Sub-agent C</b><br />write the tests for AC-4</div>
+		<div class="subagents__note">Each sub-agent starts with a small, fresh context and returns a short result, not its whole work log.</div>
+	</div>
+</div>
+
+<div class="stat not-content">
+	<span class="stat__num stat__num--ok">≈ 90%</span><span class="stat__txt">of what an agent produces with missing information is fine…</span>
+	<span class="stat__num stat__num--bad">≈ 10%</span><span class="stat__txt">…is confident nonsense, written in exactly the same tone as the rest.</span>
+	<span class="stat__foot">A rule of thumb used in this course, not a measured figure. The point is the second line: reading the output does not tell you which part is wrong.</span>
+</div>

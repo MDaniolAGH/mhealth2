@@ -1,0 +1,44 @@
+---
+/** Section 1: the same task done in a chat and by an agent, step by step. */
+---
+
+<div class="race not-content">
+	<div class="race__controls">
+		<button type="button" class="sdlc-btn sdlc-btn--primary" data-race="next">▶ Next step</button>
+		<button type="button" class="sdlc-btn" data-race="reset">Start again</button>
+		<span class="race__status" aria-live="polite"></span>
+	</div>
+	<div class="race__cols">
+		<div class="race__col">
+			<p class="race__title">Chat assistant</p>
+			<ol class="race__steps">
+				<li data-who="you" data-handoff="1">You paste <code>home_screen.dart</code> and the task into the chat.</li>
+				<li data-who="model">The model answers with a new <code>AppBar</code> that has an About button.</li>
+				<li data-who="you" data-handoff="1">You copy it into the file and run <code>flutter analyze</code>.</li>
+				<li data-who="tool">Analyzer: <code>Undefined name 'AboutScreen'</code>. Only you can see it.</li>
+				<li data-who="you" data-handoff="1">You paste the error back into the chat.</li>
+				<li data-who="model">"Sorry! Here is the missing import."</li>
+				<li data-who="you" data-handoff="1">You paste it in and run <code>flutter test</code>. It passes, and the model never saw it run.</li>
+			</ol>
+			<p class="race__count">Copy-and-paste hand-offs by you: <b>4</b></p>
+		</div>
+		<div class="race__col">
+			<p class="race__title">Agent</p>
+			<ol class="race__steps">
+				<li data-who="you">You give the task and the criteria.</li>
+				<li data-who="agent">The agent opens <code>AGENTS.md</code> and <code>home_screen.dart</code> itself.</li>
+				<li data-who="agent">It proposes a plan; you approve it.</li>
+				<li data-who="agent">It edits two files.</li>
+				<li data-who="tool">It runs <code>flutter analyze</code>: <code>Undefined name 'AboutScreen'</code>. The agent sees the error.</li>
+				<li data-who="agent">It adds the missing import and runs the analyzer again: <code>No issues found!</code></li>
+				<li data-who="agent">It runs <code>flutter test</code> and reports the real result. You review the diff.</li>
+			</ol>
+			<p class="race__count">Copy-and-paste hand-offs by you: <b>0</b></p>
+		</div>
+	</div>
+	<p class="race__moral">The difference is not the model. It is who sees the error first: you, by hand, or the agent, through its tools and its loop.</p>
+</div>
+
+<script>
+	import '../scripts/sdlc.js';
+</script>

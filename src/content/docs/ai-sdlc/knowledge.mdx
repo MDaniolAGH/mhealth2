@@ -1,0 +1,175 @@
+---
+title: '3. Project knowledge: what the plan is built on'
+description: The documents an agent reads before it plans, and why they are the project's long-term memory.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+
+:::danger[The most important input to the plan]
+A coding agent has **no memory of your project** between sessions. Everything it learned yesterday, it has forgotten. If the architecture, the decisions, the client's words and the traps are not written down in the repository, the agent will guess them again in every session, and each guess can be different. The documents on this page are the project's long-term memory, for agents and for people.
+:::
+
+The context window (section 2) is short-term memory: it lasts for one task. **Project knowledge** is what survives between tasks: the documents in the repository that describe what the system is, why it is that way, what the client asked for, and what you have learned while building it.
+
+| Document | What it records | The plan uses it to… |
+|---|---|---|
+| `README.md` | What the app is; how to build, run and test it | run the right commands |
+| `ARCHITECTURE.md` | Containers, the app's and the server's layers, what may depend on what, how data flows | put the change in the right place, in the right shape |
+| `docs/adr/` | One architecture decision record (ADR) per decision: context, decision, consequences | respect decisions instead of re-making them |
+| `NOTES.md` | Work log: done, in progress, known problems, traps found | avoid repeating mistakes; continue where the last session stopped |
+| `docs/product.md` | The product card: client, users, intended purpose, constraints, scope | build what this client needs, in the client's words |
+| `docs/client-log.md` | What the client actually said, dated | tell a client fact from an assumption |
+| API docs | The backend contract: endpoints, fields, errors (Swagger at `/docs`) | use the data correctly |
+| `AGENTS.md` | How to work here: the cycle, commands, rules, boundaries (section 4) | follow the rules, and find the documents above |
+
+`AGENTS.md` says **how to work**. The other documents say **what the system is, and why**. Keep them apart: the rules are read on every task, while the agent reads the knowledge documents only when the task needs them.
+
+<Tabs>
+<TabItem label="ARCHITECTURE.md">
+
+```markdown title="ARCHITECTURE.md (excerpt, illustrative)"
+# Mood Tracker: architecture
+
+## Containers
+Flutter app → HTTP/JSON with a Bearer token → FastAPI server → SQLite file.
+On the phone: local database (sqflite), token storage (flutter_secure_storage).
+
+## App layers (lib/)
+screens/       UI; watch providers; never import http, sqflite or secure storage
+widgets/       reusable UI
+providers/     Riverpod: state; connects screens to services and data
+repositories/  MoodRepository: API first, local database as a fallback
+services/      HTTP: ApiClient, AuthService; the only place that uses http
+data/          local database (sqflite)
+models/        pure Dart data classes
+
+## Server layers (app/), checked by import-linter
+main → routers → auth → models | schemas → database → config
+
+## Rules
+- Values that differ between builds come from --dart-define (ADR-0002).
+- No new container (database, queue, cache, cloud service) without an ADR.
+```
+
+Look closely at `repositories/`. It is one of the things a good plan will notice (stage 4).
+
+</TabItem>
+<TabItem label="Decision record">
+
+```markdown title="docs/adr/0002-build-settings-from-dart-define.md (illustrative)"
+# ADR-0002: Build settings come from --dart-define
+
+Status: accepted, 2026-11-05
+
+## Context
+The API address differs between the Android emulator, the iOS simulator
+and a phone. Editing config.dart before each build is easy to forget, and
+a configuration package would be one more SOUP item to register and keep
+up to date.
+
+## Decision
+Values that differ between builds are read with String.fromEnvironment in
+lib/config.dart and set with --dart-define, with a safe default.
+
+## Consequences
+No new dependency. A build without the define uses the default (the
+Android emulator's 10.0.2.2), so other devices must pass the address.
+```
+
+</TabItem>
+<TabItem label="NOTES.md">
+
+```markdown title="NOTES.md (illustrative)"
+# Notes
+
+## 2026-11-05: handover check (W2)
+- flutter test: all tests pass on Flutter 3.35 (macOS).
+- Trap: golden images were recorded on macOS. On another OS they can
+  differ by a few pixels. Never regenerate them to make a test pass;
+  only on purpose: flutter test --update-goldens <file>.
+- Without --dart-define=API_BASE_URL the app calls 10.0.2.2, which only
+  the Android emulator reaches (ADR-0002).
+
+## 2026-11-20: About screen (GOAL-1, PR #12)
+- Done: AboutScreen, VersionService (timeout is a parameter, 5 s).
+- Not verified: iOS simulator; very large font sizes.
+- Trap: a debug build without --dart-define=APP_VERSION shows "dev".
+  Expected, not a bug (ADR-0003).
+```
+
+</TabItem>
+<TabItem label="docs/product.md">
+
+```markdown title="docs/product.md (excerpt, illustrative)"
+# Product card
+
+Client            Rehabilitation clinic (fictional, W1): study coordinator
+Users             Adult participants of the clinic's six-month study
+Intended purpose  "A self-report mood diary for participants of the
+                  clinic's study. It is not used for diagnosis or
+                  treatment."  (client log, 2026-11-12)
+Contact           <TODO: client>
+Constraints       Synthetic data only during development.
+                  No new cloud services.
+```
+
+The purpose is quoted from the client log, with a date. The contact is a visible placeholder, because nobody has told you yet.
+
+</TabItem>
+</Tabs>
+
+**Ask the agent to plan from the knowledge, and to say so.** A plan that does not name its sources may have been guessed:
+
+```text title="Planning prompt (example)"
+Before planning, read AGENTS.md, ARCHITECTURE.md, docs/adr/, docs/product.md
+and the latest entries in NOTES.md.
+
+Plan GOAL-1 against docs/spec-about.md. In the plan:
+- list the documents you used and what you took from each;
+- point out anything where the documents and the code disagree;
+- list the questions the documents do not answer, separating questions
+  for the client from technical ones.
+Label each claim FACT (with file:line), HYPOTHESIS or UNKNOWN.
+
+Do not change any file yet.
+```
+
+<Predict id="wrong-doc" question="Which is worse for an agent: an <code>ARCHITECTURE.md</code> that is missing, or one that is out of date?">
+
+Out of date. With no document, the agent at least has to read the code. With a wrong one, it trusts what it reads and starts every plan from a false premise, confidently. That is why the planning prompt asks for contradictions between the documents and the code.
+
+</Predict>
+
+:::tip[Keeping the knowledge useful]
+- **Short and current beats long and complete.** One page of `ARCHITECTURE.md` that is true is worth more than ten that are out of date.
+- **Docs as code.** The documents live in the repository and change **in the same pull request** as the code they describe (stage 8). Reviewers check them like code.
+- **A wrong document is worse than none.** The agent trusts what it reads.
+- **Make `AGENTS.md` the index.** Agents read it first, so a line such as "Architecture: see `ARCHITECTURE.md`; decisions: `docs/adr/`" makes sure the rest is found.
+- **Client facts come from the client log only.** In the Mood Tracker's `AGENTS.md`: "This is the only source of client facts; anything else is an assumption."
+- In the handover, the *Architecture* section of `AGENTS.md` is a tiny architecture document. In your pair's repository, give the architecture, the decisions and the notes their own files from the first lab.
+:::
+
+<Quiz
+	question="Why must the agent read <code>ARCHITECTURE.md</code>, the decision records and <code>NOTES.md</code> before it plans?"
+	options={[
+		'Because agents refuse to plan without them',
+		'It starts every session without memory of the project; without these documents it guesses the architecture and earlier decisions, and the guesses look just as convincing as the facts',
+		'To make the context window as full as possible',
+		'They replace the acceptance criteria',
+	]}
+	answer={1}
+/>
+
+<Quiz
+	question="A teammate says the contact on the About screen should be <code>study@clinic.example</code>; they remember it from a meeting. Where must it be before the agent may use it?"
+	options={[
+		'In the prompt',
+		'In <code>docs/client-log.md</code>, dated, and then in <code>docs/product.md</code>',
+		'In a code comment',
+		'Anywhere, as long as the teammate is sure',
+	]}
+	answer={1}
+	explain="A client fact needs a source that outlives the meeting and the chat. Until it is in the client log, it is an assumption, and the screen shows the placeholder."
+/>

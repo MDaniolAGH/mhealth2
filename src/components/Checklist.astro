@@ -1,0 +1,56 @@
+---
+/**
+ * A checklist the reader can tick. Ticks are kept in this browser only
+ * (localStorage) under `id`, so a student can come back to it.
+ */
+interface Props {
+	id: string;
+	items: string[];
+	title?: string;
+}
+const { id, items, title } = Astro.props;
+---
+
+<div class="checklist not-content" data-id={id}>
+	{title && <p class="checklist__title">{title}</p>}
+	<ul>
+		{
+			items.map((item, i) => (
+				<li>
+					<label>
+						<input type="checkbox" data-i={i} />
+						<span set:html={item} />
+					</label>
+				</li>
+			))
+		}
+	</ul>
+	<p class="checklist__count" aria-live="polite"></p>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.checklist').forEach((list) => {
+		const key = `checklist:${list.dataset.id}`;
+		const boxes = Array.from(list.querySelectorAll<HTMLInputElement>('input[type=checkbox]'));
+		const count = list.querySelector<HTMLElement>('.checklist__count')!;
+		let saved: number[] = [];
+		try {
+			saved = JSON.parse(localStorage.getItem(key) ?? '[]');
+		} catch {}
+		boxes.forEach((b, i) => (b.checked = saved.includes(i)));
+		const render = () => {
+			const done = boxes.filter((b) => b.checked).length;
+			count.textContent = `${done} of ${boxes.length} ticked`;
+			list.classList.toggle('is-done', done === boxes.length);
+		};
+		boxes.forEach((b) =>
+			b.addEventListener('change', () => {
+				render();
+				try {
+					localStorage.setItem(key, JSON.stringify(boxes.flatMap((x, i) => (x.checked ? [i] : []))));
+				} catch {}
+			}),
+		);
+		render();
+	});
+</script>

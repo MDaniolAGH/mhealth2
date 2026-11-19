@@ -1,0 +1,44 @@
+---
+/** Section 1: chat versus agent; take parts away from the harness. */
+---
+
+<div class="harness-lab not-content">
+	<div class="agent-compare">
+		<div class="agent-compare__panel">
+			<p class="agent-compare__title">Chat assistant</p>
+			<div class="flow">
+				<div class="flow__box is-you">You write a prompt</div>
+				<div class="flow__arrow">paste code in</div>
+				<div class="flow__box is-agent">Model</div>
+				<div class="flow__arrow">copy the answer out</div>
+				<div class="flow__box is-you">You run, test and fix it</div>
+			</div>
+			<p class="flow__note">The model never sees whether its code compiles. Every check is yours, done by hand.</p>
+		</div>
+		<div class="agent-compare__panel">
+			<p class="agent-compare__title">Agent = model + harness</p>
+			<div class="harness">
+				<span class="harness__label">Harness</span>
+				<button type="button" class="harness__part harness__part--tools" data-part="tools" aria-pressed="true"><b>Tools</b>read and edit files, run commands, search; more through MCP</button>
+				<button type="button" class="harness__part harness__part--auto" data-part="automation" aria-pressed="true"><b>Automation</b>the loop: plan, act, observe, repeat; hooks</button>
+				<div class="harness__model">Model</div>
+				<button type="button" class="harness__part harness__part--instr" data-part="instructions" aria-pressed="true"><b>Instructions</b>the task prompt, prompt files and skills</button>
+				<button type="button" class="harness__part harness__part--std" data-part="standards" aria-pressed="true"><b>Standards</b><code>AGENTS.md</code>: the project's rules</button>
+			</div>
+			<p class="harness__task">A harness is a kit put together for one kind of task.</p>
+		</div>
+	</div>
+	<p class="harness-lab__hint"><b>Try it:</b> click a part of the harness to take it away, and see what the same model does without it.</p>
+	<div class="harness-lab__result" aria-live="polite"></div>
+	<div class="harness-lab__data">
+		<div data-missing="none"><h4>The full harness</h4><p>The agent can act, check its own work, stay inside the task and follow the project's rules. It still needs your criteria, and your review.</p></div>
+		<div data-missing="tools"><h4>Without tools</h4><p>It cannot open files or run <code>flutter test</code>. It writes "all tests pass" because that is the most likely next sentence, not because anything ran. You are back to copying and pasting.</p></div>
+		<div data-missing="automation"><h4>Without automation</h4><p>It makes one edit and stops. The analyzer error that follows is yours to find, paste back and ask about: one round trip per mistake.</p></div>
+		<div data-missing="instructions"><h4>Without instructions</h4><p>No task boundary and no criteria. While it is in the file, it "improves" two other screens and renames a widget. Each change looks reasonable; together they are a review nobody can finish.</p></div>
+		<div data-missing="standards"><h4>Without standards</h4><p>It adds a package for the version number, calls <code>http</code> straight from a screen and skips the tests. The code is plausible, and wrong for <em>this</em> project.</p></div>
+	</div>
+</div>
+
+<script>
+	import '../scripts/sdlc.js';
+</script>
