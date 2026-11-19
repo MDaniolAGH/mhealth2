@@ -5,38 +5,67 @@
 .llmflow__mode { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--sdlc-card); border: 1px solid var(--sdlc-line); }
 .llmflow__mode-btn { font: inherit; font-size: 0.82rem; font-weight: 650; border: 0; border-radius: 999px; padding: 0.3rem 0.8rem; background: transparent; color: var(--sdlc-muted); cursor: pointer; }
 .llmflow__mode-btn.is-on { background: var(--sdlc-primary); color: var(--sdlc-primary-ink); }
-.llmflow__svg { width: 100%; height: auto; display: block; margin: 0.5rem 0; }
-.llmflow__harness { fill: color-mix(in srgb, var(--sdlc-agent) 6%, transparent); stroke: color-mix(in srgb, var(--sdlc-agent) 55%, transparent); stroke-width: 1.5; stroke-dasharray: 7 5; transition: opacity 0.3s ease; }
-.llmflow__harness-label { font-size: 16px; font-weight: 700; fill: var(--sdlc-agent); letter-spacing: 0.04em; }
-.llmflow__edges path { fill: none; stroke: var(--sdlc-line); stroke-width: 2.5; marker-end: url(#lf-arrow); transition: stroke 0.25s ease, stroke-width 0.25s ease; }
-.llmflow__edges path.is-loop { stroke-dasharray: 6 5; }
-.llmflow__edges path.is-tool { stroke-dasharray: 3 5; }
-.llmflow__edges path.is-active { stroke: var(--sdlc-work); stroke-width: 3.5; }
-#lf-arrow path { fill: var(--sdlc-muted); }
-.llmflow__node rect, .llmflow__node circle { fill: var(--sdlc-card); stroke: var(--sdlc-line); stroke-width: 1.5; transition: all 0.3s ease; }
-.llmflow__node text { font-size: 19px; font-weight: 700; text-anchor: middle; fill: var(--sdlc-ink); }
-.llmflow__node text.sub { font-size: 13px; font-weight: 500; fill: var(--sdlc-muted); }
-.llmflow__node.is-model > rect { fill: url(#lf-model); stroke: none; }
-.llmflow__node.is-model text { fill: #fff; }
-.llmflow__layers rect { fill: rgba(255, 255, 255, 0.25); }
-.llmflow__node.is-model.is-active .llmflow__layers rect { animation: lf-layer 0.9s ease-in-out infinite; }
-.llmflow__node.is-model.is-active .llmflow__layers rect:nth-child(2) { animation-delay: 0.12s; }
-.llmflow__node.is-model.is-active .llmflow__layers rect:nth-child(3) { animation-delay: 0.24s; }
-.llmflow__node.is-model.is-active .llmflow__layers rect:nth-child(4) { animation-delay: 0.36s; }
-@keyframes lf-layer { 0%, 100% { fill: rgba(255, 255, 255, 0.25); } 50% { fill: rgba(255, 255, 255, 0.85); } }
-.llmflow__bars rect { fill: var(--sdlc-agent); opacity: 0.55; }
-.llmflow__node.is-active .llmflow__bars rect:first-child { fill: var(--sdlc-work); opacity: 1; }
-.llmflow__node.is-active rect, .llmflow__node.is-active circle { stroke: var(--sdlc-work); stroke-width: 3; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--sdlc-work) 60%, transparent)); }
-.llmflow__node.is-tools rect { stroke: color-mix(in srgb, var(--sdlc-tool) 60%, transparent); }
-.llmflow__edge-label { font-size: 15px; font-weight: 700; fill: var(--sdlc-muted); }
-.llmflow__edge-label.is-tool { fill: var(--sdlc-tool); }
-.llmflow__packet { fill: var(--sdlc-work); stroke: var(--sdlc-card); stroke-width: 3; filter: drop-shadow(0 0 6px var(--sdlc-work)); }
-.llmflow__svg.is-off .llmflow__harness, .llmflow__svg.is-off [data-node="tools"], .llmflow__svg.is-off .is-tool, .llmflow__svg.is-off .llmflow__harness-label { opacity: 0.18; }
+.lf__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin: 0.75rem 0 0.5rem; }
+.lf__bar .sdlc-btn { min-width: 2.6rem; justify-content: center; }
+.lf__play { min-width: 7.5rem !important; }
+.lf__status { min-width: 6.5rem; margin-left: 0.25rem; color: var(--sdlc-muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.lf__dots { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.lf__dots button { width: 0.7rem; height: 0.7rem; padding: 0; border-radius: 50%; border: 0; background: var(--sdlc-line); cursor: pointer; }
+.lf__dots button.is-on { background: color-mix(in srgb, var(--sdlc-primary) 45%, var(--sdlc-line)); }
+.lf__dots button.is-current { background: var(--sdlc-primary); transform: scale(1.25); }
+.lf__scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.lf__svg { display: block; width: 100%; height: auto; }
+.lf__region { stroke-width: 1.5; stroke-dasharray: 7 5; transition: opacity 0.3s ease; }
+.lf__region.is-h { fill: color-mix(in srgb, var(--sdlc-tool) 6%, transparent); stroke: color-mix(in srgb, var(--sdlc-tool) 55%, transparent); }
+.lf__region.is-m { fill: color-mix(in srgb, var(--sdlc-agent) 6%, transparent); stroke: color-mix(in srgb, var(--sdlc-agent) 55%, transparent); }
+.lf__region-label { font-size: 14px; font-weight: 800; letter-spacing: 0.02em; }
+.lf__region-label.is-h { fill: var(--sdlc-tool); }
+.lf__region-label.is-m { fill: var(--sdlc-agent); }
+.lf__edges path { fill: none; stroke: var(--sdlc-line); stroke-width: 2.5; marker-end: url(#lf2-arrow); transition: stroke 0.2s ease; }
+.lf__edges path.is-loop { stroke-dasharray: 6 5; }
+.lf__edges path.is-tool { stroke-dasharray: 3 5; }
+.lf__edges path.is-active { stroke: var(--sdlc-work); stroke-width: 3.5; }
+#lf2-arrow path { fill: var(--sdlc-muted); }
+.lf__edge-label { font-size: 14px; font-weight: 700; fill: var(--sdlc-muted); text-anchor: middle; }
+.lf__node rect, .lf__node circle:first-child { fill: var(--sdlc-card); stroke: var(--sdlc-line); stroke-width: 1.5; transition: stroke 0.25s ease, filter 0.25s ease; }
+.lf__node text { font-size: 20px; font-weight: 750; text-anchor: middle; fill: var(--sdlc-ink); }
+.lf__node text.l { text-anchor: start; }
+.lf__node text.sub { font-size: 14px; font-weight: 500; fill: var(--sdlc-muted); }
+.lf__node.is-active > rect, .lf__node.is-active > circle:first-child { stroke: var(--sdlc-work); stroke-width: 3; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--sdlc-work) 55%, transparent)); }
+.lf__node.is-model > rect { fill: url(#lf2-model); stroke: none; }
+.lf__node.is-model.is-active > rect { stroke: var(--sdlc-work); stroke-width: 3; }
+.lf__node.is-model text { fill: #fff; }
+.lf__node.is-model text.sub-in { font-size: 14px; font-weight: 500; fill: rgb(255 255 255 / 0.85); }
+.lf__layers rect { fill: rgb(255 255 255 / 0.22); stroke: none !important; }
+.lf__node.is-model.is-active .lf__layers rect { animation: lf2-layer 0.9s ease-in-out infinite; }
+.lf__node.is-model.is-active .lf__layers rect:nth-child(2) { animation-delay: 0.1s; }
+.lf__node.is-model.is-active .lf__layers rect:nth-child(3) { animation-delay: 0.2s; }
+.lf__node.is-model.is-active .lf__layers rect:nth-child(4) { animation-delay: 0.3s; }
+.lf__node.is-model.is-active .lf__layers rect:nth-child(5) { animation-delay: 0.4s; }
+.lf__node.is-model.is-active .lf__layers rect:nth-child(6) { animation-delay: 0.5s; }
+@keyframes lf2-layer { 0%, 100% { fill: rgb(255 255 255 / 0.22); } 50% { fill: rgb(255 255 255 / 0.9); } }
+.lf__node .ids { font-family: var(--__sl-font-mono); font-size: 14px; font-weight: 600; fill: var(--sdlc-agent); }
+.lf__doc rect { stroke: none !important; }
+.lf__doc rect.is-new, .lf__node .pick.is-pop { animation: lf2-pop 0.35s ease; }
+@keyframes lf2-pop { from { opacity: 0; } to { opacity: 1; } }
+.lf__bars rect { fill: var(--sdlc-agent); opacity: 0.45; stroke: none !important; }
+.lf__node.is-active .lf__bars rect:first-child { fill: var(--sdlc-work); opacity: 1; }
+.lf__node .pick { font-family: var(--__sl-font-mono); font-size: 24px; font-weight: 800; fill: var(--sdlc-agent); }
+.lf__node.is-term > rect { fill: #0F172A; stroke: #334155; }
+.lf__node.is-term .t-title { font-size: 13px; font-weight: 700; fill: #94A3B8; text-anchor: end; }
+.lf__node.is-term .t-line { font-family: var(--__sl-font-mono); font-size: 13.5px; font-weight: 500; fill: #E2E8F0; text-anchor: start; }
+.lf__node.is-term .t-line.is-ok { fill: #34D399; }
+.lf__packet circle { fill: var(--sdlc-work); stroke: var(--sdlc-card); stroke-width: 3; }
+.lf__packet .pill { fill: var(--sdlc-ink); }
+.lf__packet .pill-t { font-family: var(--__sl-font-mono); font-size: 15px; font-weight: 700; fill: var(--sdlc-surface); text-anchor: middle; }
+.lf__svg.is-off [data-node="runner"], .lf__svg.is-off [data-node="tools"], .lf__svg.is-off .is-tool { opacity: 0.18; }
+.lf__narr { margin: 0.6rem 0 0.75rem; padding: 0.75rem 1rem; min-height: 4.6rem; border-radius: var(--w-radius-sm); background: var(--sdlc-card); border: 1px solid var(--sdlc-line); border-left: 4px solid var(--sdlc-work); }
+.lf__narr.is-warn { border-left-color: var(--sdlc-fail); background: color-mix(in srgb, var(--sdlc-fail) var(--sdlc-tint), var(--sdlc-card)); }
 .llmflow__panels { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--w-gap); }
 .llmflow__ctx, .llmflow__out { padding: 0.75rem 0.9rem; border: 1px solid var(--sdlc-line); border-radius: var(--w-radius-sm); background: var(--sdlc-card); box-shadow: var(--w-shadow); }
 .llmflow__label { margin: 0 0 0.4rem; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sdlc-muted); }
 .llmflow__blocks { display: flex; flex-wrap: wrap; gap: 0.3rem; min-height: 1.8rem; }
-.llmflow__block { padding: 0.15rem 0.55rem; border-radius: 0.4rem; font-size: 0.78rem; font-family: var(--__sl-font-mono); border: 1px solid transparent; }
+.llmflow__block { padding: 0.15rem 0.55rem; border-radius: 0.4rem; font-size: 0.78rem; font-family: var(--__sl-font-mono); border: 1px solid transparent; white-space: pre-wrap; }
 .llmflow__block.is-new { animation: sdlc-rise 0.35s ease; box-shadow: 0 0 0 2px var(--sdlc-work); }
 .llmflow__block.is-sys { background: color-mix(in srgb, var(--sdlc-muted) 18%, transparent); }
 .llmflow__block.is-agents { background: var(--sdlc-kb-tint); border-color: color-mix(in srgb, var(--sdlc-kb) 40%, transparent); }
@@ -50,12 +79,12 @@
 .llmflow__answer.is-ok::before { content: '✓ '; }
 .llmflow__answer.is-fake { color: var(--sdlc-fail); }
 .llmflow__answer.is-fake::before { content: '⚠ '; }
-.llmflow__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin-top: 0.875rem; }
-.llmflow__status { color: var(--sdlc-muted); font-size: 0.85rem; margin-left: 0.25rem; }
-.llmflow__narr { margin: 0.6rem 0 0; padding: 0.75rem 1rem; min-height: 3.2rem; border-radius: var(--w-radius-sm); background: var(--sdlc-card); border: 1px solid var(--sdlc-line); border-left: 4px solid var(--sdlc-work); }
-.llmflow__narr.is-warn { border-left-color: var(--sdlc-fail); background: color-mix(in srgb, var(--sdlc-fail) var(--sdlc-tint), var(--sdlc-card)); }
-.llmflow__scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-@media screen and (max-width: 44em) { .llmflow__panels { grid-template-columns: 1fr; } .llmflow__svg { min-width: 620px; } .llmflow__node text.sub { display: none; } }
+@media screen and (max-width: 44em) {
+	.llmflow__panels { grid-template-columns: 1fr; }
+	.lf__svg { min-width: 680px; }
+	.lf__dots { width: 100%; }
+	.lf__narr { min-height: 6.5rem; }
+}
 
 /* ---------- What the model really sees (chat template) ---------- */
 .chatt__input label { display: grid; gap: 0.25rem; }

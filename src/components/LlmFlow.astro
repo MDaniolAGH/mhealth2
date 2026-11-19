@@ -1,269 +1,471 @@
 ---
 /**
- * "The model inside a harness": an animated, step-by-step diagram of one
- * request. You → harness builds the context → tokenizer → transformer →
- * probabilities and sampling → (loop) → a tool call caught by the harness →
- * the tool runs → its result goes back into the context → final answer.
- * Switch the harness off to see the same question answered without tools.
- * Text in English and Polish (picked from the page URL).
+ * "The model inside a harness": one request, step by step.
+ * Two regions: the harness on your computer (context, tool runner, terminal)
+ * and the model on the provider's server (tokenizer → transformer →
+ * sampling). A labelled packet shows what travels on each edge; the
+ * context grows as a document; the sampling loop emits real o200k_base
+ * tokens one by one; the terminal types `flutter test` and its output.
+ * "Model only" mode shows the same question answered without tools.
+ * Controls sit above the diagram and never move. English and Polish.
  */
 import { langOf } from '../i18n/ui';
 const lang = langOf(Astro);
 
-const copy = {
-	en: {
-		kicker: 'Interactive diagram',
-		title: 'One question, end to end',
-		play: '▶ Play', pause: '❚❚ Pause', prev: '◀', next: '▶', reset: 'Start again',
-		harnessOn: 'Harness with tools', harnessOff: 'Model only (chat)',
-		step: 'Step {n} of {total}',
-		ctx: 'Context window', out: 'What you see',
-		nodes: { you: 'You', harness: 'Harness', tok: 'Tokenizer', model: 'Transformer', sample: 'Sampling', tools: 'Tools', detok: 'Detokenizer' },
-		subs: { harness: 'builds the context, runs tools', tok: 'text → token IDs', model: 'billions of parameters', sample: 'pick the next token', tools: 'read · run · search', detok: 'tokens → text' },
-		blocks: { sys: 'system prompt', agents: 'AGENTS.md', user: 'Do the tests pass?', call: 'run_command("flutter test")', result: '00:05 +33: All tests passed!', answer: 'Yes: all 33 tests pass (flutter test).', fake: 'Yes, all tests pass.' },
-		steps: [
-			'You type a question: <b>“Do the tests pass?”</b>',
-			'The <b>harness</b> builds the context: its own system prompt, your <code>AGENTS.md</code>, then your message. The model will see only this.',
-			'The <b>tokenizer</b> turns the whole context into token IDs: thousands of them for a real project.',
-			'The <b>transformer</b> reads every token at once, through dozens of layers, and computes one thing: a probability for every possible next token.',
-			'<b>Sampling</b> picks one token, here <code>I’ll</code>. That is the only output of one pass.',
-			'The token is appended to the context, and everything runs again for the next token. <b>One token at a time</b>, the model writes: <i>I’ll run the tests.</i>',
-			'Now the model writes a special <b>tool call</b>: <code>run_command("flutter test")</code>. The model cannot run anything. It only writes text that asks for it.',
-			'The <b>harness</b> recognises the tool call and runs the command on your machine, with your permissions.',
-			'The tool’s output goes <b>back into the context</b>: <code>00:05 +33: All tests passed!</code> Real evidence, not a guess.',
-			'The model reads the context again, now with the result in it, and writes the answer token by token.',
-			'The <b>detokenizer</b> turns tokens back into text, and you read: <i>Yes: all 33 tests pass (flutter test).</i>',
-		],
-		stepsOff: [
-			'You type a question: <b>“Do the tests pass?”</b>',
-			'A plain chat has no project files: the context is a short system prompt and your message.',
-			'The <b>tokenizer</b> turns the context into token IDs.',
-			'The <b>transformer</b> computes a probability for every possible next token.',
-			'<b>Sampling</b> picks one token, here <code>Yes</code>.',
-			'Token by token, it writes the most likely continuation: <i>Yes, all tests pass.</i>',
-			'<b>Nothing ran.</b> There are no tools to call. The answer is just the most plausible sentence, and it reads exactly as confidently as a checked one.',
-		],
-	},
-	pl: {
-		kicker: 'Interaktywny diagram',
-		title: 'Jedno pytanie, od początku do końca',
-		play: '▶ Odtwórz', pause: '❚❚ Pauza', prev: '◀', next: '▶', reset: 'Od nowa',
-		harnessOn: 'Harness z narzędziami', harnessOff: 'Sam model (czat)',
-		step: 'Krok {n} z {total}',
-		ctx: 'Context window', out: 'Co widzisz',
-		nodes: { you: 'Ty', harness: 'Harness', tok: 'Tokenizer', model: 'Transformer', sample: 'Losowanie', tools: 'Narzędzia', detok: 'Detokenizer' },
-		subs: { harness: 'buduje kontekst, uruchamia narzędzia', tok: 'tekst → ID tokenów', model: 'miliardy parametrów', sample: 'wybór następnego tokenu', tools: 'czytaj · uruchom · szukaj', detok: 'tokeny → tekst' },
-		blocks: { sys: 'system prompt', agents: 'AGENTS.md', user: 'Czy testy przechodzą?', call: 'run_command("flutter test")', result: '00:05 +33: All tests passed!', answer: 'Tak: wszystkie 33 testy przechodzą (flutter test).', fake: 'Tak, wszystkie testy przechodzą.' },
-		steps: [
-			'Wpisujesz pytanie: <b>„Czy testy przechodzą?”</b>',
-			'<b>Harness</b> buduje kontekst: swój system prompt, twój <code>AGENTS.md</code>, a potem twoją wiadomość. Model zobaczy tylko to.',
-			'<b>Tokenizer</b> zamienia cały kontekst na ID tokenów: w prawdziwym projekcie to tysiące.',
-			'<b>Transformer</b> czyta wszystkie tokeny naraz, przez dziesiątki warstw, i liczy jedno: prawdopodobieństwo każdego możliwego następnego tokenu.',
-			'<b>Losowanie</b> wybiera jeden token, tu <code>Uruchomię</code>. To jedyny wynik jednego przebiegu.',
-			'Token trafia na koniec kontekstu i wszystko rusza od nowa po kolejny. <b>Token po tokenie</b> model pisze: <i>Uruchomię testy.</i>',
-			'Teraz model pisze specjalne <b>wywołanie narzędzia</b>: <code>run_command("flutter test")</code>. Model niczego nie uruchamia. Pisze tylko tekst, który o to prosi.',
-			'<b>Harness</b> rozpoznaje wywołanie i uruchamia polecenie na twoim komputerze, z twoimi uprawnieniami.',
-			'Wynik narzędzia wraca <b>do kontekstu</b>: <code>00:05 +33: All tests passed!</code> Prawdziwy dowód, a nie zgadywanie.',
-			'Model czyta kontekst jeszcze raz, już z wynikiem, i pisze odpowiedź token po tokenie.',
-			'<b>Detokenizer</b> zamienia tokeny z powrotem w tekst, a ty czytasz: <i>Tak: wszystkie 33 testy przechodzą (flutter test).</i>',
-		],
-		stepsOff: [
-			'Wpisujesz pytanie: <b>„Czy testy przechodzą?”</b>',
-			'Zwykły czat nie ma plików projektu: kontekst to krótki system prompt i twoja wiadomość.',
-			'<b>Tokenizer</b> zamienia kontekst na ID tokenów.',
-			'<b>Transformer</b> liczy prawdopodobieństwo każdego możliwego następnego tokenu.',
-			'<b>Losowanie</b> wybiera jeden token, tu <code>Tak</code>.',
-			'Token po tokenie pisze najbardziej prawdopodobny ciąg dalszy: <i>Tak, wszystkie testy przechodzą.</i>',
-			'<b>Nic nie zostało uruchomione.</b> Nie ma narzędzi do wywołania. Odpowiedź to po prostu najbardziej wiarygodnie brzmiące zdanie – i brzmi dokładnie tak samo pewnie jak sprawdzona.',
-		],
-	},
-}[lang];
+const en = {
+	kicker: 'Interactive diagram', title: 'One question, end to end',
+	harnessOn: 'Harness with tools', harnessOff: 'Model only (chat)',
+	play: '▶ Play', pause: '❚❚ Pause', reset: '↺ Start again', step: 'Step {n} / {total}',
+	regionH: 'HARNESS · on your computer', regionHoff: 'CHAT APP · no tools', regionM: 'MODEL · on the provider’s server',
+	ctx: 'Context window', out: 'What you see',
+	n: { you: 'You', ctx: 'Context', ctxSub: 'one growing document', runner: 'Tool runner', runnerSub: 'runs what the model asks for', tools: 'Terminal', tok: 'Tokenizer', tokSub: 'text → token IDs', model: 'Transformer', modelSub: 'reads every token at once', sample: 'Sampling', sampleSub: 'picks the next token' },
+	edge: { loop: '+1 token, repeat', back: 'tokens back to the harness' },
+	carry: { q: 'question', text: 'context as text', ids: 'token IDs', p: 'probabilities', call: 'tool call', cmd: '$ flutter test', outp: 'test output', end: '<|im_end|>', ans: 'answer' },
+	question: 'Do the tests pass?', qIds: '6449 · 290 · 10742 · 1853 · 30',
+	blocks: { sys: 'system prompt', agents: 'AGENTS.md', call: 'run_command("flutter test")', result: '00:05 +33: All tests passed!' },
+	gen: ['I', '’ll', ' run', ' the', ' tests', '.'],
+	answer: ['Yes', ':', ' all', ' ', '33', ' tests', ' pass', ' (', 'flutter', ' test', ').'],
+	fake: ['Yes', ',', ' all', ' tests', ' pass', '.'],
+	term: ['$ flutter test', '00:03 +12: …', '00:05 +33: All tests passed!'],
+	steps: [
+		'You type a question: <b>“Do the tests pass?”</b>',
+		'The <b>harness</b> builds the context: its own system prompt, your <code>AGENTS.md</code>, then your message. It is one document, and the model will see nothing else.',
+		'The harness sends the whole document to the model. The <b>tokenizer</b> cuts it into token IDs: your question alone is <code>6449 · 290 · 10742 · 1853 · 30</code>.',
+		'The <b>transformer</b> reads all the tokens at once, layer after layer, and computes one thing: a probability for every possible next token.',
+		'<b>Sampling</b> picks one token: <code>I</code>. That is the whole output of one pass.',
+		'The token is appended and everything runs again for the next one. <b>One token per pass</b>: <i>I’ll run the tests.</i>',
+		'Now the model writes a special <b>tool call</b>, <code>run_command("flutter test")</code>, and the tokens go back to the harness. The model cannot run anything. It only writes text that asks for it.',
+		'The harness recognises the tool call and hands it to the <b>tool runner</b>, which checks your permissions.',
+		'The command runs <b>on your computer</b>, in your terminal.',
+		'The output goes <b>back into the context</b>: <code>00:05 +33: All tests passed!</code> Real evidence, not a guess.',
+		'The whole document, now with the result in it, goes to the model again, and it writes the answer token by token.',
+		'<code>&lt;|im_end|&gt;</code> ends the turn. The harness shows you: <i>Yes: all 33 tests pass (flutter test).</i>',
+	],
+	stepsOff: [
+		'You type a question: <b>“Do the tests pass?”</b>',
+		'A plain chat has no project files and no tools: the context is a short system prompt and your message.',
+		'The <b>tokenizer</b> cuts the context into token IDs.',
+		'The <b>transformer</b> computes a probability for every possible next token.',
+		'<b>Sampling</b> picks one token: <code>Yes</code>.',
+		'Token by token, the model writes the most likely continuation: <i>Yes, all tests pass.</i>',
+		'<b>Nothing ran.</b> There was no tool to call. The answer is just the most plausible sentence, and it sounds exactly as sure as a checked one.',
+	],
+};
+const pl: typeof en = {
+	kicker: 'Interaktywny diagram', title: 'Jedno pytanie, od początku do końca',
+	harnessOn: 'Harness z narzędziami', harnessOff: 'Sam model (czat)',
+	play: '▶ Odtwórz', pause: '❚❚ Pauza', reset: '↺ Od nowa', step: 'Krok {n} / {total}',
+	regionH: 'HARNESS · na twoim komputerze', regionHoff: 'APLIKACJA CZATU · bez narzędzi', regionM: 'MODEL · na serwerze dostawcy',
+	ctx: 'Context window', out: 'Co widzisz',
+	n: { you: 'Ty', ctx: 'Kontekst', ctxSub: 'jeden rosnący dokument', runner: 'Wykonawca narzędzi', runnerSub: 'uruchamia to, o co prosi model', tools: 'Terminal', tok: 'Tokenizer', tokSub: 'tekst → ID tokenów', model: 'Transformer', modelSub: 'czyta wszystkie tokeny naraz', sample: 'Losowanie', sampleSub: 'wybiera następny token' },
+	edge: { loop: '+1 token, od nowa', back: 'tokeny wracają do harnessu' },
+	carry: { q: 'pytanie', text: 'kontekst jako tekst', ids: 'ID tokenów', p: 'prawdopodobieństwa', call: 'wywołanie narzędzia', cmd: '$ flutter test', outp: 'wynik testów', end: '<|im_end|>', ans: 'odpowiedź' },
+	question: 'Czy testy przechodzą?', qIds: '174441 · 1746 · 88 · 24122 · 54474 · 21589 · 30',
+	blocks: { sys: 'system prompt', agents: 'AGENTS.md', call: 'run_command("flutter test")', result: '00:05 +33: All tests passed!' },
+	gen: ['Ur', 'uch', 'omi', 'ę', ' test', 'y', '.'],
+	answer: ['Tak', ':', ' wszystkie', ' ', '33', ' test', 'y', ' prze', 'chod', 'zą', ' (', 'flutter', ' test', ').'],
+	fake: ['Tak', ',', ' wszystkie', ' test', 'y', ' prze', 'chod', 'zą', '.'],
+	term: ['$ flutter test', '00:03 +12: …', '00:05 +33: All tests passed!'],
+	steps: [
+		'Wpisujesz pytanie: <b>„Czy testy przechodzą?”</b>',
+		'<b>Harness</b> buduje kontekst: swój system prompt, twój <code>AGENTS.md</code>, a potem twoją wiadomość. To jeden dokument i model nie zobaczy nic poza nim.',
+		'Harness wysyła cały dokument do modelu. <b>Tokenizer</b> tnie go na ID tokenów: samo twoje pytanie to <code>174441 · 1746 · 88 · 24122 · 54474 · 21589 · 30</code>.',
+		'<b>Transformer</b> czyta wszystkie tokeny naraz, warstwa po warstwie, i liczy jedno: prawdopodobieństwo każdego możliwego następnego tokenu.',
+		'<b>Losowanie</b> wybiera jeden token: <code>Ur</code>. To cały wynik jednego przebiegu.',
+		'Token trafia na koniec i wszystko rusza od nowa po kolejny. <b>Jeden token na przebieg</b>: <i>Uruchomię testy.</i>',
+		'Teraz model pisze specjalne <b>wywołanie narzędzia</b>, <code>run_command("flutter test")</code>, a tokeny wracają do harnessu. Model niczego nie uruchamia. Pisze tylko tekst, który o to prosi.',
+		'Harness rozpoznaje wywołanie i przekazuje je <b>wykonawcy narzędzi</b>, który sprawdza twoje uprawnienia.',
+		'Polecenie uruchamia się <b>na twoim komputerze</b>, w twoim terminalu.',
+		'Wynik wraca <b>do kontekstu</b>: <code>00:05 +33: All tests passed!</code> Prawdziwy dowód, a nie zgadywanie.',
+		'Cały dokument, już z wynikiem, znów trafia do modelu, a ten pisze odpowiedź token po tokenie.',
+		'<code>&lt;|im_end|&gt;</code> kończy turę. Harness pokazuje ci: <i>Tak: wszystkie 33 testy przechodzą (flutter test).</i>',
+	],
+	stepsOff: [
+		'Wpisujesz pytanie: <b>„Czy testy przechodzą?”</b>',
+		'Zwykły czat nie ma plików projektu ani narzędzi: kontekst to krótki system prompt i twoja wiadomość.',
+		'<b>Tokenizer</b> tnie kontekst na ID tokenów.',
+		'<b>Transformer</b> liczy prawdopodobieństwo każdego możliwego następnego tokenu.',
+		'<b>Losowanie</b> wybiera jeden token: <code>Tak</code>.',
+		'Token po tokenie model pisze najbardziej prawdopodobny ciąg dalszy: <i>Tak, wszystkie testy przechodzą.</i>',
+		'<b>Nic nie zostało uruchomione.</b> Nie było narzędzia do wywołania. Odpowiedź to po prostu najbardziej wiarygodne zdanie i brzmi dokładnie tak samo pewnie jak sprawdzona.',
+	],
+};
+const c = lang === 'pl' ? pl : en;
 
-// Step scripts: which node is active, which edge the packet travels, which
-// context blocks exist, and what the "you see" line shows.
+// Final state after each step. hops: edges the packet travels, in order,
+// with what it carries. pick: the growing block whose first token sampling
+// just chose. loop: that block grows one token per sample→model pass.
 const on = [
-	{ node: 'you', edge: null, ctx: [], out: '' },
-	{ node: 'harness', edge: 'you>harness', ctx: ['sys', 'agents', 'user'], out: '' },
-	{ node: 'tok', edge: 'harness>tok', ctx: ['sys', 'agents', 'user'], out: '' },
-	{ node: 'model', edge: 'tok>model', ctx: ['sys', 'agents', 'user'], out: '' },
-	{ node: 'sample', edge: 'model>sample', ctx: ['sys', 'agents', 'user', 'gen1'], out: '' },
-	{ node: 'model', edge: 'sample>model', ctx: ['sys', 'agents', 'user', 'gen'], out: '' },
-	{ node: 'harness', edge: 'sample>harness', ctx: ['sys', 'agents', 'user', 'gen', 'call'], out: '' },
-	{ node: 'tools', edge: 'harness>tools', ctx: ['sys', 'agents', 'user', 'gen', 'call'], out: '' },
-	{ node: 'harness', edge: 'tools>harness', ctx: ['sys', 'agents', 'user', 'gen', 'call', 'result'], out: '' },
-	{ node: 'model', edge: 'harness>tok', ctx: ['sys', 'agents', 'user', 'gen', 'call', 'result', 'answer'], out: '' },
-	{ node: 'you', edge: 'detok>you', ctx: ['sys', 'agents', 'user', 'gen', 'call', 'result', 'answer'], out: 'answer' },
+	{ node: 'you', hops: [], ctx: [] },
+	{ node: 'ctx', hops: [['you>ctx', 'q']], ctx: ['sys', 'agents', 'user'] },
+	{ node: 'tok', hops: [['ctx>tok', 'text']], ctx: ['sys', 'agents', 'user'], ids: 1 },
+	{ node: 'model', hops: [['tok>model', 'ids']], ctx: ['sys', 'agents', 'user'], ids: 1 },
+	{ node: 'sample', hops: [['model>sample', 'p']], ctx: ['sys', 'agents', 'user', 'gen'], gen: 1, pick: 'gen' },
+	{ node: 'sample', hops: [], loop: 'gen', ctx: ['sys', 'agents', 'user', 'gen'], gen: 99, pick: 'gen' },
+	{ node: 'ctx', hops: [['sample>ctx', 'call']], ctx: ['sys', 'agents', 'user', 'gen', 'call'], gen: 99 },
+	{ node: 'runner', hops: [['ctx>runner', 'call']], ctx: ['sys', 'agents', 'user', 'gen', 'call'], gen: 99 },
+	{ node: 'tools', hops: [['runner>tools', 'cmd']], ctx: ['sys', 'agents', 'user', 'gen', 'call'], gen: 99, term: 3 },
+	{ node: 'ctx', hops: [['tools>runner', 'outp'], ['runner>ctx', 'outp']], ctx: ['sys', 'agents', 'user', 'gen', 'call', 'result'], gen: 99, term: 3 },
+	{ node: 'sample', hops: [['ctx>tok', 'text'], ['tok>model', 'ids'], ['model>sample', 'p']], loop: 'ans', ctx: ['sys', 'agents', 'user', 'gen', 'call', 'result', 'ans'], gen: 99, ans: 99, term: 3, pick: 'ans' },
+	{ node: 'you', hops: [['sample>ctx', 'end'], ['ctx>you', 'ans']], ctx: ['sys', 'agents', 'user', 'gen', 'call', 'result', 'ans'], gen: 99, ans: 99, term: 3, out: 'ans' },
 ];
 const off = [
-	{ node: 'you', edge: null, ctx: [], out: '' },
-	{ node: 'harness', edge: 'you>harness', ctx: ['sys', 'user'], out: '' },
-	{ node: 'tok', edge: 'harness>tok', ctx: ['sys', 'user'], out: '' },
-	{ node: 'model', edge: 'tok>model', ctx: ['sys', 'user'], out: '' },
-	{ node: 'sample', edge: 'model>sample', ctx: ['sys', 'user', 'fake1'], out: '' },
-	{ node: 'model', edge: 'sample>model', ctx: ['sys', 'user', 'fake'], out: '' },
-	{ node: 'you', edge: 'detok>you', ctx: ['sys', 'user', 'fake'], out: 'fake' },
+	{ node: 'you', hops: [], ctx: [] },
+	{ node: 'ctx', hops: [['you>ctx', 'q']], ctx: ['sys', 'user'] },
+	{ node: 'tok', hops: [['ctx>tok', 'text']], ctx: ['sys', 'user'], ids: 1 },
+	{ node: 'model', hops: [['tok>model', 'ids']], ctx: ['sys', 'user'], ids: 1 },
+	{ node: 'sample', hops: [['model>sample', 'p']], ctx: ['sys', 'user', 'fake'], fake: 1, pick: 'fake' },
+	{ node: 'sample', hops: [], loop: 'fake', ctx: ['sys', 'user', 'fake'], fake: 99, pick: 'fake' },
+	{ node: 'you', hops: [['sample>ctx', 'end'], ['ctx>you', 'ans']], ctx: ['sys', 'user', 'fake'], fake: 99, out: 'fake' },
 ];
-const data = { on, off, steps: copy.steps, stepsOff: copy.stepsOff, blocks: copy.blocks, step: copy.step, play: copy.play, pause: copy.pause, gen1: lang === 'pl' ? 'Uruchomię' : 'I’ll', gen: lang === 'pl' ? 'Uruchomię testy.' : 'I’ll run the tests.', fake1: lang === 'pl' ? 'Tak' : 'Yes' };
+const data = { c, on, off };
 ---
 
-<div class="biz-widget llmflow not-content" data-flow={JSON.stringify(data)}>
+<div class="biz-widget lf not-content" data-flow={JSON.stringify(data)}>
 	<div class="biz-head">
 		<div>
-			<p class="biz-kicker">{copy.kicker}</p>
-			<p class="biz-title">{copy.title}</p>
+			<p class="biz-kicker">{c.kicker}</p>
+			<p class="biz-title">{c.title}</p>
 		</div>
 		<div class="llmflow__mode" role="group">
-			<button type="button" class="llmflow__mode-btn is-on" data-mode="on">{copy.harnessOn}</button>
-			<button type="button" class="llmflow__mode-btn" data-mode="off">{copy.harnessOff}</button>
+			<button type="button" class="llmflow__mode-btn is-on" data-mode="on">{c.harnessOn}</button>
+			<button type="button" class="llmflow__mode-btn" data-mode="off">{c.harnessOff}</button>
 		</div>
 	</div>
 
-	<div class="llmflow__scroll"><svg class="llmflow__svg" viewBox="0 0 960 430" role="img" aria-label={copy.title}>
-		<defs>
-			<marker id="lf-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" /></marker>
-			<linearGradient id="lf-model" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#2563EB" /><stop offset="1" stop-color="#7C3AED" /></linearGradient>
-		</defs>
-		<rect class="llmflow__harness" x="150" y="20" width="790" height="300" rx="22" />
-		<text class="llmflow__harness-label" x="172" y="44">{copy.nodes.harness} · {copy.subs.harness}</text>
+	<div class="lf__bar">
+		<button type="button" class="sdlc-btn" data-act="prev" aria-label="previous">◀</button>
+		<button type="button" class="sdlc-btn sdlc-btn--primary lf__play" data-act="play">{c.play}</button>
+		<button type="button" class="sdlc-btn" data-act="next" aria-label="next">▶</button>
+		<button type="button" class="sdlc-btn" data-act="reset">{c.reset}</button>
+		<span class="lf__status" aria-live="polite"></span>
+		<span class="lf__dots"></span>
+	</div>
 
-		<g class="llmflow__edges">
-			<path data-edge="you>harness" d="M110 175 L 200 175" />
-			<path data-edge="harness>tok" d="M318 175 L 370 175" />
-			<path data-edge="tok>model" d="M488 175 L 540 175" />
-			<path data-edge="model>sample" d="M700 175 L 752 175" />
-			<path data-edge="sample>model" class="is-loop" d="M811 145 C 811 80, 620 80, 620 125" />
-			<path data-edge="sample>harness" class="is-tool" d="M811 205 C 811 290, 259 290, 259 205" />
-			<path data-edge="harness>tools" class="is-tool" d="M259 205 L 259 360" />
-			<path data-edge="tools>harness" class="is-tool" d="M289 360 L 289 205" />
-			<path data-edge="detok>you" d="M811 205 C 811 410, 60 410, 60 215" />
-		</g>
+	<div class="lf__scroll">
+		<svg class="lf__svg" viewBox="0 0 1000 470" role="img" aria-label={c.title}>
+			<defs>
+				<marker id="lf2-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" /></marker>
+				<linearGradient id="lf2-model" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#2563EB" /><stop offset="1" stop-color="#7C3AED" /></linearGradient>
+			</defs>
 
-		<g class="llmflow__node" data-node="you"><circle cx="60" cy="175" r="40" /><text x="60" y="180">{copy.nodes.you}</text></g>
-		<g class="llmflow__node" data-node="harness"><rect x="200" y="135" width="118" height="80" rx="14" /><text x="259" y="172">{copy.nodes.harness}</text><text class="sub" x="259" y="192">context</text></g>
-		<g class="llmflow__node" data-node="tok"><rect x="370" y="135" width="118" height="80" rx="14" /><text x="429" y="172">{copy.nodes.tok}</text><text class="sub" x="429" y="192">{copy.subs.tok}</text></g>
-		<g class="llmflow__node is-model" data-node="model">
-			<rect x="540" y="125" width="160" height="100" rx="16" />
-			<g class="llmflow__layers">
-				<rect x="556" y="140" width="128" height="9" rx="4" /><rect x="556" y="154" width="128" height="9" rx="4" /><rect x="556" y="168" width="128" height="9" rx="4" /><rect x="556" y="182" width="128" height="9" rx="4" />
+			<rect class="lf__region is-h" x="140" y="16" width="295" height="444" rx="20" />
+			<text class="lf__region-label is-h" x="158" y="42">{c.regionH}</text>
+			<rect class="lf__region is-m" x="485" y="16" width="505" height="444" rx="20" />
+			<text class="lf__region-label is-m" x="503" y="42">{c.regionM}</text>
+
+			<g class="lf__edges">
+				<path data-edge="you>ctx" d="M98 100 H160" />
+				<path data-edge="ctx>you" d="M160 140 H98" />
+				<path data-edge="ctx>tok" d="M410 100 H560" />
+				<path data-edge="tok>model" d="M730 150 V190" />
+				<path data-edge="model>sample" d="M730 300 V340" />
+				<path data-edge="sample>model" class="is-loop" d="M900 395 H950 V245 H900" />
+				<path data-edge="sample>ctx" d="M560 395 H462 V165 H410" />
+				<path data-edge="ctx>runner" class="is-tool" d="M255 190 V240" />
+				<path data-edge="runner>ctx" class="is-tool" d="M325 240 V190" />
+				<path data-edge="runner>tools" class="is-tool" d="M255 300 V340" />
+				<path data-edge="tools>runner" class="is-tool" d="M325 340 V300" />
 			</g>
-			<text x="620" y="212">{copy.nodes.model}</text>
-		</g>
-		<g class="llmflow__node" data-node="sample">
-			<rect x="752" y="135" width="118" height="80" rx="14" />
-			<g class="llmflow__bars"><rect x="770" y="160" width="10" height="24" /><rect x="784" y="168" width="10" height="16" /><rect x="798" y="174" width="10" height="10" /><rect x="812" y="178" width="10" height="6" /><rect x="826" y="180" width="10" height="4" /></g>
-			<text x="811" y="203">{copy.nodes.sample}</text>
-		</g>
-		<g class="llmflow__node is-tools" data-node="tools"><rect x="200" y="350" width="118" height="62" rx="14" /><text x="259" y="378">{copy.nodes.tools}</text><text class="sub" x="259" y="397">{copy.subs.tools}</text></g>
-		<text class="llmflow__edge-label" x="640" y="78">+1 token</text>
-		<text class="llmflow__edge-label is-tool" x="520" y="282">tool call</text>
-		<circle class="llmflow__packet" r="8" cx="-20" cy="-20" />
-	</svg></div>
+			<text class="lf__edge-label" transform="translate(972 320) rotate(-90)">{c.edge.loop}</text>
+			<text class="lf__edge-label" transform="translate(452 280) rotate(-90)">{c.edge.back}</text>
 
+			<g class="lf__node" data-node="you">
+				<circle cx="58" cy="120" r="40" />
+				<text x="58" y="126">{c.n.you}</text>
+			</g>
+
+			<g class="lf__node" data-node="ctx">
+				<rect x="160" y="66" width="250" height="124" rx="14" />
+				<text x="176" y="92" class="l">{c.n.ctx}</text>
+				<text x="176" y="111" class="sub l">{c.n.ctxSub}</text>
+				<g class="lf__doc"></g>
+			</g>
+
+			<g class="lf__node is-tool" data-node="runner">
+				<rect x="160" y="240" width="250" height="60" rx="14" />
+				<text x="285" y="266">{c.n.runner}</text>
+				<text x="285" y="288" class="sub">{c.n.runnerSub}</text>
+			</g>
+
+			<g class="lf__node is-tool is-term" data-node="tools">
+				<rect x="160" y="340" width="250" height="104" rx="12" />
+				<circle cx="178" cy="356" r="4" fill="#F87171" /><circle cx="192" cy="356" r="4" fill="#FBBF24" /><circle cx="206" cy="356" r="4" fill="#34D399" />
+				<text x="398" y="360" class="t-title">{c.n.tools}</text>
+				<text x="172" y="386" class="t-line"></text>
+				<text x="172" y="407" class="t-line"></text>
+				<text x="172" y="428" class="t-line is-ok"></text>
+			</g>
+
+			<g class="lf__node" data-node="tok">
+				<rect x="560" y="66" width="340" height="84" rx="14" />
+				<text x="730" y="93">{c.n.tok}</text>
+				<text x="730" y="113" class="sub">{c.n.tokSub}</text>
+				<text x="730" y="139" class="ids"></text>
+			</g>
+
+			<g class="lf__node is-model" data-node="model">
+				<rect x="560" y="190" width="340" height="110" rx="16" />
+				<g class="lf__layers">
+					<rect x="590" y="197" width="280" height="6" rx="3" /><rect x="590" y="207" width="280" height="6" rx="3" /><rect x="590" y="217" width="280" height="6" rx="3" /><rect x="590" y="227" width="280" height="6" rx="3" /><rect x="590" y="237" width="280" height="6" rx="3" /><rect x="590" y="247" width="280" height="6" rx="3" />
+				</g>
+				<text x="730" y="274">{c.n.model}</text>
+				<text x="730" y="295" class="sub-in">{c.n.modelSub}</text>
+			</g>
+
+			<g class="lf__node" data-node="sample">
+				<rect x="560" y="340" width="340" height="104" rx="14" />
+				<text x="580" y="365" class="l">{c.n.sample}</text>
+				<text x="580" y="384" class="sub l">{c.n.sampleSub}</text>
+				<g class="lf__bars">
+					<rect x="584" y="396" width="16" height="36" /><rect x="606" y="408" width="16" height="24" /><rect x="628" y="416" width="16" height="16" /><rect x="650" y="422" width="16" height="10" /><rect x="672" y="426" width="16" height="6" /><rect x="694" y="429" width="16" height="3" />
+				</g>
+				<text x="790" y="420" class="pick"></text>
+			</g>
+
+			<g class="lf__packet" transform="translate(-100 -100)">
+				<circle r="7" />
+				<rect class="pill" x="0" y="-36" height="26" rx="13" />
+				<text class="pill-t" x="0" y="-18"></text>
+			</g>
+		</svg>
+	</div>
+
+	<p class="lf__narr" aria-live="polite"></p>
 	<div class="llmflow__panels">
-		<div class="llmflow__ctx"><p class="llmflow__label">{copy.ctx}</p><div class="llmflow__blocks"></div></div>
-		<div class="llmflow__out"><p class="llmflow__label">{copy.out}</p><p class="llmflow__answer"></p></div>
+		<div class="llmflow__ctx"><p class="llmflow__label">{c.ctx}</p><div class="llmflow__blocks"></div></div>
+		<div class="llmflow__out"><p class="llmflow__label">{c.out}</p><p class="llmflow__answer"></p></div>
 	</div>
-
-	<div class="llmflow__bar">
-		<button type="button" class="sdlc-btn" data-act="prev" aria-label="prev">{copy.prev}</button>
-		<button type="button" class="sdlc-btn sdlc-btn--primary" data-act="play">{copy.play}</button>
-		<button type="button" class="sdlc-btn" data-act="next" aria-label="next">{copy.next}</button>
-		<button type="button" class="sdlc-btn" data-act="reset">{copy.reset}</button>
-		<span class="llmflow__status" aria-live="polite"></span>
-	</div>
-	<p class="llmflow__narr" aria-live="polite"></p>
 </div>
 
 <script>
 	const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-	document.querySelectorAll<HTMLElement>('.llmflow').forEach((box) => {
-		const D = JSON.parse(box.dataset.flow || '{}');
-		const svg = box.querySelector('svg')!;
-		const packet = box.querySelector<SVGCircleElement>('.llmflow__packet')!;
+	const SVGNS = 'http://www.w3.org/2000/svg';
+	const sleep = (ms: number) => new Promise((r) => setTimeout(r, reduce ? 0 : ms));
+
+	document.querySelectorAll<HTMLElement>('.lf').forEach((box) => {
+		const { c: C, on, off } = JSON.parse(box.dataset.flow || '{}');
+		const svg = box.querySelector<SVGSVGElement>('.lf__svg')!;
+		const packet = svg.querySelector<SVGGElement>('.lf__packet')!;
+		const pill = packet.querySelector<SVGRectElement>('.pill')!;
+		const pillT = packet.querySelector<SVGTextElement>('.pill-t')!;
+		const doc = svg.querySelector<SVGGElement>('.lf__doc')!;
+		const ids = svg.querySelector<SVGTextElement>('.ids')!;
+		const pick = svg.querySelector<SVGTextElement>('.pick')!;
+		const termLines = Array.from(svg.querySelectorAll<SVGTextElement>('.t-line'));
 		const blocksEl = box.querySelector<HTMLElement>('.llmflow__blocks')!;
 		const answer = box.querySelector<HTMLElement>('.llmflow__answer')!;
-		const narr = box.querySelector<HTMLElement>('.llmflow__narr')!;
-		const status = box.querySelector<HTMLElement>('.llmflow__status')!;
+		const narr = box.querySelector<HTMLElement>('.lf__narr')!;
+		const status = box.querySelector<HTMLElement>('.lf__status')!;
+		const dots = box.querySelector<HTMLElement>('.lf__dots')!;
 		const playBtn = box.querySelector<HTMLButtonElement>('[data-act="play"]')!;
+		const scroller = box.querySelector<HTMLElement>('.lf__scroll')!;
+		const regionLabel = svg.querySelector<SVGTextElement>('.lf__region-label.is-h')!;
+
+		type Key = 'gen' | 'ans' | 'fake';
 		let mode: 'on' | 'off' = 'on';
 		let i = 0;
-		let timer: number | undefined;
-		let raf = 0;
-
-		const blockText: Record<string, [string, string]> = {
-			sys: [D.blocks.sys, 'is-sys'], agents: [D.blocks.agents, 'is-agents'], user: [D.blocks.user, 'is-user'],
-			gen1: [D.gen1, 'is-gen'], gen: [D.gen, 'is-gen'], call: [D.blocks.call, 'is-call'], result: [D.blocks.result, 'is-result'],
-			answer: [D.blocks.answer, 'is-gen'], fake1: [D.fake1, 'is-gen'], fake: [D.blocks.fake, 'is-fake'],
+		let run = 0; // bumped on every jump, so running animations stop
+		let playing = false;
+		const st: Record<Key, number> = { gen: 0, ans: 0, fake: 0 };
+		const seq: Record<Key, string[]> = { gen: C.gen, ans: C.answer, fake: C.fake };
+		const growing = (k: string): k is Key => k === 'gen' || k === 'ans' || k === 'fake';
+		const steps = () => (mode === 'on' ? on : off);
+		const texts = () => (mode === 'on' ? C.steps : C.stepsOff);
+		const meta: Record<string, [string, string, string, number]> = {
+			// text, panel class, document colour, document bar width
+			sys: [C.blocks.sys, 'is-sys', 'var(--sdlc-muted)', 150],
+			agents: [C.blocks.agents, 'is-agents', 'var(--sdlc-kb)', 200],
+			user: [C.question, 'is-user', 'var(--sdlc-you)', 90],
+			gen: ['', 'is-gen', 'var(--sdlc-agent)', 110],
+			call: [C.blocks.call, 'is-call', 'var(--sdlc-work)', 160],
+			result: [C.blocks.result, 'is-result', 'var(--sdlc-tool)', 170],
+			ans: ['', 'is-gen', 'var(--sdlc-agent)', 200],
+			fake: ['', 'is-fake', 'var(--sdlc-fail)', 120],
 		};
+		const textOf = (k: string) => (growing(k) ? seq[k].slice(0, st[k]).join('') : meta[k][0]);
+		const show = (t: string) => t.replace(/ /g, '·');
 
-		const move = (edge: string | null) => {
-			cancelAnimationFrame(raf);
-			svg.querySelectorAll('.llmflow__edges path').forEach((p) => p.classList.remove('is-active'));
-			if (!edge) { packet.setAttribute('cx', '-20'); return; }
-			const path = svg.querySelector<SVGPathElement>(`[data-edge="${edge}"]`);
-			if (!path) return;
-			path.classList.add('is-active');
-			const len = path.getTotalLength();
-			const dur = reduce ? 1 : Math.min(1400, 400 + len * 1.4);
-			const t0 = performance.now();
-			const frame = (t: number) => {
-				const f = Math.min(1, (t - t0) / dur);
-				const e = f < 0.5 ? 2 * f * f : 1 - Math.pow(-2 * f + 2, 2) / 2;
-				const pt = path.getPointAtLength(e * len);
-				packet.setAttribute('cx', String(pt.x));
-				packet.setAttribute('cy', String(pt.y));
-				if (f < 1) raf = requestAnimationFrame(frame);
-			};
-			raf = requestAnimationFrame(frame);
-		};
-
-		const render = () => {
-			const steps = D[mode];
-			const texts = mode === 'on' ? D.steps : D.stepsOff;
-			const s = steps[i];
-			svg.querySelectorAll('.llmflow__node').forEach((n) => n.classList.toggle('is-active', (n as HTMLElement).dataset.node === s.node));
-			svg.classList.toggle('is-off', mode === 'off');
-			const sc = box.querySelector<HTMLElement>('.llmflow__scroll')!;
-			const act = svg.querySelector(`[data-node="${s.node}"]`);
-			if (act && sc.scrollWidth > sc.clientWidth) {
-				const r = act.getBoundingClientRect(), c = sc.getBoundingClientRect();
-				sc.scrollTo({ left: sc.scrollLeft + r.left - c.left - (c.width - r.width) / 2, behavior: reduce ? 'auto' : 'smooth' });
-			}
-			move(s.edge);
+		const drawCtx = (keys: string[], fresh = '') => {
 			blocksEl.textContent = '';
-			s.ctx.forEach((k: string, j: number) => {
-				const [txt, cls] = blockText[k];
+			doc.textContent = '';
+			keys.forEach((k, j) => {
 				const b = document.createElement('span');
-				b.className = `llmflow__block ${cls}` + (j === s.ctx.length - 1 && i > 0 ? ' is-new' : '');
-				b.textContent = txt;
+				b.className = `llmflow__block ${meta[k][1]}` + (k === fresh ? ' is-new' : '');
+				b.textContent = textOf(k) || '…';
 				blocksEl.appendChild(b);
+				const r = document.createElementNS(SVGNS, 'rect');
+				const full = meta[k][3];
+				const w = growing(k) ? Math.max(12, (full * st[k]) / seq[k].length) : full;
+				r.setAttribute('x', '176');
+				r.setAttribute('y', String(121 + j * 9));
+				r.setAttribute('width', String(w));
+				r.setAttribute('height', '6');
+				r.setAttribute('rx', '3');
+				r.style.fill = meta[k][2];
+				if (k === fresh) r.classList.add('is-new');
+				doc.appendChild(r);
 			});
-			answer.textContent = s.out ? blockText[s.out][0] : '…';
-			answer.className = 'llmflow__answer' + (s.out === 'fake' ? ' is-fake' : s.out ? ' is-ok' : '');
-			narr.innerHTML = texts[i];
-			narr.classList.toggle('is-warn', mode === 'off' && i === steps.length - 1);
-			status.textContent = String(D.step).replace('{n}', String(i + 1)).replace('{total}', String(steps.length));
 		};
-		const go = (k: number) => { const n = D[mode].length; i = Math.max(0, Math.min(n - 1, k)); render(); };
-		const stop = () => { clearInterval(timer); timer = undefined; playBtn.textContent = D.play; };
+		const setTerm = (n: number) => termLines.forEach((t, j) => (t.textContent = j < n ? C.term[j] : ''));
+		const setPick = (k?: string) => {
+			pick.textContent = k && growing(k) && st[k] > 0 ? `→ ${show(seq[k][st[k] - 1])}` : '';
+			pick.classList.remove('is-pop');
+			void pick.getBBox();
+			pick.classList.add('is-pop');
+		};
+		const setIds = (on: boolean) => (ids.textContent = on ? String(C.qIds).replace(/ · /g, ' ') : '');
+		const setActive = (node: string) => svg.querySelectorAll<SVGGElement>('.lf__node').forEach((g) => g.classList.toggle('is-active', g.dataset.node === node));
+		const clearEdges = () => svg.querySelectorAll('.lf__edges path').forEach((p) => p.classList.remove('is-active'));
+		const hidePacket = () => packet.setAttribute('transform', 'translate(-100 -100)');
+		const header = (k: number) => {
+			narr.innerHTML = texts()[k];
+			narr.classList.toggle('is-warn', mode === 'off' && k === steps().length - 1);
+			status.textContent = String(C.step).replace('{n}', String(k + 1)).replace('{total}', String(steps().length));
+			dots.querySelectorAll('button').forEach((d, j) => { d.classList.toggle('is-on', j <= k); d.classList.toggle('is-current', j === k); });
+		};
+		const focus = (node: string) => {
+			const g = svg.querySelector(`[data-node="${node}"]`);
+			if (!g || scroller.scrollWidth <= scroller.clientWidth) return;
+			const r = g.getBoundingClientRect(), b = scroller.getBoundingClientRect();
+			scroller.scrollTo({ left: scroller.scrollLeft + r.left - b.left - (b.width - r.width) / 2, behavior: reduce ? 'auto' : 'smooth' });
+		};
+
+		const travel = (edge: string, label: string, ms: number, my: number) =>
+			new Promise<void>((done) => {
+				const path = svg.querySelector<SVGPathElement>(`[data-edge="${edge}"]`);
+				if (!path || reduce) { done(); return; }
+				clearEdges();
+				path.classList.add('is-active');
+				pillT.textContent = label;
+				const tw = pillT.getComputedTextLength() + 20;
+				pill.setAttribute('width', String(tw));
+				pill.setAttribute('x', String(-tw / 2));
+				const len = path.getTotalLength();
+				const t0 = performance.now();
+				const frame = (t: number) => {
+					if (my !== run) { done(); return; }
+					const f = Math.min(1, (t - t0) / ms);
+					const e = f < 0.5 ? 2 * f * f : 1 - Math.pow(-2 * f + 2, 2) / 2;
+					const pt = path.getPointAtLength(e * len);
+					packet.setAttribute('transform', `translate(${pt.x} ${pt.y})`);
+					if (f < 1) requestAnimationFrame(frame);
+					else done();
+				};
+				requestAnimationFrame(frame);
+			});
+
+		// The final state of step k, without animation.
+		const paint = (k: number) => {
+			const s = steps()[k];
+			(['gen', 'ans', 'fake'] as Key[]).forEach((key) => (st[key] = Math.min(s[key] ?? 0, seq[key].length)));
+			setActive(s.node);
+			clearEdges();
+			hidePacket();
+			drawCtx(s.ctx);
+			setIds(!!s.ids);
+			setTerm(s.term ?? 0);
+			setPick(s.pick);
+			answer.textContent = s.out ? seq[s.out as Key].join('') : '…';
+			answer.className = 'llmflow__answer' + (s.out === 'fake' ? ' is-fake' : s.out ? ' is-ok' : '');
+			header(k);
+		};
+
+		// Animate from step k-1 into step k, ending in k's final state.
+		const animate = async (k: number) => {
+			const my = ++run;
+			const prev = steps()[k - 1];
+			const s = steps()[k];
+			i = k;
+			paint(k - 1);
+			header(k);
+			focus(s.node);
+			for (const [edge, carry] of s.hops) {
+				const [from, to] = edge.split('>');
+				setActive(from);
+				await travel(edge, C.carry[carry] ?? carry, 950, my);
+				if (my !== run) return;
+				setActive(to);
+				if (to === 'tok' && s.ids) { setIds(true); await sleep(500); }
+				if (to === 'model') await sleep(reduce ? 0 : 700);
+				if (my !== run) return;
+			}
+			hidePacket();
+			setActive(s.node);
+			if (s.term && !prev.term) {
+				for (let n = 1; n <= s.term; n++) { setTerm(n); await sleep(550); if (my !== run) return; }
+			}
+			const fresh = s.ctx.filter((x: string) => !prev.ctx.includes(x));
+			if (s.pick && growing(s.pick) && st[s.pick] === 0) st[s.pick] = 1;
+			for (const f of fresh) {
+				const upto = s.ctx.slice(0, s.ctx.indexOf(f) + 1);
+				drawCtx(upto, f);
+				if (growing(f)) setPick(f);
+				await sleep(420);
+				if (my !== run) return;
+			}
+			if (s.loop && growing(s.loop)) {
+				const key = s.loop;
+				while (st[key] < seq[key].length) {
+					await travel('sample>model', `+ ${show(seq[key][st[key] - 1])}`, 420, my);
+					if (my !== run) return;
+					setActive('model');
+					await sleep(180);
+					await travel('model>sample', C.carry.p, 380, my);
+					if (my !== run) return;
+					setActive('sample');
+					st[key]++;
+					setPick(key);
+					drawCtx(s.ctx, key);
+				}
+			}
+			if (my !== run) return;
+			paint(k);
+		};
+
+		const stop = () => { playing = false; playBtn.textContent = C.play; };
+		const jump = (k: number) => { stop(); run++; i = k; paint(k); };
+		const buildDots = () => {
+			dots.textContent = '';
+			steps().forEach((_: unknown, j: number) => {
+				const d = document.createElement('button');
+				d.type = 'button';
+				d.setAttribute('aria-label', String(j + 1));
+				d.addEventListener('click', () => jump(j));
+				dots.appendChild(d);
+			});
+		};
+		const playLoop = async () => {
+			while (playing && i < steps().length - 1) {
+				await animate(i + 1);
+				const my = run;
+				if (!playing) return;
+				await sleep(1500);
+				if (my !== run) return;
+			}
+			stop();
+		};
 		playBtn.addEventListener('click', () => {
-			if (timer) return stop();
-			if (i >= D[mode].length - 1) i = -1;
-			playBtn.textContent = D.pause;
-			go(i + 1);
-			timer = window.setInterval(() => { if (i >= D[mode].length - 1) return stop(); go(i + 1); }, 2600);
+			if (playing) { jump(i); return; }
+			if (i >= steps().length - 1) { run++; i = 0; paint(0); }
+			playing = true;
+			playBtn.textContent = C.pause;
+			playLoop();
 		});
-		box.querySelector('[data-act="next"]')!.addEventListener('click', () => { stop(); go(i + 1); });
-		box.querySelector('[data-act="prev"]')!.addEventListener('click', () => { stop(); go(i - 1); });
-		box.querySelector('[data-act="reset"]')!.addEventListener('click', () => { stop(); go(0); });
+		box.querySelector('[data-act="next"]')!.addEventListener('click', () => { stop(); if (i < steps().length - 1) animate(i + 1); else jump(i); });
+		box.querySelector('[data-act="prev"]')!.addEventListener('click', () => jump(Math.max(0, i - 1)));
+		box.querySelector('[data-act="reset"]')!.addEventListener('click', () => jump(0));
 		box.querySelectorAll<HTMLButtonElement>('.llmflow__mode-btn').forEach((b) =>
 			b.addEventListener('click', () => {
-				stop();
 				mode = b.dataset.mode as 'on' | 'off';
 				box.querySelectorAll('.llmflow__mode-btn').forEach((x) => x.classList.toggle('is-on', x === b));
-				go(0);
+				svg.classList.toggle('is-off', mode === 'off');
+				regionLabel.textContent = mode === 'on' ? C.regionH : C.regionHoff;
+				buildDots();
+				jump(0);
 			}),
 		);
-		render();
+		buildDots();
+		paint(0);
 	});
 </script>
