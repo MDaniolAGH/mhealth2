@@ -1,0 +1,82 @@
+---
+title: '2. Intended purpose: diary or medical device?'
+description: The same app can be a diary or a regulated medical device, depending on one sentence. Check it before you write stories or estimate costs.
+---
+
+import StageFacts from '../../../components/StageFacts.astro';
+import Sorter from '../../../components/Sorter.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+
+<StageFacts tone="you" who={'The <span class="sdlc-chip is-knowledge">client</span> states it · <span class="sdlc-chip is-you">You</span> check what it implies · an expert confirms'} input="The decision, the client log, the features you are considering" output="The intended purpose in four lines, in <code>docs/product.md</code>, quoted from the client" />
+
+The **intended purpose** says what a product is for. Under the EU Medical Device Regulation (MDR), software intended for a medical purpose, such as diagnosis, prevention, monitoring, prediction, treatment or alleviation of a disease, is a **medical device**. A device needs a quality management system, risk management, a software life-cycle process (IEC 62304), clinical evaluation and a CE mark. That changes the cost of every later decision by an order of magnitude.
+
+What counts is the **purpose the manufacturer states and the functions the software has**, not a label such as "research" or "for information only". Storing and displaying what a user typed usually does not make software a device. Interpreting data, scoring it, alerting on it or recommending an action may.
+
+<Predict id="purpose-flip" question="The Mood Tracker stays exactly the same: same code, same screens. Only the sentence in the app store changes, from &quot;a mood diary for study participants&quot; to &quot;helps patients manage depression&quot;. Does anything change?">
+
+Possibly everything. "Manage depression" states a purpose of treating or alleviating a disease. With that sentence, the same code may be medical-device software, with all the obligations that follow. The purpose is the product's legal identity, which is why only the client may state it, and why an agent must never write it.
+
+</Predict>
+
+## Four lines
+
+Write the purpose in four lines, as the course skill `mh-intended-purpose` asks:
+
+```text title="docs/product.md: intended purpose (illustrative)"
+For whom      adult participants of the clinic's six-month study
+Situation     at home, once a day, on their own phone
+Action        record how they feel, and see their own entries
+Consequence   none for their care: entries are not used for diagnosis or
+              treatment; the study team reads them for research only
+Quote         "A self-report mood diary for participants of the clinic's
+              study. It is not used for diagnosis or treatment."
+              (client log, 2026-11-12)
+```
+
+Then, for every feature or text you are about to add, write the same four lines and compare. If the **action** or the **consequence** moves towards diagnosis or treatment, stop and ask.
+
+<Sorter
+	title="Likely a diary, likely a medical device, or a question for a regulatory expert?"
+	intro="A teaching drill, not legal advice. Real qualification follows the MDR (Article 2 and Rule 11) and the MDCG 2019-11 guidance, and needs an expert."
+	bins={[
+		{ key: 'no', label: 'Likely not a device', tone: 'tool' },
+		{ key: 'ask', label: 'Ask an expert', tone: 'audit' },
+		{ key: 'yes', label: 'Likely a device', tone: 'you' },
+	]}
+	items={[
+		{ text: '&quot;A self-report mood diary for participants of the clinic\'s study. It is not used for diagnosis or treatment.&quot;', bin: 'no', why: 'It records and shows what people typed, and excludes a medical use, as long as the app\'s functions match the sentence.' },
+		{ text: '&quot;Helps patients manage depression.&quot;', bin: 'yes', why: 'Managing a disease is treatment or alleviation: a medical purpose. Agents write sentences like this without being asked, in store texts and READMEs.' },
+		{ text: '&quot;Supports clinicians in deciding when to change a patient\'s treatment.&quot;', bin: 'yes', why: 'Information used to take decisions about treatment is exactly what MDR Rule 11 classifies, often above the lowest class.' },
+		{ text: '&quot;Shows participants their own entries, exactly as they typed them.&quot;', bin: 'no', why: 'Storage and display without interpretation usually do not qualify on their own.' },
+		{ text: '&quot;Helps participants notice how they feel, so they can talk about it with their therapist.&quot;', bin: 'ask', why: 'It sits close to treatment: is the app part of the therapy, or a private diary? The answer depends on details and claims. This is the kind of sentence an expert must read.' },
+		{ text: '&quot;Screens users for signs of depression.&quot;', bin: 'yes', why: 'Screening for a disease is a diagnostic purpose.' },
+	]}
+/>
+
+:::danger[Agents write medical claims without being asked]
+Ask an agent for a store description, a README or onboarding text, and it will often add benefits: "helps you manage your mood", "supports your mental health". Each such sentence is a claim about the purpose. The Mood Tracker's `AGENTS.md` has the rule you need: *"Flag any change that could make the intended purpose in `docs/product.md` untrue, before writing code."* Apply it to text as well as to code.
+:::
+
+<Quiz
+	question="Which change to the Mood Tracker most needs a new look at its intended purpose?"
+	options={[
+		'A dark mode for all the screens of the app',
+		'An About screen that shows the app version',
+		'A faster way to log in with the phone\'s fingerprint',
+		'A message that advises participants to see a doctor',
+	]}
+	answer={3}
+	why={[
+		'Appearance does not change what the app is for.',
+		'Showing the version is information about the software, not about health.',
+		'Security and convenience; nothing about diagnosis or treatment.',
+		'',
+	]}
+	explain="Advising an action based on what someone entered moves the app from recording towards recommending: the step the MDR looks at. Stop, write the four lines for the change, and ask before building it."
+/>
+
+:::tip[Do this in your project]
+Write your client's intended purpose in four lines, quoted from your client log. Then ask the agent: *"List every sentence in the app, the README and the store text that claims more than this purpose."* Check each hit yourself, and bring the list to your client.
+:::

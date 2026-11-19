@@ -7,7 +7,13 @@ import PipelineMap from '../../../components/PipelineMap.astro';
 import Checklist from '../../../components/Checklist.astro';
 import Predict from '../../../components/Predict.astro';
 
-A coding agent can write a Flutter screen in a few minutes. That alone is not a way to build software. Somebody still has to decide what the screen is for, describe it precisely enough to check, give the agent what it needs to know about the project, look at what it did, prove that it works, and be able to explain the change months later.
+A coding agent writes a Flutter screen in minutes. Someone still has to:
+
+- decide what the screen is for;
+- describe it so that it can be checked;
+- give the agent the facts about the project;
+- check what the agent did, and prove that it works;
+- be able to explain the change months later.
 
 This guide follows **one feature**, an About screen for the Mood Tracker, from a sketch to a merged pull request. At every stage it shows who does the work, what goes in, what comes out, and what checks it.
 
@@ -16,17 +22,17 @@ This guide follows **one feature**, an About screen for the Mood Tracker, from a
 	title="After this guide, you can"
 	items={[
 		'Explain what an agent adds to a language model, and why the same model behaves differently in a different harness',
-		"Decide what belongs in an agent's context, and why more context is not always better",
-		'Keep the project knowledge (architecture, decisions, notes, the client\'s words) that an agent needs to plan well, and keep it up to date',
-		'Write an <code>AGENTS.md</code> that sets the cycle, the standards and the checks an agent must pass',
+		"Decide what belongs in an agent's context, and what it costs",
+		"Keep the project knowledge (architecture, decisions, notes, the client's words) that an agent needs to plan well",
+		'Write an <code>AGENTS.md</code> and turn its most important rules into checks',
 		'Take a feature through all ten stages and name what each stage leaves behind',
 		'Trace a merged line of code back to the goal and the decision that justified it',
 	]}
 />
 
-<Predict id="who-does-most" question="Before you look at the map: of the ten stages from an idea to a merged change, how many do you think a coding agent can do <b>on its own</b>, with nobody checking?">
+<Predict id="who-does-most" question="Before you look at the map: of the ten stages from an idea to a merged change, how many can a coding agent do <b>on its own</b>, with nobody checking?">
 
-None, in this pipeline. The agent does most of the typing in stages 3 to 9, and only stage 5 is done by the agent alone. Even there, a deterministic gate checks every change (stage 6), and you reviewed the plan before any code was written (stage 4). Stages 1, 2 and 10 are yours alone. On the map, count the stages in the **Agent** lane that are not shared with a person or a tool.
+None. Only stage 5 sits in the Agent lane alone, and even there the gate (stage 6) checks every change, and you approved the plan (stage 4) first. Stages 1, 2 and 10 are yours alone. The agent does much of the typing; people and deterministic tools do the deciding and the checking.
 
 </Predict>
 
@@ -37,6 +43,28 @@ Work flows from top to bottom. The colour of a stage shows who does the work; a 
 **Try it.** Press **Walk through** to follow the About screen through every stage, including a failed check. Use **Show** to add the feedback loops, the knowledge flows or the audit trail. Click a stage, or a document in the project knowledge. The arrow keys step through the walk.
 
 <PipelineMap />
+
+:::note[The worked example, and its names]
+The About screen is the neutral task from the W3 demo. The client is the fictional rehabilitation clinic from W1, not one of the briefs C01–C07. These names appear on every page:
+
+- **Issue #7**: the client's request.
+- **GOAL-1**: what we build and why (stage 2).
+- **`docs/spec-about.md`**: the acceptance criteria **AC-1…AC-6** (stage 3).
+- **`docs/product.md`**: the product card, with the intended purpose and the contact.
+- **`docs/client-log.md`**: what the client actually said, with dates.
+- **ADR-0002, ADR-0003**: decision records about build settings and the app version.
+- **PR #12**: the pull request with the change.
+
+All of them were **written for this guide**. They are not a recording of a real agent session; the numbers and the commit hash are invented, and tool output is marked as a placeholder.
+:::
+
+## Felt speed and measured speed
+
+<Predict id="felt-speed" question="In a 2025 randomised trial, experienced open-source developers fixed real issues in their own mature projects, some with AI tools and some without. Were they faster with AI? By how much did they <b>think</b> they were?">
+
+They were about **19% slower** with AI tools, and afterwards still believed they had been about 20% faster. Before the study they expected to be 24% faster ([METR, July 2025](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)). The authors call it a snapshot of early-2025 tools in one setting, not a general law. The lesson for this course: measure the time, including checking and rework, in your agent log. Do not estimate it from how the work felt.
+
+</Predict>
 
 ## Where you use this in the course
 
@@ -49,6 +77,8 @@ Work flows from top to bottom. The colour of a stage shows who does the work; a 
 | **W6** | 6 | what working with agents cost: the agent log, commit trailers, the semester's balance |
 | **Your pair's brief** | all ten | `ARCHITECTURE.md`, decision records and `NOTES.md` from the first lab; changes through pull requests, gates in CI, reviews by another pair |
 
-:::note[About the worked example]
-The About screen is the neutral task from the W3 demo. The client is the fictional rehabilitation clinic from W1, not one of the briefs C01–C07. The artefacts on these pages were **written for this guide** to show what each stage should produce. They are not a recording of a real agent session, and the issue and pull request numbers and the commit hash are invented. Where an artefact contains tool output, it is marked as a placeholder for the real output.
+The [product development](../../product/overview/) part of this guide covers the work before stage 1: from the client's brief to the request that becomes issue #7.
+
+:::tip[Do this in your project (10 min)]
+Sketch the ten stages for the first feature of your brief. For each stage, write who does it and what record it leaves behind. Put a photo of the sketch in `NOTES.md`.
 :::

@@ -78,6 +78,8 @@ No new dependency. A build without the define uses the default (the
 Android emulator's 10.0.2.2), so other devices must pass the address.
 ```
 
+**SOUP** (*software of unknown provenance*, a term from the medical-device software standard IEC 62304) is software you use but did not develop under your own process, such as a package from pub.dev. Each one is recorded, assessed and watched for problems. That is why a new package is never "free".
+
 </TabItem>
 <TabItem label="NOTES.md">
 
@@ -92,12 +94,14 @@ Android emulator's 10.0.2.2), so other devices must pass the address.
 - Without --dart-define=API_BASE_URL the app calls 10.0.2.2, which only
   the Android emulator reaches (ADR-0002).
 
-## 2026-11-20: About screen (GOAL-1, PR #12)
+## 2026-11-20: About screen (GOAL-1, PR #12)   <- written later, at stage 8
 - Done: AboutScreen, VersionService (timeout is a parameter, 5 s).
 - Not verified: iOS simulator; very large font sizes.
 - Trap: a debug build without --dart-define=APP_VERSION shows "dev".
   Expected, not a bug (ADR-0003).
 ```
+
+The second entry is written at the end of the feature (stage 8); it is shown here so you can see a complete log. A **golden test** compares a screenshot of a widget with an approved image file and fails if a pixel differs.
 
 </TabItem>
 <TabItem label="docs/product.md">
@@ -154,22 +158,39 @@ Out of date. With no document, the agent at least has to read the code. With a w
 <Quiz
 	question="Why must the agent read <code>ARCHITECTURE.md</code>, the decision records and <code>NOTES.md</code> before it plans?"
 	options={[
-		'Because agents refuse to plan without them',
-		'It starts every session without memory of the project; without these documents it guesses the architecture and earlier decisions, and the guesses look just as convincing as the facts',
-		'To make the context window as full as possible',
-		'They replace the acceptance criteria',
+		'Every session starts empty, and without them it guesses, as confidently as it states facts',
+		'Agents are built to refuse to plan until they have read every document in the repository',
+		'A full context window makes the model more accurate, so more documents are always better',
+		'The documents replace the acceptance criteria, so the plan no longer needs them',
 	]}
-	answer={1}
+	answer={0}
+	why={[
+		'',
+		'They do not refuse; that is the problem. They plan anyway, from guesses.',
+		'More context costs more and can distract (section 2). The right documents matter, not the number.',
+		'Criteria say what to build; the documents say how this system is built. The plan needs both.',
+	]}
+	explain="A new session knows nothing about your project. What is not written down is guessed, and a guess reads exactly like a fact."
 />
 
 <Quiz
 	question="A teammate says the contact on the About screen should be <code>study@clinic.example</code>; they remember it from a meeting. Where must it be before the agent may use it?"
 	options={[
-		'In the prompt',
-		'In <code>docs/client-log.md</code>, dated, and then in <code>docs/product.md</code>',
-		'In a code comment',
-		'Anywhere, as long as the teammate is sure',
+		'In the task prompt, so the agent sees it right away',
+		'In a code comment next to the place where it is shown',
+		'In <code>docs/client-log.md</code>, dated, and then in the product card',
+		'Nowhere: if the teammate is sure, the agent can just use it',
 	]}
-	answer={1}
-	explain="A client fact needs a source that outlives the meeting and the chat. Until it is in the client log, it is an assumption, and the screen shows the placeholder."
+	answer={2}
+	why={[
+		'A prompt disappears with the session. The next session will not know where the address came from.',
+		'A comment is not a source. Nobody can tell from it who decided, or when.',
+		'',
+		'Memory from a meeting is an assumption until it is written down with a date and a source.',
+	]}
+	explain="A client fact needs a source that outlives the meeting and the chat. Until it is in the client log, it is an assumption, and the screen shows “not yet confirmed”."
 />
+
+:::tip[Do this in your project]
+Run the planning prompt above on your repository, with the line *"Do not change any file."* Fix one contradiction it finds between your documents and your code, in a pull request.
+:::

@@ -1,0 +1,134 @@
+---
+title: '1. The decision, the facts and the people'
+description: Name the client's decision before any solution, separate facts from assumptions, and map who provides, sees and decides.
+---
+
+import StageFacts from '../../../components/StageFacts.astro';
+import Sorter from '../../../components/Sorter.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts · <span class="sdlc-chip is-you">You</span> check · the <span class="sdlc-chip is-knowledge">client</span> confirms'} input="The brief, <code>docs/client-log.md</code>" output="<code>docs/decision.md</code>, <code>docs/assumptions.md</code>, a stakeholder table" />
+
+<span id="decision" class="stage-anchor"></span>
+
+## The decision before the solution
+
+A client rarely needs "an app". They need to **make a decision**. Name it before you propose anything, or the agent will name a solution for you, and every later document will be about that solution.
+
+> *[Who] must decide whether to [option A], [option B] or [option C], so that [goal], within [key constraints].*
+
+For the clinic:
+
+```text title="docs/decision.md (illustrative)"
+Decision  The study coordinator must decide how participants learn what the
+          app is for and whom to contact, and how support learns which version
+          a participant runs: in the app, in the consent documents, or both,
+          so that the ethics committee's request is met,
+          before the next participant group starts, without new cloud services.
+Options   keep as is | consent form + printed sheet | a screen in the app |
+          the study web page
+Sources   client log 2026-11-12 (coordinator; ethics committee request)
+```
+
+No technology names, and at least one option that is not software. "Build an About screen" is a solution; it appears later, as one of the options.
+
+<Sorter
+	title="Decision or solution?"
+	bins={[
+		{ key: 'decision', label: 'Decision', tone: 'client' },
+		{ key: 'solution', label: 'Solution', tone: 'neutral' },
+	]}
+	items={[
+		{ text: 'Build an About screen in the Mood Tracker', bin: 'solution', why: 'It names what to build. It may be the right answer, but it is not the question.' },
+		{ text: 'Decide how participants learn what the app is for, and whom to contact', bin: 'decision', why: 'It names what the client must choose, and leaves the options open, including paper.' },
+		{ text: 'Add the <code>package_info_plus</code> package to show the version', bin: 'solution', why: 'A technology choice, two levels below the decision. Agents jump here first.' },
+		{ text: 'Decide whether support needs the server version, or only the app version', bin: 'decision', why: 'A real choice for the client, and it changes the scope of every option.' },
+		{ text: 'Print a QR code with the contact on the consent form', bin: 'solution', why: 'A concrete solution. Keep it in the options list, not in the decision.' },
+	]}
+/>
+
+```text title="Prompt (Copilot, with the ba-decision-statement skill)"
+/ba-decision-statement docs/brief.md
+Use only the brief and docs/client-log.md. Include at least one option that
+is not software. Remove every feature or technology name the client did not
+choose. Label each element FACT (with the log line), ASSUMPTION or UNKNOWN.
+```
+
+<span id="assumptions" class="stage-anchor"></span>
+
+## Facts, assumptions and unknowns
+
+Every recommendation rests on assumptions. Make them visible, so they can be checked before they become expensive.
+
+- **Fact**: stated in the brief or by the client, or shown in the code or the app, **with a source**.
+- **Assumption**: something you treat as true without confirmation. Useful only if it is specific enough to be wrong.
+- **Unknown**: something you know you do not know. It becomes a question.
+
+Rank assumptions by the **damage if they are wrong**, not by how likely they feel. And record where each came from: *validated*, *client said (date)*, *agent-generated* or *unknown*. An agent-generated statement is never a fact, however confident it sounds.
+
+<Sorter
+	title="Fact, assumption or unknown?"
+	intro="Each statement is about the About-screen request."
+	bins={[
+		{ key: 'fact', label: 'Fact', tone: 'tool' },
+		{ key: 'assumption', label: 'Assumption', tone: 'audit' },
+		{ key: 'unknown', label: 'Unknown', tone: 'neutral' },
+	]}
+	items={[
+		{ text: 'The ethics committee wants the app to state its purpose.', bin: 'fact', why: 'Source: client log, 2026-11-12, the coordinator quoting the committee. Still worth asking <em>where</em> exactly it must be stated (page 3).' },
+		{ text: 'Participants will open an About screen when they have a question.', bin: 'assumption', why: 'Plausible, untested, and high impact: if it is wrong, the screen solves nothing. Cheapest check: a throwaway prototype with three to five people.' },
+		{ text: 'Who answers participants\' questions?', bin: 'unknown', why: 'Nobody has said. Write it as a question for the client, not as an answer.' },
+		{ text: 'An AI persona, &quot;Anna, 67&quot;, says she needs a larger font.', bin: 'assumption', why: 'A synthetic user is a hypothesis, not a data point. It reflects the model\'s training data and your prompt. Test it with real people; never put it in the client log.' },
+		{ text: 'The app has no About screen today.', bin: 'fact', why: 'Evidence: <code>lib/screens/</code> has six screens and none is an About screen; the home screen\'s app bar has a single button (<code>home_screen.dart</code>, lines 30–39).' },
+		{ text: 'Most participants use Android phones.', bin: 'assumption', why: 'It decides which devices you test on. Ask the coordinator; do not let the agent pick a number.' },
+	]}
+/>
+
+:::caution[Synthetic users are not users]
+An agent can role-play a patient, a nurse or a coordinator in seconds. These **synthetic users** produce no new information: they reflect the model's training data and your prompt, and they tend to agree with you. Use them to prepare an interview guide or to find questions you forgot. Never use them as evidence, and never write what they "said" into the client log.
+:::
+
+<span id="stakeholders" class="stage-anchor"></span>
+
+## Stakeholders and data flows
+
+Requirements come from people, and conflicts between people are often the real requirements. Include those who are affected but not paying.
+
+| Stakeholder | Goal | Concern | Influence |
+|---|---|---|---|
+| Study coordinator (client) | ethics approval; fewer support calls | wrong or unapproved text in the app | decides |
+| Ethics committee | participants know what the app is for | a purpose that claims too much | can block the study |
+| Participants | know what the app is for and whom to ask | confusion; being asked for more data | use it, or stop |
+| Support person at the clinic | know which version a participant runs | time spent on calls without context | none formally; high in practice |
+| Your pair (maintainers) | a change you can build, test and explain | text that changes every week | proposes |
+
+| Data | From | To | Purpose | Agreed? |
+|---|---|---|---|---|
+| App version | the build | the screen, then support (read out by the participant) | find out whether a reported problem is already fixed | yes |
+| Server version | `GET /version` | the screen | the same, for the server | to confirm |
+| Purpose sentence, contact | the client log, via `docs/product.md` | the screen | participants know the purpose and whom to ask | contact: **not yet** |
+
+The About screen shows no data about the participant. Keep it that way: adding the participant's ID "to help support" would be a new flow of personal data that nobody has agreed to.
+
+<Quiz
+	question="An agent's assumption log lists: &quot;Participants prefer short texts (FACT)&quot;. There is no source. What do you do?"
+	options={[
+		'Keep it as a fact: it is common knowledge in app design',
+		'Delete it, since the agent should not have written it at all',
+		'Relabel it as an assumption, rate the impact, and plan a check',
+		'Ask the agent again until it gives you a source for the claim',
+	]}
+	answer={2}
+	why={[
+		'"Common knowledge" is not a source, and it may not hold for this group of participants.',
+		'It may be a useful assumption. The problem is the label, not the idea.',
+		'',
+		'Agents can invent sources too. A source you have not opened is not a source.',
+	]}
+	explain="A fact needs a source you have checked. Everything else is an assumption, and that is fine, as long as it is labelled, ranked and has a way to be checked."
+/>
+
+:::tip[Do this in your project]
+Write `docs/decision.md` and `docs/assumptions.md` for your brief, with the course skills `/ba-decision-statement` and `/ba-assumptions`. Then go through the agent's output line by line: every FACT needs a source you have opened; everything else is relabelled. Add one stakeholder who is affected but not paying.
+:::

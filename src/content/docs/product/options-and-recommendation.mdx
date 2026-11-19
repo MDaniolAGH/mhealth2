@@ -1,0 +1,150 @@
+---
+title: '6. Options, estimates and the recommendation'
+description: Compare real options, including ones that are not software, by total cost and hard limits; estimate honestly; recommend on one page.
+---
+
+import StageFacts from '../../../components/StageFacts.astro';
+import OptionsBoard from '../../../components/OptionsBoard.astro';
+import Estimator from '../../../components/Estimator.astro';
+import Sorter from '../../../components/Sorter.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Predict from '../../../components/Predict.astro';
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts tables and argues against you · <span class="sdlc-chip is-you">You</span> check and own the advice · the <span class="sdlc-chip is-knowledge">client</span> decides'} input="The decision, the purpose, the ranked stories, the answers to your questions" output="An options table, estimates, <code>docs/recommendation.md</code>; then issue #7" />
+
+<span id="options" class="stage-anchor"></span>
+
+## Options, including the ones that are not software
+
+The cheapest licence is rarely the cheapest option. Always compare at least:
+
+- **keep as is, or simplify**;
+- **change the way of working**, with little or no software change;
+- **use an existing product or service**;
+- **adapt the existing app**.
+
+Compare them by **total cost of ownership**: the one-off work, the running cost, and the **client's own time and duties** for as long as the study lasts. A screen that needs an app release for every change of wording costs the client something every time.
+
+<Predict id="cheapest" question="The clinic's need: participants know what the app is for and whom to contact, and support can tell which version a participant runs. Before you look at the board: which option do you expect to win?">
+
+It depends on the client's **hard limits**, not on your preference. If the ethics committee insists on the app itself stating the purpose, only the screen survives. If the wording must be changeable within a week without a release, the screen is out. If both limits hold, nothing survives, and the honest recommendation is to go back to the client. Switch the limits on below and watch.
+
+</Predict>
+
+<OptionsBoard
+	need="Need: participants know what the app is for and whom to contact; support can tell which version a participant runs. (Team hours are illustrative.)"
+	limits={[
+		{ key: 'inapp', label: 'The app itself must state the purpose' },
+		{ key: 'wording', label: 'Wording can change within a week, without an app release' },
+		{ key: 'budget', label: 'At most 12 team hours this sprint' },
+	]}
+	budgetKey="budget"
+	budget={12}
+	options={[
+		{ name: 'A. Keep as is', what: 'Nothing changes. Support asks participants to look in the phone\'s settings.', o: 0, m: 0, p: 0, duties: 'explaining the settings on every call', risk: 'the ethics committee\'s request is not met', breaks: [{ limit: 'inapp', why: 'The app does not state its purpose.' }] },
+		{ name: 'B. Consent form and printed sheet', what: 'One sentence on the consent form; a printed sheet with the purpose, the contact, and how to find the version in the phone\'s settings.', o: 1, m: 2, p: 4, duties: 'reprinting when the text changes', risk: 'sheets get lost; the settings path differs between phones', breaks: [{ limit: 'inapp', why: 'The purpose is on paper, not in the app.' }] },
+		{ name: 'C. About screen in the app', what: 'GOAL-1: purpose, contact, app and server version, in the app.', o: 6, m: 10, p: 20, duties: 'every change of wording needs a new release', risk: 'release cycle; an agent adding a medical claim to the text', breaks: [{ limit: 'wording', why: 'Text is part of the build: changing it needs a release.' }] },
+		{ name: 'D. Study web page and store text', what: 'The clinic\'s study page and the store listing state the purpose and contact.', o: 1, m: 2, p: 5, duties: 'keeping the page current', risk: 'participants never read store text; a medical claim slips in', breaks: [{ limit: 'inapp', why: 'The purpose is outside the app.' }] },
+	]}
+/>
+
+Three things to notice. First, the board did not choose: the client's limits did. Second, when no option survives, the useful answer is to say **which limit to relax**, not to pick the least bad option quietly. Third, every number on the board is an estimate, so the next question is how good the estimates are.
+
+## Estimates: a range, not a number
+
+A **three-point estimate** asks for an optimistic (O), a most likely (M) and a pessimistic (P) value, and combines them: **E = (O + 4M + P) / 6**, with a spread of about **(P − O) / 6**. Give the client the range, not the single number. Change the values below and watch the expected value move with the pessimistic tail.
+
+<Estimator task="Option C, the About screen, in team hours: build, tests, review, documentation" o={6} m={10} p={20} />
+
+Agents speed up typing code. They do not speed up asking the client, checking the agent's work, review or regulatory work, and they add some new work of their own. So with agents, estimates should get **wider, not narrower**. An agent can draft O, M and P for each task; treat them as hypotheses. In W6 you compare them with the *Time* lines in your agent log, which is how estimates get better.
+
+:::note[Test a risky assumption with a throwaway prototype]
+The assumption with the biggest impact is often "people will use it". You can test it in a day or two: a clickable prototype, made with a prototyping tool (such as v0, Lovable or Bolt) or a quick Flutter mock-up, shown to three to five people. Report what you learned **and what you did not test**. The prototype is thrown away afterwards: it has no architecture, no gate and no SOUP register, so it is never the starting point for the real code. Use synthetic data only, and no real patients.
+:::
+
+<span id="recommendation" class="stage-anchor"></span>
+
+## The one-page recommendation
+
+The client should be able to decide after reading one page. The course skill `ba-recommendation` uses this structure:
+
+1. **Recommendation**: one sentence that answers the decision.
+2. **Why**: three to five reasons, each pointing to this client's evidence.
+3. **Scope**: what is included, and what is explicitly not.
+4. **Cost and responsibilities**: one-off, running, and what stays with the client.
+5. **Risks**: the top three, and how each is handled.
+6. **What would change this**: the assumptions it depends on, and the result that would make you stop (the **kill criterion**).
+7. **Next step**: one concrete action, and who takes it.
+
+```text title="docs/recommendation.md (excerpt, illustrative)"
+Recommendation  Add an About screen to the app (option C), together with one
+                sentence on the consent form (part of option B).
+Why             The ethics committee asked for the app to state its purpose
+                (client log 2026-11-12); support needs the version (same entry);
+                C fits the sprint budget (E ≈ 11 h, range about 6–16 h).
+What would      If the committee accepts the consent form alone, choose B and
+change this     skip the software change. If the wording must change monthly,
+                load the text from the server instead (a new decision).
+Kill criterion  If the client cannot name a contact before release, the screen
+                ships without one, and we tell the client this is a risk.
+Next step       Coordinator asks the committee question 1 by Friday.
+```
+
+An agent drafts this page well. Make it work for you, not just with you:
+
+```text title="Prompts (Copilot)"
+Argue for the option I rejected, as convincingly as you can. Use only
+evidence from docs/ and the client log.
+
+List the facts that would change this recommendation, and for each, the
+cheapest way to find out. Label every number as SOURCED (with source and
+date) or ESTIMATE (with its basis). Mark anything else [UNVERIFIED].
+```
+
+The first prompt protects you from an agent that agrees with whatever you seem to prefer. The second keeps invented numbers, such as prices, market sizes and statistics, out of a document your client will act on.
+
+Once the client decides, the recommendation becomes **issue #7**, and the About screen enters the [AI SDLC at stage 1](../../ai-sdlc/idea-to-plan/#stage-idea).
+
+<Quiz
+	question="The agent's options table says: &quot;Market research shows 72% of study participants prefer in-app information.&quot; There is no source. What do you do?"
+	options={[
+		'Remove the number, or mark it [UNVERIFIED] until you find a real source',
+		'Keep it: it supports the option you are recommending anyway',
+		'Round it to &quot;about 70%&quot;, so it sounds less precise',
+		'Ask the agent which study it comes from, and cite its answer',
+	]}
+	answer={0}
+	why={[
+		'',
+		'Agreeing with you is exactly what makes an invented number dangerous.',
+		'A rounded invented number is still invented.',
+		'Agents can invent the study as well. Cite only a source you have opened.',
+	]}
+	explain="A number without a source you have opened is not evidence. In a document the client acts on, it is a liability."
+/>
+
+## Sort again
+
+<Sorter
+	title="The same list as on the first page. Has anything changed?"
+	bins={[
+		{ key: 'agent', label: 'Agent', tone: 'agent' },
+		{ key: 'you', label: 'You', tone: 'you' },
+		{ key: 'client', label: 'Client', tone: 'client' },
+		{ key: 'nobody', label: 'Nobody yet', tone: 'neutral' },
+	]}
+	items={[
+		{ text: 'Draft twenty possible questions for the study coordinator', bin: 'agent', why: 'Drafting is cheap; choosing is yours.' },
+		{ text: 'Choose the three questions you will actually ask the coordinator', bin: 'you', why: 'Only the questions whose answers change your recommendation.' },
+		{ text: 'Say whether the ethics committee needs the purpose stated inside the app', bin: 'client', why: 'A fact about the client\'s world, and a hard limit on the options board.' },
+		{ text: 'Find where the app sets its version number, with file and line', bin: 'agent', why: 'An agent searches; you reproduce.' },
+		{ text: 'Write the sentence that says what the app is for', bin: 'client', why: 'The intended purpose decides whether the app is a medical device. Never an agent.' },
+		{ text: 'Decide who answers participants\' questions after the study ends', bin: 'nobody', why: 'Still nobody: it stays on the question list, and in the recommendation as a risk.' },
+		{ text: 'Check that every user story points to a line in the client log', bin: 'you', why: 'Open each cited line yourself.' },
+		{ text: 'Rank the stories as Must, Should, Could or Won\'t', bin: 'client', why: 'The client decides; you explain the trade-offs.' },
+	]}
+/>
+
+:::tip[Do this in your project]
+Write `docs/recommendation.md` for your brief on one page, with at least one option that is not software, a three-point estimate, and a kill criterion. Run the two prompts above on your draft and change what they find. This page, with its sources, is what a client or an employer remembers.
+:::

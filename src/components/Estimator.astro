@@ -1,0 +1,69 @@
+---
+/**
+ * Three-point (PERT) estimate: E = (O + 4M + P) / 6, spread (P - O) / 6.
+ * The reader enters optimistic, most likely and pessimistic values.
+ */
+interface Props {
+	task: string;
+	unit?: string;
+	o: number;
+	m: number;
+	p: number;
+}
+const { task, unit = 'hours', o, m, p } = Astro.props;
+---
+
+<div class="biz-widget estimator not-content" data-unit={unit}>
+	<p class="biz-kicker">Three-point estimate</p>
+	<p class="biz-title" set:html={task} />
+	<div class="estimator__inputs">
+		<label><span>Optimistic (O)</span><input type="number" min="0" step="0.5" value={o} data-k="o" /></label>
+		<label><span>Most likely (M)</span><input type="number" min="0" step="0.5" value={m} data-k="m" /></label>
+		<label><span>Pessimistic (P)</span><input type="number" min="0" step="0.5" value={p} data-k="p" /></label>
+	</div>
+	<div class="estimator__scale" aria-hidden="true">
+		<div class="estimator__range"></div>
+		<i class="estimator__tick" data-t="o"></i>
+		<i class="estimator__tick" data-t="m"></i>
+		<i class="estimator__tick" data-t="p"></i>
+		<b class="estimator__e"></b>
+	</div>
+	<p class="estimator__out" aria-live="polite"></p>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.estimator').forEach((box) => {
+		const unit = box.dataset.unit ?? 'hours';
+		const get = (k: string) => Number(box.querySelector<HTMLInputElement>(`input[data-k="${k}"]`)!.value);
+		const out = box.querySelector<HTMLElement>('.estimator__out')!;
+		const fmt = (x: number) => (Math.round(x * 10) / 10).toString();
+		const render = () => {
+			const o = get('o'), m = get('m'), p = get('p');
+			if (!(o <= m && m <= p) || p <= 0) {
+				out.innerHTML = '<b>Check the order:</b> optimistic ≤ most likely ≤ pessimistic.';
+				box.classList.add('is-invalid');
+				return;
+			}
+			box.classList.remove('is-invalid');
+			const e = (o + 4 * m + p) / 6;
+			const sd = (p - o) / 6;
+			const lo = Math.max(0, e - 2 * sd), hi = e + 2 * sd;
+			const max = p * 1.1;
+			const pos = (x: number) => `${(x / max) * 100}%`;
+			box.querySelector<HTMLElement>('.estimator__range')!.style.cssText = `left:${pos(lo)};width:calc(${pos(hi)} - ${pos(lo)})`;
+			(['o', 'm', 'p'] as const).forEach((k) => {
+				const v = { o, m, p }[k];
+				const t = box.querySelector<HTMLElement>(`.estimator__tick[data-t="${k}"]`)!;
+				t.style.left = pos(v);
+				t.dataset.label = `${k.toUpperCase()} ${fmt(v)}`;
+			});
+			const eb = box.querySelector<HTMLElement>('.estimator__e')!;
+			eb.style.left = pos(e);
+			eb.textContent = `E ${fmt(e)}`;
+			const skew = p - m > 2 * (m - o) ? ' The pessimistic tail is long: say what could go wrong, and plan for it.' : '';
+			out.innerHTML = `<b>Expected: about ${fmt(e)} ${unit}</b>, likely between ${fmt(lo)} and ${fmt(hi)} (E ± 2 × ${fmt(sd)}). Give the client the range, not the single number.${skew}`;
+		};
+		box.querySelectorAll('input').forEach((i) => i.addEventListener('input', render));
+		render();
+	});
+</script>

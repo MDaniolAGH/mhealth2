@@ -1,0 +1,108 @@
+---
+/**
+ * The discovery map: nine analysis steps in four phases, from the client's
+ * brief to a recommendation. Each step says what the agent can do, what you
+ * must do, what only the client can give, and what the step leaves behind.
+ */
+import { link } from '../lib/url';
+
+interface Step {
+	n: number;
+	phase: 'frame' | 'learn' | 'specify' | 'decide';
+	title: string;
+	sub: string;
+	agent: string;
+	you: string;
+	client: string;
+	out: string;
+	skill: string;
+	href: string;
+}
+const steps: Step[] = [
+	{ n: 1, phase: 'frame', title: 'Decision', sub: 'what the client must decide', agent: 'Drafts the decision sentence and lists options, including ones that are not software.', you: 'Remove every feature or technology name the client did not choose.', client: 'Confirms that this is really their decision.', out: 'One sentence: who decides, between which options, by when, by what criteria', skill: 'ba-decision-statement', href: 'product/decision-and-facts/#decision' },
+	{ n: 2, phase: 'frame', title: 'Facts and assumptions', sub: 'what we know, guess, do not know', agent: 'Lists what the recommendation rests on and labels each item.', you: 'Check every "fact" has a source; rank assumptions by the damage if wrong.', client: 'Turns assumptions into facts by answering.', out: 'An assumption log: statement, type, source or check, impact', skill: 'ba-assumptions', href: 'product/decision-and-facts/#assumptions' },
+	{ n: 3, phase: 'frame', title: 'Questions', sub: 'only those that change the answer', agent: 'Drafts many questions and the effect of each possible answer.', you: 'Keep 3–5 whose answers change what you will propose.', client: 'Answers them. Only the client can.', out: '3–5 ranked questions, each with "if A → X; if B → Y"', skill: 'ba-questions', href: 'product/questions-and-observation/#questions' },
+	{ n: 4, phase: 'learn', title: 'Observation', sub: 'what the app really does', agent: 'Searches the code and runs the app with synthetic data.', you: 'Reproduce it yourself; keep observation, interpretation and implication apart.', client: 'Says whether it matters to them.', out: 'An observation with evidence (file:line or steps), and why it matters', skill: 'ba-app-observation', href: 'product/questions-and-observation/#observation' },
+	{ n: 5, phase: 'learn', title: 'Terms', sub: 'one word, one meaning', agent: 'Finds the words people use differently and the edge cases.', you: 'Write each definition so two people would classify every case the same way.', client: 'Decides what the words mean. They own the meaning.', out: 'Operational definitions with a rule for every edge case', skill: 'ba-define-terms', href: 'product/testable-stories/#terms' },
+	{ n: 6, phase: 'learn', title: 'Stakeholders', sub: 'who provides, sees, decides', agent: 'Suggests stakeholders and data flows you may have missed.', you: 'Add those who are affected but not paying; mark flows nobody agreed.', client: 'Resolves conflicts between stakeholders.', out: 'A stakeholder table and a data-flow table with a purpose for every flow', skill: 'ba-stakeholders', href: 'product/decision-and-facts/#stakeholders' },
+	{ n: 7, phase: 'specify', title: 'Stories', sub: 'needs the client agreed, testable', agent: 'Drafts stories and acceptance criteria from the client log; critiques them.', you: 'Delete every story without a source; split, sharpen, rank with the client.', client: 'Approves, ranks (Must, Should, Could, Won\'t).', out: 'User stories with Given/When/Then criteria, a source and a priority', skill: 'ba-requirements', href: 'product/user-stories/' },
+	{ n: 8, phase: 'decide', title: 'Options', sub: 'total cost, hard limits', agent: 'Lists options, drafts cost and risk tables, argues for the option you rejected.', you: 'Check every number has a source and a date, or is marked as an estimate.', client: 'Sets the hard limits: budget, time, their own staff\'s hours.', out: 'An options table with one-off, running and client costs, and three-point estimates', skill: 'ba-options', href: 'product/options-and-recommendation/#options' },
+	{ n: 9, phase: 'decide', title: 'Recommendation', sub: 'one page, answer first', agent: 'Drafts the page and lists what would change it.', you: 'Make every reason point to this client\'s evidence; own the advice.', client: 'Decides. "No" is a valid result.', out: 'A one-page recommendation, then the goal that enters the AI SDLC', skill: 'ba-recommendation', href: 'product/options-and-recommendation/#recommendation' },
+];
+const phases = { frame: 'Frame', learn: 'Learn', specify: 'Specify', decide: 'Decide' };
+---
+
+<div class="biz-widget dmap not-content">
+	<div class="biz-head">
+		<div class="dmap__controls" role="group" aria-label="Walk through the steps">
+			<button type="button" class="sdlc-btn" data-dm="prev" aria-label="Previous step">◀</button>
+			<button type="button" class="sdlc-btn sdlc-btn--primary" data-dm="next">▶ Walk through</button>
+			<span class="dmap__status" aria-live="polite"></span>
+		</div>
+		<div class="dmap__legend">
+			{Object.entries(phases).map(([k, v]) => <span class={`dmap__phase is-${k}`}>{v}</span>)}
+		</div>
+	</div>
+	<ol class="dmap__steps">
+		{
+			steps.map((s) => (
+				<li class={`dmap__step is-${s.phase}`} data-n={s.n}>
+					<a href={link(s.href)} class="dmap__card">
+						<span class="dmap__n">{s.n}</span>
+						<span class="dmap__t">{s.title}</span>
+						<span class="dmap__s">{s.sub}</span>
+					</a>
+					<div class="dmap__detail" hidden>
+						<p class="dmap__dtitle">
+							{s.n}. {s.title} <span class={`dmap__phase is-${s.phase}`}>{phases[s.phase]}</span>
+						</p>
+						<dl>
+							<dt class="is-agent">Agent</dt><dd set:html={s.agent} />
+							<dt class="is-you">You</dt><dd set:html={s.you} />
+							<dt class="is-client">Client only</dt><dd set:html={s.client} />
+							<dt>Leaves</dt><dd set:html={s.out} />
+							<dt>Skill</dt><dd><code>/{s.skill}</code></dd>
+						</dl>
+						<p><a href={link(s.href)}>Read the section →</a></p>
+					</div>
+				</li>
+			))
+		}
+	</ol>
+	<div class="dmap__panel" aria-live="polite">
+		<p class="dmap__empty">Click a step, or press <b>Walk through</b>. The steps are a checklist, not a waterfall: you will go back to earlier ones.</p>
+	</div>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.dmap').forEach((map) => {
+		map.classList.add('is-js');
+		const steps = Array.from(map.querySelectorAll<HTMLElement>('.dmap__step'));
+		const panel = map.querySelector<HTMLElement>('.dmap__panel')!;
+		const status = map.querySelector<HTMLElement>('.dmap__status')!;
+		const prev = map.querySelector<HTMLButtonElement>('[data-dm="prev"]')!;
+		const next = map.querySelector<HTMLButtonElement>('[data-dm="next"]')!;
+		let at = -1;
+		const show = (i: number) => {
+			at = i;
+			steps.forEach((s, k) => s.classList.toggle('is-active', k === i));
+			steps.forEach((s, k) => s.classList.toggle('is-past', k < i));
+			const step = steps[i];
+			panel.innerHTML = step.querySelector('.dmap__detail')!.innerHTML;
+			panel.className = 'dmap__panel ' + Array.from(step.classList).find((c) => c.startsWith('is-') && c !== 'is-active')!;
+			status.textContent = `Step ${i + 1} of ${steps.length}`;
+			prev.disabled = i <= 0;
+			next.disabled = i >= steps.length - 1;
+			next.textContent = '▶ Next';
+		};
+		steps.forEach((s, i) =>
+			s.querySelector('a')!.addEventListener('click', (e) => {
+				e.preventDefault();
+				show(i);
+			}),
+		);
+		next.addEventListener('click', () => show(Math.min(at + 1, steps.length - 1)));
+		prev.addEventListener('click', () => show(Math.max(at - 1, 0)));
+		prev.disabled = true;
+	});
+</script>

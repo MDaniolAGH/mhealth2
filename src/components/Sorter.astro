@@ -1,0 +1,98 @@
+---
+/**
+ * A sorting drill: each statement goes into one bin. A wrong pick shows the
+ * right bin and why; the score counts right answers on the first try.
+ * Without JavaScript, the answers are listed under each statement.
+ */
+interface Bin {
+	key: string;
+	label: string;
+	tone?: 'you' | 'agent' | 'tool' | 'knowledge' | 'audit' | 'client' | 'neutral';
+}
+interface Item {
+	text: string;
+	bin: string;
+	why: string;
+}
+interface Props {
+	title: string;
+	intro?: string;
+	bins: Bin[];
+	items: Item[];
+}
+const { title, intro, bins, items } = Astro.props;
+const label = Object.fromEntries(bins.map((b) => [b.key, b.label]));
+---
+
+<div class="biz-widget sorter not-content">
+	<div class="biz-head">
+		<p class="biz-kicker">Sort it</p>
+		<span class="sorter__score" aria-live="polite"></span>
+	</div>
+	<p class="biz-title" set:html={title} />
+	{intro && <p class="biz-intro" set:html={intro} />}
+	<ol class="sorter__items">
+		{
+			items.map((item) => (
+				<li class="sorter__item" data-bin={item.bin}>
+					<p class="sorter__text" set:html={item.text} />
+					<div class="sorter__bins" role="group" aria-label="Choose one">
+						{bins.map((b) => (
+							<button type="button" class={`sorter__bin is-${b.tone ?? 'neutral'}`} data-key={b.key}>
+								{b.label}
+							</button>
+						))}
+					</div>
+					<p class="sorter__why">
+						<b class="sorter__verdict" />
+						<span class="sorter__answer">{label[item.bin]}.</span> <Fragment set:html={item.why} />
+					</p>
+				</li>
+			))
+		}
+	</ol>
+	<div class="sorter__done">
+		<span class="sorter__summary"></span>
+		<button type="button" class="sdlc-btn" data-sorter="reset">Start again</button>
+	</div>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.sorter').forEach((sorter) => {
+		sorter.classList.add('is-js');
+		const items = Array.from(sorter.querySelectorAll<HTMLElement>('.sorter__item'));
+		const score = sorter.querySelector<HTMLElement>('.sorter__score')!;
+		const summary = sorter.querySelector<HTMLElement>('.sorter__summary')!;
+		const render = () => {
+			const done = items.filter((i) => i.dataset.done).length;
+			const right = items.filter((i) => i.dataset.done === 'right').length;
+			score.textContent = `${right} / ${items.length}`;
+			sorter.classList.toggle('is-done', done === items.length);
+			summary.textContent =
+				right === items.length
+					? `All ${right} right. You can explain each one?`
+					: `${right} of ${items.length} right first time. Read the explanations for the others.`;
+		};
+		items.forEach((item) => {
+			item.querySelectorAll<HTMLButtonElement>('.sorter__bin').forEach((btn) => {
+				btn.addEventListener('click', () => {
+					if (item.dataset.done) return;
+					const right = btn.dataset.key === item.dataset.bin;
+					item.dataset.done = right ? 'right' : 'wrong';
+					btn.classList.add(right ? 'is-right' : 'is-wrong');
+					item.querySelector(`.sorter__bin[data-key="${item.dataset.bin}"]`)?.classList.add('is-answer');
+					item.querySelector<HTMLElement>('.sorter__verdict')!.textContent = right ? 'Right. ' : 'Not quite: ';
+					render();
+				});
+			});
+		});
+		sorter.querySelector('[data-sorter="reset"]')!.addEventListener('click', () => {
+			items.forEach((item) => {
+				delete item.dataset.done;
+				item.querySelectorAll('.sorter__bin').forEach((b) => b.classList.remove('is-right', 'is-wrong', 'is-answer'));
+			});
+			render();
+		});
+		render();
+	});
+</script>

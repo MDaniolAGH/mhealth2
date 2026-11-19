@@ -5,7 +5,7 @@ template: splash
 hero:
   image:
     file: ../../assets/hero.svg
-  tagline: A coding agent can write a Flutter screen in minutes. This guide is about everything else. You decide what to build, give the agent what it needs to know, check what it did, and stay able to explain the change months later.
+  tagline: A coding agent can write a Flutter screen in minutes. This guide is about everything else. You decide what to build and why, give the agent what it needs to know, check what it did, and stay able to explain the change months later.
   actions:
     - text: Start with the map
       link: ai-sdlc/overview/
@@ -17,26 +17,40 @@ hero:
 
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-## One feature, ten stages
+## Part 1 · The AI SDLC: from idea to merge
 
-The guide follows **one feature**, an About screen for the Mood Tracker you took over, from a client's sketch to a merged pull request. At every stage it shows who does the work, what goes in, what comes out, and what checks it. Each page has something to try and a few questions to check yourself.
+The guide follows **one feature**, an About screen for the Mood Tracker you took over, from a sketch to a merged pull request. At every stage it shows who does the work, what goes in, what comes out, and what checks it. Each page has something to try, a few questions to check yourself, and a task for your own project.
 
 <CardGrid>
 	<LinkCard title="The pipeline at a glance" description="The whole process on one interactive map. Start here. (5 min)" href="ai-sdlc/overview/" />
-	<LinkCard title="1. From a prompt to an agent" description="Model, harness, tools. Take the harness apart. (5 min)" href="ai-sdlc/agents/" />
+	<LinkCard title="1. From a prompt to an agent" description="Model, harness, tools, and why every tool is also a way in. (6 min)" href="ai-sdlc/agents/" />
 	<LinkCard title="2. Context" description="What the agent knows, and what it costs. Build a context. (5 min)" href="ai-sdlc/context/" />
 	<LinkCard title="3. Project knowledge" description="What the plan is built on: architecture, decisions, notes, the client's words. (5 min)" href="ai-sdlc/knowledge/" />
-	<LinkCard title="4. AGENTS.md" description="The project's rules for agents. (3 min)" href="ai-sdlc/agents-md/" />
-	<LinkCard title="5. Stage by stage" description="The worked example in three parts: idea to plan, code and the gate, tests to merge. (15 min)" href="ai-sdlc/idea-to-plan/" />
+	<LinkCard title="4. AGENTS.md" description="The project's rules for agents, from a request to enforcement. (4 min)" href="ai-sdlc/agents-md/" />
+	<LinkCard title="5. Stage by stage" description="The worked example in three parts: idea to plan, code and the gate, tests to merge. (20 min)" href="ai-sdlc/idea-to-plan/" />
 	<LinkCard title="6. Auditability" description="Walk back from a line of code to the goal. Break a link and see what is lost. (4 min)" href="ai-sdlc/auditability/" />
 	<LinkCard title="7. Templates" description="AGENTS.md, ARCHITECTURE.md, ADR, NOTES.md, spec, commit, pull request: ready to copy." href="ai-sdlc/templates/" />
+</CardGrid>
+
+## Part 2 · Product development with agents
+
+The business side: from a client's brief to user stories and a one-page recommendation, with an agent drafting and you deciding. Same client, same feature: this is where issue #7 comes from.
+
+<CardGrid>
+	<LinkCard title="From brief to backlog" description="The discovery map, and who does what: the agent, you, the client. (5 min)" href="product/overview/" />
+	<LinkCard title="1. Decision, facts, people" description="The decision before the solution; facts, assumptions, synthetic users; stakeholders. (7 min)" href="product/decision-and-facts/" />
+	<LinkCard title="2. Intended purpose" description="Diary or medical device? One sentence decides. (5 min)" href="product/purpose/" />
+	<LinkCard title="3. Questions and observations" description="Questions that change the answer; what the app really does. (5 min)" href="product/questions-and-observation/" />
+	<LinkCard title="4. User stories" description="From need to story, with a source for each. Fix an agent-written story. (5 min)" href="product/user-stories/" />
+	<LinkCard title="5. Testable, ranked, split" description="Given/When/Then, INVEST, MoSCoW, splitting, words with one meaning. (6 min)" href="product/testable-stories/" />
+	<LinkCard title="6. Options and recommendation" description="Hard limits, total cost, three-point estimates, one page. (8 min)" href="product/options-and-recommendation/" />
 </CardGrid>
 
 ## How to use this guide
 
 <CardGrid>
 	<Card title="Before W3" icon="open-book">
-		Read the map and sections 1 to 4. They build on W2: how a model works, context, and your pair's `AGENTS.md`.
+		Read the map and sections 1 to 4 of Part 1. They build on W2: how a model works, context, and your pair's `AGENTS.md`.
 	</Card>
 	<Card title="During the labs" icon="laptop">
 		Keep section 5 open while you work on your client's brief. Each stage says what it should leave behind.

@@ -9,8 +9,10 @@ interface Props {
 	options: string[];
 	answer: number; // index into options
 	explain?: string;
+	/** Optional feedback for each option, shown when that option is picked wrongly. */
+	why?: string[];
 }
-const { question, options, answer, explain = '' } = Astro.props;
+const { question, options, answer, explain = '', why = [] } = Astro.props;
 ---
 
 <div class="quiz not-content" data-answer={answer}>
@@ -20,7 +22,7 @@ const { question, options, answer, explain = '' } = Astro.props;
 		{
 			options.map((o, i) => (
 				<li>
-					<button type="button" class="quiz__opt" data-i={i}>
+					<button type="button" class="quiz__opt" data-i={i} data-why={why[i] ?? ''}>
 						<span class="quiz__letter">{String.fromCharCode(65 + i)}</span>
 						<span set:html={o} />
 					</button>
@@ -56,7 +58,7 @@ const { question, options, answer, explain = '' } = Astro.props;
 				} else {
 					btn.classList.add('is-wrong');
 					btn.disabled = true;
-					feedback.textContent = 'Not this one. Why not? Think about it, then try again.';
+					feedback.textContent = btn.dataset.why || 'Not this one. Why not? Think about it, then try again.';
 				}
 			});
 		});

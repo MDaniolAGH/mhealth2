@@ -43,7 +43,7 @@
 		<div data-defect="deps"><b>Caught by layer 5, the dependency scan,</b> which compares <code>pubspec.lock</code> and <code>requirements.txt</code> with a database of known vulnerabilities. A new package with no row in <code>docs/soup.csv</code> is stopped here too, by the SOUP register test.</div>
 		<div data-defect="golden"><b>Caught by layer 6, a golden test:</b> the rendered mood card no longer matches the approved image. In review, an 8 px change is almost invisible.</div>
 		<div data-defect="tests"><b>Passes every gate.</b> The code is well-formed, tidy, in the right layer and looks fine with a running server. Only the <b>test for AC-4</b>, which waits 5 s for a server that never answers, catches it. Gates check properties of the code, not your intent.</div>
-		<div data-defect="human"><b>Passes every check, the tests included.</b> The agent wrote the sentence into <code>docs/product.md</code> as well, and the test only checks that the screen shows what that file says. Only a person comparing it with <code>docs/client-log.md</code> notices that the client never said it. A purpose such as "helps patients manage depression" is a medical claim; it can change how the software is regulated.</div>
+		<div data-defect="human"><b>Passes every check, the tests included.</b> The agent wrote the sentence into <code>docs/product.md</code> as well, and the AC-5 test only checks that the screen's text matches that file. Only a person comparing it with <code>docs/client-log.md</code> notices that the client never said it. A purpose such as "helps patients manage depression" is a medical claim: it can turn the app into a regulated medical device.</div>
 	</div>
 </div>
 

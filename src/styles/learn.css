@@ -3,12 +3,12 @@
 .quiz,
 .predict,
 .checklist {
-	margin-top: 1.5rem;
-	padding: 1rem 1.1rem;
+	padding: var(--w-pad);
 	border: 1px solid var(--sdlc-line);
 	border-left: 4px solid var(--q, var(--sl-color-accent));
-	border-radius: 0.6rem;
+	border-radius: var(--w-radius);
 	background: var(--sdlc-surface);
+	box-shadow: var(--w-shadow);
 	color: var(--sdlc-ink);
 	font-size: var(--sl-text-sm);
 	line-height: 1.5;
@@ -40,8 +40,8 @@
 	text-transform: uppercase;
 	color: var(--q, var(--sl-color-accent));
 }
-.quiz { --q: var(--course-secondary); }
-.predict { --q: var(--sdlc-audit); }
+.quiz { --q: var(--sdlc-agent); }
+.predict { --q: var(--sdlc-predict); }
 .checklist { --q: var(--sdlc-tool); }
 
 .quiz__q,
@@ -54,9 +54,10 @@
 	align-items: flex-start;
 	width: 100%;
 	padding: 0.5rem 0.7rem;
-	border: 1.5px solid var(--sdlc-line);
-	border-radius: 0.45rem;
+	border: 1px solid var(--sdlc-line);
+	border-radius: var(--w-radius-sm);
 	background: var(--sdlc-card);
+	box-shadow: var(--w-shadow);
 	color: inherit;
 	font: inherit;
 	text-align: left;
@@ -79,7 +80,7 @@
 }
 .quiz__opt.is-wrong { border-color: var(--sdlc-fail); opacity: 0.6; cursor: not-allowed; text-decoration: line-through; text-decoration-color: var(--sdlc-fail); }
 .quiz__opt.is-right { border-color: var(--sdlc-tool); background: var(--sdlc-tool-tint); }
-.quiz__opt.is-right .quiz__letter { background: var(--sdlc-tool); color: var(--sdlc-card); border-color: var(--sdlc-tool); }
+.quiz__opt.is-right .quiz__letter { background: var(--sdlc-tool); color: var(--sdlc-on); border-color: var(--sdlc-tool); }
 .quiz.is-solved .quiz__opt:not(.is-right) { opacity: 0.45; cursor: default; }
 .quiz__feedback { margin: 0.6rem 0 0; font-weight: 600; min-height: 1.2em; }
 .quiz.is-solved .quiz__feedback { color: var(--sdlc-tool); }
@@ -89,8 +90,8 @@
 .predict__input {
 	width: 100%;
 	padding: 0.5rem 0.65rem;
-	border: 1.5px solid var(--sdlc-line);
-	border-radius: 0.45rem;
+	border: 1px solid var(--sdlc-line);
+	border-radius: var(--w-radius-sm);
 	background: var(--sdlc-card);
 	color: inherit;
 	font: inherit;
@@ -102,8 +103,8 @@
 	padding: 0.35rem 0.9rem;
 	border: 0;
 	border-radius: 999px;
-	background: var(--q);
-	color: var(--sdlc-card);
+	background: var(--sdlc-primary);
+	color: var(--sdlc-primary-ink);
 	font: inherit;
 	font-weight: 700;
 	cursor: pointer;
@@ -113,8 +114,8 @@
 .predict__answer {
 	margin-top: 0.7rem;
 	padding: 0.7rem 0.85rem;
-	border-radius: 0.45rem;
-	background: var(--sdlc-audit-tint);
+	border-radius: var(--w-radius-sm);
+	background: color-mix(in srgb, var(--sdlc-predict) var(--sdlc-tint), var(--sdlc-card));
 	animation: sdlc-rise 0.3s ease;
 }
 .predict__answer[hidden] { display: none; }
@@ -157,3 +158,25 @@
 
 /* Anchors the pipeline map links to; keep the heading below the sticky header. */
 .stage-anchor { display: block; height: 0; scroll-margin-top: calc(var(--sl-nav-height, 3.5rem) + 1rem); }
+
+/* Shared stages: two colours, as on the pipeline map. */
+.is-you-agent { --chip: var(--sdlc-agent); --chip-tint: var(--sdlc-agent-tint); --chip-a: var(--sdlc-you); --chip-b: var(--sdlc-agent); }
+.is-agent-tool { --chip: var(--sdlc-tool); --chip-tint: var(--sdlc-tool-tint); --chip-a: var(--sdlc-agent); --chip-b: var(--sdlc-tool); }
+.is-you, .is-agent, .is-tool { --chip-a: var(--chip); --chip-b: var(--chip); }
+.stage-strip a { border-color: var(--sdlc-line); background: var(--sdlc-card); box-shadow: var(--w-shadow); }
+.stage-strip a::before {
+	content: '';
+	width: 0.7em;
+	height: 0.7em;
+	border-radius: 50%;
+	background: linear-gradient(90deg, var(--chip-a) 50%, var(--chip-b) 50%);
+}
+.stage-strip a:hover { background: var(--sdlc-surface); color: var(--sdlc-ink); border-color: var(--chip); }
+.stage-facts { position: relative; border-left-width: 1px !important; border-left-color: var(--sdlc-line) !important; padding-left: calc(var(--w-pad) + 4px) !important; overflow: hidden; }
+.stage-facts::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 4px; background: linear-gradient(var(--chip-a), var(--chip-b)); }
+
+/* Glossary */
+.glossary { display: grid; grid-template-columns: minmax(10rem, max-content) 1fr; gap: 0.6rem 1.5rem; }
+.glossary dt { font-weight: 700; margin: 0 !important; }
+.glossary dd { margin: 0 !important; color: var(--sl-color-gray-2); }
+@media screen and (max-width: 44em) { .glossary { grid-template-columns: 1fr; gap: 0.15rem; } .glossary dd { margin-bottom: 0.6rem !important; } }

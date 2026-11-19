@@ -1,0 +1,95 @@
+---
+title: '4. User stories: from need to story'
+description: Write stories from needs the client agreed to, with a source for each, and keep ideas separate from requirements.
+---
+
+import StageFacts from '../../../components/StageFacts.astro';
+import MultiCheck from '../../../components/MultiCheck.astro';
+import Sorter from '../../../components/Sorter.astro';
+import Predict from '../../../components/Predict.astro';
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts and critiques · <span class="sdlc-chip is-you">You</span> cut and trace · the <span class="sdlc-chip is-knowledge">client</span> approves'} input="The client log, the decision, the purpose, the stakeholder table" output="<code>docs/stories.md</code>: stories with a source, and a separate list of ideas" />
+
+A **user story** is a need the client agreed to, written from the point of view of the person who has it:
+
+> **As a** *[who]*, **I want** *[what]*, **so that** *[why]*.
+
+The course's `ba-requirements` skill writes the same thing as a requirement: *"[Who] can/must [do or get what], so that [goal]."* Use whichever your team prefers. Three rules matter more than the format:
+
+1. **Need before solution.** "Participants know whom to contact" is a need. "A contact button in the app bar" is an idea about how to meet it. Ideas stay ideas until the client approves them.
+2. **Every story has a source**: a line in the client log, a stakeholder, an observation. No source, no story: it goes on the *Ideas* list.
+3. **Small.** A story you cannot finish and check in a few days is several stories (next page).
+
+<MultiCheck
+	title="What is wrong with this agent-written story? Tick every problem."
+	intro={'<pre>As a participant I want a package_info_plus version label\nso the app is quick and support@clinic.example can help me.</pre>'}
+	options={[
+		{ text: 'It names a solution (a package and a label) instead of a need', correct: true, why: 'The need is "support can tell which version I run". How to show it is decided later.' },
+		{ text: 'It adds a new package, a SOUP item nobody agreed to', correct: true, why: 'A product decision hidden in a story. Every package must be recorded, assessed and maintained.' },
+		{ text: '&quot;Quick&quot; cannot be tested', correct: true, why: 'Quick for whom, measured how? Without a threshold, nobody can say whether it is done.' },
+		{ text: 'It mixes two needs: knowing the version, and getting help', correct: true, why: 'Two stories, possibly for two different people (support and participants), with different priorities.' },
+		{ text: 'The contact address is invented', correct: true, why: 'It is in no client log. The real contact is still a TODO for the client.' },
+		{ text: 'It has no source: which client statement does it come from?', correct: true, why: 'Without a source, nobody can check that the client ever wanted it.' },
+		{ text: 'It is written from the participant\'s point of view', correct: false, why: 'That is right for a user story. The question is whether it is the participant\'s need at all.' },
+		{ text: 'It is too short to be a proper story', correct: false, why: 'Short is good. The problems are in what it says, not in its length.' },
+	]}
+>
+
+**A better version: two stories and an idea**
+
+```text
+S1  As a support person at the clinic, I want to see which app version a
+    participant runs, so that I can tell whether a reported problem is
+    already fixed.
+    Source: client log 2026-11-12 (coordinator)
+
+S2  As a participant, I want to see what the app is for and whom to
+    contact, in words the clinic approved, so that I know when to use it
+    and where to ask.
+    Source: client log 2026-11-12 (ethics committee request)
+
+Ideas (not approved): show the version with package_info_plus; a QR code
+to the study web page.
+```
+
+</MultiCheck>
+
+## Requirement or idea?
+
+<Sorter
+	title="Requirement (agreed, with a source) or idea (not yet)?"
+	bins={[
+		{ key: 'req', label: 'Requirement', tone: 'agent' },
+		{ key: 'idea', label: 'Idea', tone: 'neutral' },
+	]}
+	items={[
+		{ text: 'Participants can see whom to contact about the study. <em>(client log, 2026-11-12)</em>', bin: 'req', why: 'A need with a source. The contact itself is still a question for the client.' },
+		{ text: 'A QR code that opens the study\'s web page.', bin: 'idea', why: 'Nobody asked for it. It may be good; it waits on the Ideas list until the client says so.' },
+		{ text: 'Support can tell which app version a participant runs. <em>(coordinator, client log 2026-11-12)</em>', bin: 'req', why: 'Need, owner, source: a requirement.' },
+		{ text: 'The About screen uses the same design as the clinic\'s other app.', bin: 'idea', why: 'Unless the client said it, it is your idea, or the agent\'s.' },
+	]}
+/>
+
+## The story is the agent's input
+
+A good story with its criteria **is** the prompt for the AI SDLC: it becomes GOAL-1 and `docs/spec-about.md` (stage 3), and the agent plans from it. Teams that write specs for agents get better plans, because the agent has less to guess. Agents are also good critics of stories, if you ask them to be:
+
+```text title="Prompts (Copilot)"
+/ba-requirements docs/client-log.md
+Write user stories only from docs/client-log.md. Cite the log line for each.
+Put anything without a source under "Ideas (not approved)".
+
+Act as a strict reviewer of docs/stories.md. For each story: does it name a
+solution instead of a need? Is it testable? Is it two stories in one? Is the
+source real? Do not rewrite the stories; list the problems.
+```
+
+<Predict id="agent-stories" question="You give the agent the client log and ask for user stories. It returns fifteen. The client log has six statements. What do you expect the other nine to be?">
+
+Mostly plausible stories nobody asked for: features that "apps like this usually have", reasonable expectations, nice-to-haves. Some may be good ideas. None is a requirement until the client agrees. The citation rule finds them: a story whose source line does not say what the story claims goes to the Ideas list.
+
+</Predict>
+
+:::tip[Do this in your project]
+Ask the agent for stories from your client log, with the citation rule above. Open every cited line and check it says what the story claims. Move the rest to *Ideas*, and bring the Ideas list to your client as questions, not as a plan.
+:::

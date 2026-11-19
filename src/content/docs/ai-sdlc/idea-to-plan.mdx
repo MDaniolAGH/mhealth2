@@ -26,7 +26,7 @@ The artefacts below were **written for this guide**. They are not a recording of
 
 > *"Participants keep asking which version they have, and our ethics committee wants the app to say what it is for."*
 
-The study coordinator's sketch shows a screen with the app's name, a version, a sentence about the study and a contact. That is enough to start a conversation, so record it as an issue (here, issue #7). It is not enough to start coding: it does not say where the version comes from, what happens when the server is down, which sentence about the study, or whose contact.
+The study coordinator's sketch shows a screen with the app's name, a version, a sentence about the study and a contact. That is enough to start a conversation, so record it as an issue (here, issue #7). It is not enough to start coding: it does not say where the version comes from, what happens when the server is down, which sentence about the study, or whose contact. (Where this request came from, and why an About screen won over the other options, is the subject of the [product development](../../product/overview/) part.)
 
 <span id="stage-analysis" class="stage-anchor"></span>
 
@@ -56,15 +56,17 @@ Constraints      No new packages (each is a SOUP item). Works when the server
 Out of scope     A licences page, a changelog, update checks.
 ```
 
-:::caution[What goes wrong here]
-Skipping analysis and asking the agent to "add an About screen". In the W3 demo you counted how many decisions the agent then made for the client: where the version comes from, what happens offline, whose contact, whether the screen works before login, which language. Each was a plausible guess.
-:::
+<Predict id="hidden-decisions" question="You skip analysis and type only <em>&quot;add an About screen&quot;</em> into agent mode. List the decisions the agent will make for the client without asking.">
+
+Where the version comes from (a new package?), what to show when the server is down, which sentence describes the app's purpose, whose contact, which language. Each guess is plausible, and each belongs to the client or to you. GOAL-1 fixes them before any code exists. In the W3 demo you counted these hidden decisions on a real diff.
+
+</Predict>
 
 <span id="stage-requirements" class="stage-anchor"></span>
 
 ## 3. Technical requirements
 
-<StageFacts tone="you" who={'<span class="sdlc-chip is-you">You</span> decide · <span class="sdlc-chip is-agent">Agent</span> may draft and ask questions'} input="The goal, the client log, the architecture and API docs, <code>AGENTS.md</code>" output="<code>docs/spec-about.md</code>: numbered criteria that can be observed" />
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-you">You</span> decide · <span class="sdlc-chip is-agent">Agent</span> may draft and ask questions'} input="The goal, the client log, the architecture and API docs, <code>AGENTS.md</code>" output="<code>docs/spec-about.md</code>: numbered criteria that can be observed" />
 
 Requirements are the goal written so that each sentence can be **shown true or false** by a test or by running the app. Several inputs feed into them:
 
@@ -94,6 +96,30 @@ AC-6  The existing screens, the login and the mood list do not change.
 Out of scope: a licences page, a changelog, update checks.
 ```
 
+The same criterion can be written in **EARS** form (*Easy Approach to Requirements Syntax*, W3), which makes the trigger and the response explicit:
+
+> **AC-4 (EARS)** *If* the server does not answer within 5 seconds, *then* the About screen *shall* show "Server: unavailable".
+
+Most edge cases are "If… then… shall" sentences. When you cannot write one, the requirement is not clear yet.
+
+<Quiz
+	question="Which of these criteria can be shown true or false by a test or a run?"
+	options={[
+		'The About screen loads quickly, even on older phones',
+		'Participants find the About screen easy to understand',
+		"The About screen's code is clean and well tested",
+		'If GET /version has not answered after 5 s, the screen shows "Server: unavailable"',
+	]}
+	answer={3}
+	why={[
+		'"Quickly" has no threshold. It becomes testable once you define it: "visible within 1 s of tapping About on the reference phone".',
+		'True or false only after you define how you measure it, for example "4 of 5 participants find the contact without help".',
+		'Nobody can observe "clean". Turn it into gate rules (stage 6) instead.',
+		'',
+	]}
+	explain="Only the last one names an observable result and a threshold. The others become criteria once you say what you will observe, and on what."
+/>
+
 <Predict id="first-test" question="Which criterion would you test first, and why?">
 
 **AC-4 and AC-5.** Edges are where a plausible guess is most likely to be wrong, and where nobody notices by looking at the screen: on your laptop the server is always running, and the placeholder looks harmless. AC-4 has a boundary you can test exactly (an answer just before 5 s is shown; no answer by 5 s is not). AC-5 protects the client's own words, which an agent will otherwise invent.
@@ -110,9 +136,9 @@ Out of scope: a licences page, a changelog, update checks.
 
 ## 4. Plan: what we will build, and how
 
-<StageFacts tone="agent" who={'<span class="sdlc-chip is-agent">Agent</span> proposes · <span class="sdlc-chip is-you">You</span> approve, correct or ask for an alternative'} input={`<code>docs/spec-about.md</code> and the <a href="../knowledge/"><b>project knowledge</b></a>: <code>ARCHITECTURE.md</code>, decision records, <code>NOTES.md</code>, <code>docs/product.md</code>, API docs, <code>AGENTS.md</code>`} output="An approved plan, with its sources, the contradictions found, and your written answers" />
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> proposes · <span class="sdlc-chip is-you">You</span> approve, correct or ask for an alternative'} input={`<code>docs/spec-about.md</code> and the <a href="../knowledge/"><b>project knowledge</b></a>: <code>ARCHITECTURE.md</code>, decision records, <code>NOTES.md</code>, <code>docs/product.md</code>, API docs, <code>AGENTS.md</code>`} output="An approved plan, with its sources, the contradictions found, and your written answers" />
 
-Ask the agent for a plan **before** it edits anything. The plan says *what* will be built and *how*: which files, which approach, which checks. In W3 you did this with Spec Kit: spec → plan → tasks → implementation.
+Ask the agent for a plan **before** it edits anything. The plan says *what* will be built and *how*: which files, which approach, which checks. In W3 you did this with Spec Kit, GitHub's toolkit for spec-driven development: spec → plan → tasks → implementation.
 
 :::danger[No plan without the project knowledge]
 Point the agent at the architecture, the decision records, the product card and the notes **before** it plans (the planning prompt in section 3), and expect the plan to **name the documents it used**. A plan that cites no sources has guessed. Compare the two versions below: the knowledge kept the code in the right layer, avoided a new package, and kept the client's words the client's.
@@ -140,9 +166,15 @@ Files
   new   lib/services/version_service.dart  fetchServerVersion(timeout:)  AC-3, AC-4
   new   lib/providers/about_provider.dart  serverVersionProvider         AC-3
   new   lib/screens/about_screen.dart      the screen                    AC-1..AC-5
+  new   lib/about_content.dart             purpose and contact, copied
+                                           word for word from
+                                           docs/product.md; null = not
+                                           confirmed                     AC-5
   edit  lib/config.dart                    appVersion                    AC-2
   edit  lib/screens/home_screen.dart       About button in the app bar   AC-1, AC-6
   new   test/screens/about_screen_test.dart                             AC-1..AC-5
+  new   test/about_content_test.dart       fails if the text differs
+                                           from docs/product.md          AC-5
   new   test/architecture_test.dart        screens never import http     (rule)
 
 Approach
@@ -199,27 +231,50 @@ Review a plan with these questions. Your ticks are saved in this browser, so you
 	]}
 />
 
+<Predict id="plan-flaw" question="Read the approved plan once more, in the first tab. One line in <b>Files</b> contradicts the plan's own <b>Questions</b>. Which one?">
+
+`edit lib/config.dart  appVersion  AC-2`. Reading the version from `lib/config.dart` already assumes the answer to question 2 (`--dart-define`), while question 2 still asks whether to use a package instead. Answer the question first, or make that step depend on the answer. Plans that quietly assume their own open questions are common; reading for them is part of approving a plan.
+
+</Predict>
+
 Answers to the plan's questions are decisions, so they belong in the record: here, *"1: show 'not yet confirmed'. 2: `--dart-define`, as in ADR-0002; record it as an ADR."* A plan is cheap; an implementation is not. You can reject a plan, or ask for two alternatives and choose one, for a fraction of the cost of undoing code.
 
 <Quiz
 	question="A plan proposes <code>lib/repositories/about_repository.dart</code>. <code>ARCHITECTURE.md</code> lists <code>repositories/</code>, but the folder does not exist. What is the best response?"
 	options={[
-		'Approve it: the document says the layer exists',
-		'Ask which documents and code the plan is based on; decide whether the document or the code is right, fix the document or record a decision, and ask for a plan that fits',
-		'Let it implement first and review the code later',
-		'Delete <code>ARCHITECTURE.md</code> so the plan no longer contradicts it',
+		'Ask what the plan is based on, decide whether the document or the code is right, fix one of them, then re-plan',
+		'Approve it: the document says the layer exists, so the agent is following the architecture',
+		'Let the agent implement it first, and decide about the folder when you review the code',
+		'Delete <code>ARCHITECTURE.md</code>, so that the plan no longer contradicts any document',
 	]}
-	answer={1}
-	explain="A contradiction between the documents and the code is a finding, not a detail. Resolve it on purpose, and write the resolution down; otherwise the next plan meets the same false premise."
+	answer={0}
+	why={[
+		'',
+		'The document is wrong about the code. Following it builds on a false premise.',
+		'Undoing code costs far more than correcting a plan.',
+		'Then every next plan guesses the architecture again.',
+	]}
+	explain="A contradiction between the documents and the code is a finding, not a detail. Resolve it on purpose and write the resolution down; otherwise the next plan meets the same false premise."
 />
 
 <Quiz
 	question="Which of these is the strongest sign that a plan was guessed rather than built on the project knowledge?"
 	options={[
-		'It is short',
-		'It asks two questions',
-		'It cites no documents, and the intended purpose in it appears nowhere in <code>docs/client-log.md</code>',
-		'It lists the tests it will write',
+		'It is short: less than a page, with only five files',
+		'It asks you two questions before it changes anything',
+		'It names no documents, and its purpose text is not in the client log',
+		'It lists the tests it will write for each criterion',
 	]}
 	answer={2}
+	why={[
+		'Short is fine if it is complete.',
+		'Asking questions is a good sign: it found gaps instead of filling them.',
+		'',
+		'Mapping tests to criteria is what a good plan does.',
+	]}
+	explain="The real test is sources. A plan that cites no documents has guessed the architecture, and a client fact you cannot trace to the client log was invented."
 />
+
+:::tip[Do this in your project]
+For your brief's first feature, write `GOAL-n` (the four questions plus *out of scope*) and `docs/spec-<feature>.md` with at least one edge case and one "must not change". Before the agent drafts anything, ask it for the questions it needs answered, separating questions for the client from technical ones.
+:::

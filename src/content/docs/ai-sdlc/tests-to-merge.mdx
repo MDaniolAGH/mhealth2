@@ -15,7 +15,7 @@ import Predict from '../../../components/Predict.astro';
 
 ## 7. Tests
 
-<StageFacts tone="tool" who={'<span class="sdlc-chip is-agent">Agent</span> writes · <span class="sdlc-chip is-tool">Tools</span> run · <span class="sdlc-chip is-you">You</span> check that they test the criteria, and run the app'} input="<code>docs/spec-about.md</code> and the code" output="Tests and their real results, and what you saw on a device" />
+<StageFacts tone="agent-tool" who={'<span class="sdlc-chip is-agent">Agent</span> writes · <span class="sdlc-chip is-tool">Tools</span> run · <span class="sdlc-chip is-you">You</span> check that they test the criteria, and run the app'} input="<code>docs/spec-about.md</code> and the code" output="Tests and their real results, and what you saw on a device" />
 
 There are three levels of automated test, from fast and narrow to slow and broad, plus your own run of the app:
 
@@ -44,11 +44,23 @@ testWidgets('AC-4: no answer within 5 s shows "Server: unavailable"',
   await tester.pump(const Duration(milliseconds: 200));
   expect(find.text('Server: unavailable'), findsOneWidget);
 
-  await tester.pump(const Duration(seconds: 1)); // the late reply is ignored
+  await tester.pump(const Duration(seconds: 1)); // the late reply arrives
 });
 ```
 
 `aboutScreenWith` is a small helper in the same file that wraps the screen in a `ProviderScope` with the service overridden. The criterion ID is in the test name, as `AGENTS.md` asks, so a failing test points straight at a criterion.
+
+<Predict id="mutants" question="Would this test fail for each of these bugs? (1) The timeout is 10 s instead of 5 s. (2) The timeout is 3 s. (3) A reply that arrives late replaces &quot;unavailable&quot; with &quot;Server 1.0.0&quot;.">
+
+(1) **Fails**: at 5.1 s the screen still says "checking…". (2) **Fails**: at 4.9 s it already says "unavailable". (3) **Passes**: the last `pump` lets the late reply in, but nothing checks the screen afterwards. A test that survives a real bug proves less than it seems to; finding such tests is what mutation testing in W4 is for. The fix is two more lines:
+
+```dart
+  await tester.pump(const Duration(seconds: 1)); // the late reply arrives
+  expect(find.text('Server: unavailable'), findsOneWidget);
+  expect(find.text('Server 1.0.0'), findsNothing);
+```
+
+</Predict>
 
 <Predict id="same-mistake" question="The agent wrote both the About screen and its tests, and everything passes. What could still be wrong?">
 
@@ -57,14 +69,14 @@ The agent can make the same wrong assumption in the code and in the test. If it 
 </Predict>
 
 :::tip[Who writes the test that matters most?]
-For the riskiest criterion, write the test yourself, or at least read it closely **before** the implementation exists. Then ask: *would this test fail if the feature were broken?* Break the code on purpose and run it. In W4, mutation testing asks the same question automatically, for every line.
+For the riskiest criterion, write the test yourself, or at least read it closely **before** the implementation exists. Then ask: *would this test fail if the feature were broken?* Break the code on purpose and run it. In W4, mutation testing asks the same question automatically, for many small deliberate bugs.
 :::
 
 <span id="stage-docs" class="stage-anchor"></span>
 
 ## 8. Documentation: update what the next plan reads
 
-<StageFacts tone="agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts · <span class="sdlc-chip is-you">You</span> check against the code'} input="The change, the plan's answers and contradictions, what went wrong on the way" output="Updated project knowledge, in the same pull request as the code" />
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts · <span class="sdlc-chip is-you">You</span> check against the code'} input="The change, the plan's answers and contradictions, what went wrong on the way" output="Updated project knowledge, in the same pull request as the code" />
 
 This stage closes the loop that makes the next plan good. Whatever was decided or learned during this feature must be written down now, while it is fresh, or the next session (yours or the agent's) starts without it.
 
@@ -89,7 +101,7 @@ Agents are good at drafting these updates from the diff and the plan: ask for th
 
 ## 9. Pull request
 
-<StageFacts tone="agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts · <span class="sdlc-chip is-you">You</span> correct, own and submit'} input="The commits, the gate and test results, the documentation changes" output="A pull request a reviewer can check in minutes" />
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts · <span class="sdlc-chip is-you">You</span> correct, own and submit'} input="The commits, the gate and test results, the documentation changes" output="A pull request a reviewer can check in minutes" />
 
 A pull request asks another person to accept your change. Its description is written for that reviewer. It says what was done and why, where to look first, what evidence exists, which documents changed, which AI tools helped, and which standards apply. The course's AI rules ask you to disclose AI help in a commit trailer or here.
 
@@ -151,6 +163,9 @@ The reviewer checks the pull request against the review checklist and leaves a r
 		'Every client fact (purpose, contact, wording) is in <code>docs/client-log.md</code>',
 		'The documentation describes the code as it now is',
 		'No secrets, no real personal or health data; no new package without a SOUP row and agreement',
+		'No test was changed or deleted to make it pass (<code>git diff -- test/</code>)',
+		'Every new package exists, is the one you meant, and is maintained: agents sometimes invent package names, and attackers register them',
+		'No dead code, duplicated helpers or &quot;improvements&quot; outside the plan',
 		'You could explain any line of it if asked',
 	]}
 />
@@ -160,32 +175,57 @@ When the pull request is merged, the project knowledge describes the new feature
 <Quiz
 	question="When should <code>ARCHITECTURE.md</code>, the decision records and <code>NOTES.md</code> be updated for a feature?"
 	options={[
-		'At the end of the semester',
-		'Only when the teacher asks',
-		'In the same pull request as the code, so reviewers check them together and the next plan reads the current state',
-		'Never: the code is the documentation',
+		'In the same pull request as the code that changes them',
+		'After the merge, in a separate documentation pull request',
+		'At the end of the sprint, in one batch for all features',
+		'When the next feature needs them, so no work is wasted',
 	]}
-	answer={2}
+	answer={0}
+	why={[
+		'',
+		'A separate pull request is reviewed without the diff it describes, if it is reviewed at all.',
+		'By then you write what you remember, not what you built.',
+		'The next plan reads them first. If they are stale, it starts from a false premise.',
+	]}
+	explain="In the same pull request, the reviewer checks the documents against the diff, and the next plan starts from the current state."
 />
 
 <Quiz
 	question="What belongs in a pull request's Evidence section?"
 	options={[
-		"The agent's statement that all tests pass",
-		'Real results you saw, plus what you did not verify',
-		'The full chat transcript',
-		'Nothing; the reviewer will run the tests',
+		"The agent's statement that all the tests pass",
+		'The full chat transcript, so the reviewer can follow',
+		'Real results you saw, and what you did not verify',
+		'Nothing: the reviewer will run the tests anyway',
 	]}
-	answer={1}
+	answer={2}
+	why={[
+		'A statement is a claim, not evidence. Agents write "all tests pass" without running them.',
+		'Too long to review, and it shows what was said, not what is true.',
+		'',
+		'CI runs them, but the reviewer also needs your device check and an honest list of gaps.',
+	]}
+	explain="The reviewer needs real output and an honest list of what was not checked. That is also what makes your claims trustworthy next time."
 />
 
 <Quiz
 	question="The AI reviewer in CI approves the pull request with no comments. Can you merge?"
 	options={[
-		'Yes: two checks passed',
-		'No: a person must review and approve, and be able to explain every line; the AI review is one more input',
-		'Yes, if the gate also passed',
-		'Yes, if your partner has no time to review',
+		'Yes: an AI review and a green gate are two independent checks',
+		'No: a person must review and approve, and be able to explain every line',
+		'Yes, as long as all the tests passed as well as the gate',
+		'Yes, if your partner has no time to review it this week',
 	]}
 	answer={1}
+	why={[
+		'Two automatic checks are still not a person who takes responsibility.',
+		'',
+		'Tests check what you specified, not whether it was the right thing.',
+		'Then it waits. Unreviewed code is how the "intended purpose nobody said" reaches users.',
+	]}
+	explain="The AI review is one more input. It cannot take responsibility, and text planted in the pull request can steer it (W5)."
 />
+
+:::tip[Do this in your project]
+For your riskiest criterion, read the test before the code exists. Then break the code on purpose and record in the pull request that the test failed. Use the pull-request template, and leave the boxes for checks you did not do unticked.
+:::

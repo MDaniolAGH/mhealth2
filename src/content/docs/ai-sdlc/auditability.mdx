@@ -25,7 +25,8 @@ Why it matters:
 
 - **Months later**, the answer to "why?" is in the records, not in someone's memory.
 - **Agents.** The next agent session plans from the same records (section 3). A broken trail for people is a broken context for agents.
-- **Regulated software.** Medical-device software standards, such as IEC 62304, expect requirements to be traceable to the code and the tests that implement them, and every third-party component (SOUP) to be recorded. The Mood Tracker is not a medical device, but it handles health data, and the habit costs little.
+- **Regulated software.** Medical-device software standards, such as IEC 62304, expect requirements to be traceable to the design, the tests and the risk controls, and every third-party component (SOUP) to be recorded. With the intended purpose the client stated, the Mood Tracker is not a medical device. A different purpose sentence could change that (see [product development](../../product/purpose/)), and it handles health data either way, so the habit costs little.
+- **Two different regulatory questions.** *Is the app a medical device?* depends on its intended purpose (the EU Medical Device Regulation, MDR). *Does the app contain AI?* is a separate question under the EU AI Act. Using a coding agent to build the app does not make the app an AI system; an AI feature inside it, such as a chatbot or a predictor, would.
 - **AI-assisted work.** The trailers, the pull request and your agent log record which agent and model contributed, what it cost, and who reviewed it. In W6 you add these up for the whole semester.
 
 ```bash title="Following the trail with Git"
@@ -37,22 +38,39 @@ git blame lib/config.dart                                # which commit wrote ea
 <Quiz
 	question="The plan's question &quot;package or <code>--dart-define</code>?&quot; was answered in a chat that is now closed, and no decision record exists. What has been lost?"
 	options={[
-		'Nothing, the code shows the answer',
-		'The reason: the trail from the code back to the decision is broken, so nobody can tell a decision from a guess',
-		'The test results',
-		'The commit',
+		'Nothing: the code itself shows which answer was chosen',
+		'The test results that showed the version is correct',
+		'The commit that introduced the version string',
+		'The reason, so nobody can tell a decision from a guess',
 	]}
-	answer={1}
+	answer={3}
+	why={[
+		'The code shows what was chosen, not why, or by whom.',
+		'The tests are still in CI. They check the behaviour, not the reason.',
+		'Git still has the commit. It just cannot say why.',
+		'',
+	]}
+	explain="Without the reason, the next person, or the next agent session, will &quot;fix&quot; the choice the moment it looks unusual."
 />
 
 <Quiz
 	question="Which command lists every commit made for GOAL-1?"
 	options={[
-		'<code>git blame GOAL-1</code>',
 		'<code>git log --grep="GOAL-1"</code>',
+		'<code>git blame GOAL-1</code>',
 		'<code>git show GOAL-1</code>',
 		'<code>gh pr view GOAL-1</code>',
 	]}
-	answer={1}
+	answer={0}
+	why={[
+		'',
+		'git blame works on a file, line by line, not on a goal.',
+		'git show needs a commit, a tag or a branch name.',
+		'gh pr view needs a pull-request number or branch.',
+	]}
 	explain="It works only because every commit has a <code>Refs: GOAL-1</code> trailer. Without it, the commits are still there, but nothing connects them to the goal."
 />
+
+:::tip[Do this in your project]
+Pick one line of code your pair changed this week and walk it back: `git blame` → pull request → plan → ADR → goal. Where the trail breaks, add the missing record now, while you still remember the reason.
+:::

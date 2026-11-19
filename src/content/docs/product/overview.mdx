@@ -1,0 +1,76 @@
+---
+title: Product development with agents
+description: How to go from a client's brief to user stories and a recommendation with an agent at your side, and what only you and the client can do.
+---
+
+import DiscoveryMap from '../../../components/DiscoveryMap.astro';
+import Sorter from '../../../components/Sorter.astro';
+import Checklist from '../../../components/Checklist.astro';
+import Predict from '../../../components/Predict.astro';
+
+Writing code is getting cheaper every month. Deciding **what** to build, **for whom**, and **on what evidence** is not. An agent will happily write a fluent analysis, twenty user stories and a cost table in a few minutes, and it will write them just as fluently when they are wrong. The value moves to the person who can tell the difference.
+
+This part of the guide is the business side of the AI SDLC: the work **before** stage 1, from a client's brief to the request that becomes issue #7. It uses the same fictional client, the rehabilitation clinic from W1, and the course's own business-analysis skills (`/ba-*`), which you run in Copilot.
+
+<Checklist
+	id="product-outcomes"
+	title="After this part, you can"
+	items={[
+		"Turn a client's brief into a <b>one-page decision memo</b>: a recommendation, a sourced assumption log, and the two questions whose answers would change it",
+		'Tell an agent\'s <b>facts</b> from its <b>guesses</b>, and keep invented client facts, numbers and medical claims out of your documents',
+		'Write <b>user stories with testable criteria</b> that an agent can implement through the AI SDLC, each traced to what the client said',
+		'Compare options, including ones that are not software, by <b>total cost and hard limits</b>, with honest three-point estimates',
+		"Check whether a product's <b>intended purpose</b> could make it a medical device, before anyone builds it",
+	]}
+/>
+
+## The discovery map
+
+Nine steps, from the course's `ba-*` skills, in four phases. For each step the map shows what the agent can do, what you must do, and what **only the client** can give. Agents are fast at the first column. The other two columns are where projects succeed or fail.
+
+<DiscoveryMap />
+
+Between *Frame* and *Specify* sits one more check: the **intended purpose** ([page 2](../purpose/)). It can turn a diary into a regulated medical device, so it comes before stories and costs.
+
+## Who does what?
+
+<Predict id="sort-before" question="Before the sorting exercise: which of the four do you think does the <b>least</b> in product work with agents: the agent, you, the client, or &quot;nobody yet&quot;?">
+
+There is no single right answer, but most people underestimate **"nobody yet"**. In real projects many decisions have no owner at first: who answers participants' questions, who approves the wording. Writing them down as open questions is part of the job. An agent never does it on its own: it fills the gap with a plausible answer instead.
+
+</Predict>
+
+<Sorter
+	title="Who should do this: the agent, you, the client, or nobody yet (write it as a question)?"
+	intro="Each task comes from the About-screen request. Sort it, then read why. You will sort the same list again at the end of this part."
+	bins={[
+		{ key: 'agent', label: 'Agent', tone: 'agent' },
+		{ key: 'you', label: 'You', tone: 'you' },
+		{ key: 'client', label: 'Client', tone: 'client' },
+		{ key: 'nobody', label: 'Nobody yet', tone: 'neutral' },
+	]}
+	items={[
+		{ text: 'Draft twenty possible questions for the study coordinator', bin: 'agent', why: 'Drafting is cheap and agents are good at breadth. Choosing is not cheap: that is the next task.' },
+		{ text: 'Choose the three questions you will actually ask the coordinator', bin: 'you', why: 'Client time is scarce. Only you know which answers would change your recommendation.' },
+		{ text: 'Say whether the ethics committee needs the purpose stated inside the app, or whether the consent form is enough', bin: 'client', why: 'This is a fact about the client\'s world. An agent can only guess it, and a guess here changes the whole recommendation.' },
+		{ text: 'Find where the app sets its version number, with file and line', bin: 'agent', why: 'A good agent task: search the code and report <code>file:line</code>. You still reproduce it before you rely on it.' },
+		{ text: 'Write the sentence that says what the app is for', bin: 'client', why: 'The intended purpose is the client\'s statement, with regulatory consequences. An agent must never write it; you may draft options for the client to choose from.' },
+		{ text: 'Decide who answers participants\' questions after the study ends', bin: 'nobody', why: 'Nobody owns this yet. Write it down as a question for the client; do not let anyone, human or agent, fill it in.' },
+		{ text: 'Check that every user story points to a line in the client log', bin: 'you', why: 'The agent can list sources, but checking that they exist and say what the story claims is your job.' },
+		{ text: 'Rank the stories as Must, Should, Could or Won\'t', bin: 'client', why: 'Priority is the client\'s decision. You can propose a ranking and explain the trade-offs.' },
+	]}
+/>
+
+## Where you use this in the course
+
+| When | Product stage | What you do |
+|---|---|---|
+| **W2** | Understand and choose: assessing the prototype you took over | due diligence in three dimensions (technical, regulatory, business); the value proposition; options including doing nothing; three-point estimates |
+| **W3** | From intended purpose to requirements | the purpose and what it costs; requirements and priorities; a throwaway prototype to test a need |
+| **W4** | Building and checking | a bounded engineering contribution: a change, its evidence, its cost |
+| **W5** | Handover and the route to market | regulation if it is a medical device, data protection if it is not; running and maintenance costs |
+| **W6** | Business case | total cost of ownership, a pilot with success criteria agreed in advance; "no" as a valid result |
+
+:::tip[Do this in your project]
+Run `/ba-analyst` on your brief in Copilot. Then sort its output with the four bins above: mark what the agent may keep, what you must check, what only your client can answer, and what nobody owns yet. Put the "nobody yet" items at the top of your questions for the next client meeting.
+:::

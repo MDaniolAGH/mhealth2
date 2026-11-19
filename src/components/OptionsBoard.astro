@@ -1,0 +1,98 @@
+---
+/**
+ * An options board: realistic options for one client decision, with
+ * three-point estimates in team hours. Switching on a hard limit strikes out
+ * every option that breaks it, and says why.
+ */
+interface Limit {
+	key: string;
+	label: string;
+}
+interface Option {
+	name: string;
+	what: string;
+	o: number;
+	m: number;
+	p: number;
+	duties: string;
+	risk: string;
+	breaks?: { limit: string; why: string }[];
+	budget?: boolean; // checked against the budget limit by its estimate
+}
+interface Props {
+	need: string;
+	limits: Limit[];
+	budgetKey?: string;
+	budget?: number;
+	options: Option[];
+}
+const { need, limits, budgetKey, budget, options } = Astro.props;
+const e = (o: Option) => Math.round(((o.o + 4 * o.m + o.p) / 6) * 10) / 10;
+---
+
+<div class="biz-widget optboard not-content" data-budget-key={budgetKey} data-budget={budget}>
+	<p class="biz-kicker">Options board</p>
+	<p class="biz-title" set:html={need} />
+	<div class="optboard__limits" role="group" aria-label="Hard limits">
+		<span class="sdlc-legend__hint">Hard limits from the client:</span>
+		{limits.map((l) => <label><input type="checkbox" data-limit={l.key} /> <span set:html={l.label} /></label>)}
+	</div>
+	<div class="optboard__grid">
+		{
+			options.map((o) => (
+				<article class="optboard__opt" data-e={e(o)} data-breaks={(o.breaks ?? []).map((b) => b.limit).join(' ')}>
+					<header>
+						<b set:html={o.name} />
+						<span class="optboard__e" title="Three-point estimate in team hours">
+							≈ {e(o)} h
+						</span>
+					</header>
+					<p set:html={o.what} />
+					<dl>
+						<dt>O / M / P</dt>
+						<dd>{o.o} / {o.m} / {o.p} h</dd>
+						<dt>Stays with the client</dt>
+						<dd set:html={o.duties} />
+						<dt>Main risk</dt>
+						<dd set:html={o.risk} />
+					</dl>
+					<ul class="optboard__why">
+						{(o.breaks ?? []).map((b) => (
+							<li data-limit={b.limit} set:html={b.why} />
+						))}
+						{budgetKey && <li data-limit={budgetKey}>Expected effort ({e(o)} h) is over the budget.</li>}
+					</ul>
+				</article>
+			))
+		}
+	</div>
+	<p class="optboard__out" aria-live="polite"></p>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.optboard').forEach((board) => {
+		const opts = Array.from(board.querySelectorAll<HTMLElement>('.optboard__opt'));
+		const boxes = Array.from(board.querySelectorAll<HTMLInputElement>('input[data-limit]'));
+		const out = board.querySelector<HTMLElement>('.optboard__out')!;
+		const budgetKey = board.dataset.budgetKey;
+		const budget = Number(board.dataset.budget);
+		const render = () => {
+			const on = boxes.filter((b) => b.checked).map((b) => b.dataset.limit!);
+			let alive = 0;
+			opts.forEach((o) => {
+				const broken = new Set((o.dataset.breaks ?? '').split(' ').filter((k) => on.includes(k)));
+				if (budgetKey && on.includes(budgetKey) && Number(o.dataset.e) > budget) broken.add(budgetKey);
+				o.classList.toggle('is-out', broken.size > 0);
+				o.querySelectorAll<HTMLElement>('.optboard__why li').forEach((li) => (li.hidden = !broken.has(li.dataset.limit!)));
+				if (!broken.size) alive++;
+			});
+			out.innerHTML = !on.length
+				? 'Switch on the client\'s hard limits. An option that breaks one is out, however cheap it is.'
+				: alive === 0
+					? '<b>No option survives.</b> Tell the client which limit to relax, or recommend doing nothing for now. "No" is a valid result.'
+					: `<b>${alive} of ${opts.length} options survive.</b> Compare those on the client's other criteria, not on cost alone.`;
+		};
+		boxes.forEach((b) => b.addEventListener('change', render));
+		render();
+	});
+</script>

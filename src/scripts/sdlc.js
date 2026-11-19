@@ -872,7 +872,7 @@
         msg = "<b>It does not fit.</b> The harness will have to drop or summarise something, and you do not control what. The facts that matter may be the ones that go.";
         colour = fail;
       } else if (missing.length) {
-        msg = "<b>Missing facts:</b> " + missing.join(", ") + ". The agent will not stop; it will fill these gaps with plausible guesses (the 90/10 rule).";
+        msg = "<b>Missing facts:</b> " + missing.join(", ") + ". The agent will not stop; it will fill these gaps with plausible guesses.";
         colour = warn;
       } else if (focus < 0.5) {
         msg = "<b>Complete, but mostly noise.</b> Every fact is there, buried in " + k(total - relevant) + " tokens of unrelated text, paid for again on every step of the loop.";

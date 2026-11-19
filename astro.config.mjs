@@ -13,7 +13,7 @@ export default defineConfig({
 		starlight({
 			title: 'AI SDLC: From Idea to Merge',
 			description:
-				'How to build software with coding agents: one feature of the Mood Tracker, from a sketch to a merged pull request.',
+				'How to build software with coding agents, from a client\'s brief to a merged pull request: one feature of the Mood Tracker, step by step.',
 			logo: { src: './src/assets/logo.svg', alt: '' },
 			favicon: '/favicon.svg',
 			social: [
@@ -21,7 +21,7 @@ export default defineConfig({
 			],
 			editLink: { baseUrl: 'https://github.com/MDaniolAGH/mhealth2/edit/main/' },
 			lastUpdated: true,
-			customCss: ['./src/styles/theme.css', './src/styles/sdlc.css', './src/styles/learn.css'],
+			customCss: ['./src/styles/theme.css', './src/styles/sdlc.css', './src/styles/learn.css', './src/styles/biz.css'],
 			sidebar: [
 				{ label: 'Start here', link: '/' },
 				{
@@ -42,9 +42,22 @@ export default defineConfig({
 						},
 						{ label: '6. Auditability', slug: 'ai-sdlc/auditability' },
 						{ label: '7. Templates', slug: 'ai-sdlc/templates' },
-						{ label: 'Sources', slug: 'ai-sdlc/sources' },
 					],
 				},
+				{
+					label: 'Product development with agents',
+					items: [
+						{ label: 'From brief to backlog', slug: 'product/overview' },
+						{ label: '1. Decision, facts, people', slug: 'product/decision-and-facts' },
+						{ label: '2. Intended purpose', slug: 'product/purpose' },
+						{ label: '3. Questions and observations', slug: 'product/questions-and-observation' },
+						{ label: '4. User stories', slug: 'product/user-stories' },
+						{ label: '5. Testable, ranked, split', slug: 'product/testable-stories' },
+						{ label: '6. Options and recommendation', slug: 'product/options-and-recommendation' },
+					],
+				},
+				{ label: 'Glossary', slug: 'glossary' },
+				{ label: 'Sources', slug: 'ai-sdlc/sources' },
 			],
 		}),
 	],

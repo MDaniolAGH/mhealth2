@@ -1,0 +1,92 @@
+---
+/**
+ * "Find every problem": the reader ticks the statements they think are true,
+ * then checks. Each option is marked found / missed / false alarm, with why.
+ * The slot (for example a corrected version) is shown after checking.
+ */
+interface Option {
+	text: string;
+	correct: boolean;
+	why: string;
+}
+interface Props {
+	title: string;
+	intro?: string;
+	options: Option[];
+}
+const { title, intro, options } = Astro.props;
+---
+
+<div class="biz-widget multicheck not-content">
+	<p class="biz-kicker">Find every problem</p>
+	<p class="biz-title" set:html={title} />
+	{intro && <div class="biz-intro"><Fragment set:html={intro} /></div>}
+	<ul class="multicheck__options">
+		{
+			options.map((o) => (
+				<li class="multicheck__opt" data-correct={o.correct ? '1' : '0'}>
+					<label>
+						<input type="checkbox" />
+						<span set:html={o.text} />
+					</label>
+					<p class="multicheck__why">
+						<b class="multicheck__tag" /> <Fragment set:html={o.why} />
+					</p>
+				</li>
+			))
+		}
+	</ul>
+	<div class="multicheck__bar">
+		<button type="button" class="sdlc-btn sdlc-btn--primary" data-mc="check">Check my answer</button>
+		<button type="button" class="sdlc-btn" data-mc="reset" hidden>Try again</button>
+		<span class="multicheck__score" aria-live="polite"></span>
+	</div>
+	<div class="multicheck__after" hidden>
+		<slot />
+	</div>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.multicheck').forEach((box) => {
+		box.classList.add('is-js');
+		const opts = Array.from(box.querySelectorAll<HTMLElement>('.multicheck__opt'));
+		const check = box.querySelector<HTMLButtonElement>('[data-mc="check"]')!;
+		const reset = box.querySelector<HTMLButtonElement>('[data-mc="reset"]')!;
+		const score = box.querySelector<HTMLElement>('.multicheck__score')!;
+		const after = box.querySelector<HTMLElement>('.multicheck__after')!;
+		check.addEventListener('click', () => {
+			let found = 0, missed = 0, alarms = 0;
+			opts.forEach((o) => {
+				const ticked = o.querySelector('input')!.checked;
+				const correct = o.dataset.correct === '1';
+				const state = correct ? (ticked ? 'found' : 'missed') : ticked ? 'alarm' : 'ok';
+				o.dataset.state = state;
+				o.querySelector<HTMLElement>('.multicheck__tag')!.textContent =
+					{ found: '✓ Found.', missed: '! Missed.', alarm: '✗ Not a problem.', ok: 'Not a problem.' }[state];
+				if (state === 'found') found++;
+				if (state === 'missed') missed++;
+				if (state === 'alarm') alarms++;
+				o.querySelector('input')!.disabled = true;
+			});
+			const total = found + missed;
+			score.textContent = `Found ${found} of ${total} problems` + (alarms ? `, ${alarms} false alarm${alarms > 1 ? 's' : ''}.` : '.');
+			box.classList.add('is-checked');
+			after.hidden = false;
+			check.hidden = true;
+			reset.hidden = false;
+		});
+		reset.addEventListener('click', () => {
+			opts.forEach((o) => {
+				delete o.dataset.state;
+				const input = o.querySelector('input')!;
+				input.checked = false;
+				input.disabled = false;
+			});
+			box.classList.remove('is-checked');
+			score.textContent = '';
+			after.hidden = true;
+			check.hidden = false;
+			reset.hidden = true;
+		});
+	});
+</script>

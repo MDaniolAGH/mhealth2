@@ -18,7 +18,9 @@ import Predict from '../../../components/Predict.astro';
 
 <StageFacts tone="agent" who={'<span class="sdlc-chip is-agent">Agent</span> inside its harness'} input="The approved plan, <code>NOTES.md</code>, <code>AGENTS.md</code>" output="Small, reviewable changes on a branch, each with a commit message that says why" />
 
-The agent works on a **branch** (here `feat/about-screen`), never directly on `main`. It implements the plan and follows the standards, the architecture and the interfaces the plan fixed. It runs the checks after every change (stage 6) and loops until they pass. In W4 you ran several agents in parallel, each in its own worktree: a branch per attempt keeps them apart.
+The agent works on a **branch** (here `feat/about-screen`), never directly on `main`. It implements the plan and follows the standards, the architecture and the interfaces the plan fixed. It runs the checks after every change (stage 6) and loops until they pass. In W4 you ran several agents in parallel, each in its own **worktree** (a second working folder of the same repository, on its own branch), so that two agents never edit the same files.
+
+You can also hand a whole issue to the **Copilot cloud agent**: it works in a sandbox on GitHub and opens a pull request. Nothing about the pipeline changes. The issue must carry the criteria, the pull request goes through the same gate, and you review it as you would review a colleague's.
 
 Each change ends in a **commit**, and the commit message is part of the record. Besides *what* changed, a good message says *why*, how it was *verified*, and how it was *made*. This is the course's format (`docs/commits.md`):
 
@@ -36,7 +38,7 @@ ADR: ADR-0003
 AI-assisted: GitHub Copilot (agent) / <model>
 Decision: <accepted|revised>
 Time: <minutes> min
-Cost: <premium requests|unknown>
+Cost: <AI credits|unknown>
 ```
 
 The `Key: value` lines at the end are **Git trailers**. Git and other tools can read them, so `git log --grep="GOAL-1"` lists every commit for the goal, and the AI lines feed your pair's agent log. The agent never fills in *Decision*, *Time* or *Cost*: those are yours.
@@ -67,7 +69,7 @@ A **quality gate** is a set of automatic checks that every change must pass befo
 | 2 | **Is it written the way we write code?** | Consistent code is cheaper to read, and style stops being a review topic | lint rules, formatting | `flutter_lints`, `dart format` |
 | 3 | **Does it respect the architecture?** | Layers erode one "small exception" at a time, and agents copy whatever pattern they see | dependency rules | `lint-imports` (server); a test for the app (below) |
 | 4 | **Is it safe to share?** | A key or password in Git history is public as soon as the repository is | secret scan | git-secrets, gitleaks |
-| 5 | **Can we trust what it depends on?** | Every package is code you did not write and did not review: a SOUP item | vulnerability scan, register check | OSV-Scanner; `tests/test_soup_register.py` |
+| 5 | **Can we trust what it depends on?** | Every package is code you did not write or review: a SOUP item that must be recorded and watched | vulnerability scan, register check | OSV-Scanner; `tests/test_soup_register.py` |
 | 6 | **Does the UI still look as approved?** | Small visual changes slip past a code review | screenshot comparison | golden tests (`matchesGoldenFile`) |
 
 Two questions are deliberately **not** in the gate: *does it do what we asked?* is answered by tests against the criteria (stage 7), and *is it the right thing to build?* only by people (stages 7 and 10).
@@ -75,12 +77,11 @@ Two questions are deliberately **not** in the gate: *does it do what we asked?* 
 ### What makes a check a gate
 
 - **Deterministic.** The same input always gets the same verdict. A language model offers no such promise, and that is exactly why the gate exists.
-- **Automatic and fast.** The agent runs it after every change. Seconds, not minutes, so it can run often.
-- **Binary and binding.** Pass or fail, never "mostly". CI blocks the merge on a failure, and nobody, human or agent, can talk it round.
+- **Binding, with evidence.** Pass or fail, never "mostly". Once the check is marked as **required** in the repository's branch protection rules, a failure blocks the merge and nobody, human or agent, can argue with it. Each run leaves a log of which tool, in which version, said what about which commit.
 - **Fail-closed.** If a check cannot run (the tool is missing, it crashed), that counts as a failure, not a pass.
-- **Independent of the author.** The agent's opinion of its own code is not evidence. The gate's verdict is.
-- **Leaves evidence.** A log of which tool, in which version, said what about which commit. That is part of the audit trail.
 - **A ratchet.** Rules only get stricter. Never weaken a rule, edit `.importlinter` or delete a test to make a change pass; `AGENTS.md` forbids it, and the diff shows it.
+
+The gate is also **independent of the author**: the agent's opinion of its own code is not evidence; the gate's verdict is.
 
 ### Layers of defence
 
@@ -112,7 +113,10 @@ The earlier a check runs, the cheaper the fix. The same checks run in three plac
 |---|---|---|---|
 | **The agent's loop** | after every edit (`AGENTS.md` says so) | the agent, which fixes it | seconds |
 | **A pre-commit hook** | before each commit | you, before it enters history | a minute |
-| **CI on the pull request** | before merging; cannot be skipped | everyone; the merge is blocked | a round trip |
+| **CI on the pull request** | before merging; cannot be skipped once required | everyone; the merge is blocked | a round trip |
+
+<details>
+<summary><b>Set it up in your repository</b>: the commands, a CI workflow and an architecture rule</summary>
 
 <Tabs>
 <TabItem label="Run it locally">
@@ -145,11 +149,11 @@ jobs:
       run:
         working-directory: mood_tracker
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-          flutter-version: 3.35.x
+          flutter-version: 3.35.x   # the handover's pinned version
       - run: flutter pub get
       - run: dart format --output=none --set-exit-if-changed .
       - run: flutter analyze
@@ -160,8 +164,8 @@ jobs:
       run:
         working-directory: mood-tracker-api
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - run: pip install -r requirements.txt -r requirements-dev.txt
@@ -169,7 +173,7 @@ jobs:
       - run: python -m pytest -q
 ```
 
-Golden images recorded on macOS may differ by a few pixels on Linux (see `NOTES.md`). Decide on purpose where the golden tests run; never regenerate them to make CI pass.
+Golden images recorded on macOS may differ by a few pixels on Linux (see `NOTES.md`). Decide on purpose where the golden tests run; never regenerate them to make CI pass. In the repository settings, mark both jobs as **required** checks, or a failure only shows a red cross.
 
 </TabItem>
 <TabItem label="An architecture rule">
@@ -208,25 +212,44 @@ The handover's `AGENTS.md` lists this rule as "not checked by a test yet". With 
 </TabItem>
 </Tabs>
 
+</details>
+
 <Quiz
 	question="The quality gate passes: <code>flutter analyze</code> reports no issues and the formatter is happy. What do you know?"
 	options={[
-		'The feature meets its acceptance criteria',
-		'The code is well-formed and consistent; whether it does what was asked still needs tests and a run',
-		'There are no security problems',
-		'The pull request can be merged',
+		'The feature meets all six of its acceptance criteria',
+		'The code is well-formed and consistent, and nothing more yet',
+		'There are no security problems left in the change',
+		'The pull request is ready to be merged right away',
 	]}
 	answer={1}
+	why={[
+		'The analyzer does not know your criteria. Only tests against them, and a run, show that.',
+		'',
+		'These two tools do not look for secrets or vulnerable packages; layers 4 and 5 do, and even they catch only what they know.',
+		'Merging needs the tests, the documentation and a person\'s review.',
+	]}
+	explain="The analyzer and the formatter answer questions 1 and 2 of the gate. The criteria need tests, security needs the scans, and merging needs a person."
 />
 
 <Quiz
-	question="An agent's change fails the architecture test. It proposes to add the file to an exceptions list in the test &quot;because this screen is special&quot;. What do you do?"
+	question="An agent's change fails the architecture test. It proposes to add the file to an exceptions list in the test, &quot;because this screen is special&quot;. What do you do?"
 	options={[
-		'Accept: the agent knows the code',
-		'Reject: the gate is a ratchet. Move the call into <code>lib/services/</code>, or, if the rule really is wrong, propose an ADR and change the rule on purpose',
-		'Delete the test, since it blocks progress',
-		'Merge now and fix it later',
+		'Accept it: the agent has read the code and knows the screen best',
+		'Delete the test for now, since it is blocking the team\'s progress',
+		'Merge the change today and open an issue to fix the test later',
+		'Reject it: move the call into <code>lib/services/</code>, or change the rule on purpose with an ADR',
 	]}
-	answer={1}
+	answer={3}
+	why={[
+		'The agent\'s opinion of its own change is not evidence. The rule exists for exactly this moment.',
+		'A deleted test protects nothing, and nobody remembers to bring it back.',
+		'"Later" rarely comes, and the next agent copies the exception.',
+		'',
+	]}
 	explain="A rule weakened to make one change pass stops protecting every later change. If a rule has to change, that is a decision with a record, not a side effect of a diff."
 />
+
+:::tip[Do this in your project]
+Add the quality-gate workflow to your repository, mark its jobs as required checks for `main`, and open a pull request that deliberately fails one of them. Put a screenshot of the blocked merge in your dossier, then close the pull request.
+:::

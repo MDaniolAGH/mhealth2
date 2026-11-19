@@ -1,0 +1,102 @@
+---
+title: '3. Questions and observations'
+description: Ask only questions whose answers change your recommendation, and report what the app really does, with evidence.
+---
+
+import StageFacts from '../../../components/StageFacts.astro';
+import Sorter from '../../../components/Sorter.astro';
+import Quiz from '../../../components/Quiz.astro';
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts and searches · <span class="sdlc-chip is-you">You</span> choose and reproduce'} input="The assumption log, the code, the running app with synthetic data" output="<code>docs/questions.md</code> (3–5 ranked questions), observations with evidence" />
+
+<span id="questions" class="stage-anchor"></span>
+
+## Questions that change the recommendation
+
+Client time is scarce. Ask only questions whose answers change what you will propose. For each one, write down what you would do with each possible answer: if no answer would change anything, do not ask it.
+
+```text title="docs/questions.md (illustrative)"
+1. Must the purpose be stated inside the app, or is the consent form enough
+   for the ethics committee?
+   Why: the main assumption behind the whole request.
+   If "in the app"  → an About screen (or the store text, if that counts).
+   If "the form"    → a printed sheet; no software change at all.
+
+2. Who answers participants' questions, and when?
+   Why: nobody owns it yet; the screen cannot show a contact that does not exist.
+   If a named person  → show the contact.
+   If nobody          → show no contact, and tell the client this is a risk.
+```
+
+A good question is **open, neutral and specific**. It does not suggest the answer ("Would a nice About screen help?") and it asks about the client's world, not about technology they may not know.
+
+<Sorter
+	title="Keep, rewrite or drop?"
+	intro="Questions for the study coordinator about the About-screen request."
+	bins={[
+		{ key: 'keep', label: 'Keep', tone: 'tool' },
+		{ key: 'rewrite', label: 'Rewrite', tone: 'audit' },
+		{ key: 'drop', label: 'Drop', tone: 'neutral' },
+	]}
+	items={[
+		{ text: 'Does the ethics committee need the purpose inside the app, or is the consent form enough?', bin: 'keep', why: 'Each answer leads to a different proposal, and one of them needs no software at all.' },
+		{ text: 'What colour should the About button be?', bin: 'drop', why: 'No answer changes the recommendation. Decide it later, in design, or let the existing theme decide.' },
+		{ text: 'Would a nice About screen help your participants?', bin: 'rewrite', why: 'It is leading: it suggests the solution and invites "yes". Ask instead: "How do participants find help today, and what goes wrong?"' },
+		{ text: 'Do participants install the app from a public store or from the clinic?', bin: 'keep', why: 'If from a store, the store text is an option, and a place where a medical claim can slip in.' },
+		{ text: 'Should we use Flutter\'s built-in licence page?', bin: 'drop', why: 'A technical question for your pair, not for the client. It does not change their decision.' },
+	]}
+/>
+
+:::note[Discovery synthesis with an agent]
+After interviews, an agent can cluster your notes into themes in minutes. Insist that **every theme cites a quote**, and check that each quote exists and says what the theme claims. Interview notes are personal data, often health data: use anonymised notes, keep them out of consumer AI tools, and in this course use synthetic material only.
+:::
+
+<span id="observation" class="stage-anchor"></span>
+
+## Observations from the app
+
+The prototype you took over is full of surprises. Report what it **does**, prove it, and say why it matters to this client. Keep three things apart:
+
+- **Observation**: what the app or the code does, with evidence (`file:line`, or steps that anyone can repeat with synthetic data).
+- **Interpretation**: what it might mean. Label the uncertain parts.
+- **Implication**: why the client should care.
+
+Do not start from "find the bug". The word *bug* is only right when the expected behaviour was agreed and the app contradicts it. An agent is good at the search; you reproduce what it found before it goes into your report.
+
+<Sorter
+	title="Observation, interpretation or implication?"
+	bins={[
+		{ key: 'obs', label: 'Observation', tone: 'agent' },
+		{ key: 'int', label: 'Interpretation', tone: 'audit' },
+		{ key: 'imp', label: 'Implication', tone: 'client' },
+	]}
+	items={[
+		{ text: 'No file in <code>lib/</code> contains an About or licence screen; the home screen\'s app bar has a single button (<code>home_screen.dart</code>, lines 30–39).', bin: 'obs', why: 'What the code contains, with a location anyone can check.' },
+		{ text: 'The previous team did not care about support.', bin: 'int', why: 'A guess about people, and an unfair one. Nothing in the code tells you why the screen is missing.' },
+		{ text: 'Today, support cannot tell which version a participant runs unless the participant finds it somewhere else.', bin: 'imp', why: 'Why the observation matters to this client. Check "somewhere else": the phone\'s app settings may show it.' },
+		{ text: 'The server reports version 1.0.0 in its API description at <code>/openapi.json</code>.', bin: 'obs', why: 'Reproducible: start the server and open the URL. <code>app/main.py</code> sets it.' },
+		{ text: 'The app version is probably the one in <code>pubspec.yaml</code>.', bin: 'int', why: 'Plausible, and worth checking: <code>pubspec.yaml</code> says <code>1.0.0+1</code>, but a build can override it. Until you have built and looked, it is an interpretation.' },
+	]}
+/>
+
+<Quiz
+	question="The agent reports: &quot;Bug: the app has no About screen, so it violates good practice.&quot; What is wrong with this observation?"
+	options={[
+		'Nothing: a missing About screen is a bug in any app',
+		'It calls a missing feature a bug, without an agreed expectation',
+		'It should have given the line number of the missing screen',
+		'It is too short to be useful in a report for the client',
+	]}
+	answer={1}
+	why={[
+		'Nobody agreed that the app must have one. Good practice is not a requirement.',
+		'',
+		'There is no line for something that does not exist; the evidence is the search itself.',
+		'Length is not the problem; the label is.',
+	]}
+	explain="Rewrite it: <em>Observation</em>: no About screen exists (evidence: the search). <em>Implication</em>: support cannot see the version. Whether that is a problem is the client's call."
+/>
+
+:::tip[Do this in your project]
+Run `/ba-questions` and keep only the questions that pass the "if A → X, if B → Y" test, at most five. Then pick your client's main concern and run `/ba-app-observation` on it. Reproduce the agent's evidence yourself before anything goes into your dossier.
+:::

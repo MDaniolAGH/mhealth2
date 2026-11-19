@@ -1,0 +1,107 @@
+---
+title: Glossary
+description: Short definitions of the terms used in this guide.
+---
+
+<dl class="glossary">
+
+<dt>Acceptance criterion</dt>
+<dd>A sentence that a test or a run can show true or false, for example AC-4. Often written as Given/When/Then.</dd>
+
+<dt>ADR (architecture decision record)</dt>
+<dd>A short document for one decision: its context, the decision and its consequences. Kept in <code>docs/adr/</code>.</dd>
+
+<dt>Agent</dt>
+<dd>A language model inside a harness, so that it can read files, run commands, see the results and try again.</dd>
+
+<dt>Agent skill</dt>
+<dd>A folder with a <code>SKILL.md</code> file of instructions that the agent loads only when a task needs it, such as the course's <code>ba-*</code> and <code>mh-*</code> skills.</dd>
+
+<dt><code>AGENTS.md</code></dt>
+<dd>A Markdown file in the root of a repository with the rules for coding agents. Their entry point into the project.</dd>
+
+<dt>AI Credits</dt>
+<dd>The unit GitHub Copilot bills in since June 2026, debited by the tokens each model processes.</dd>
+
+<dt>Assumption</dt>
+<dd>Something treated as true without confirmation. Useful only if it is specific enough to be wrong.</dd>
+
+<dt>CI (continuous integration)</dt>
+<dd>Checks that run automatically on every push or pull request, for example with GitHub Actions.</dd>
+
+<dt>Context window</dt>
+<dd>All the text a model can see at once for a task, measured in tokens.</dd>
+
+<dt>Deterministic</dt>
+<dd>Same input, same result, every time. Compilers and test runners are; language models are not.</dd>
+
+<dt>EARS</dt>
+<dd><em>Easy Approach to Requirements Syntax</em>: sentence patterns for requirements, such as "If [trigger], then [system] shall [response]".</dd>
+
+<dt>Golden test</dt>
+<dd>A test that compares a screenshot of a widget with an approved image file and fails if they differ.</dd>
+
+<dt>Harness</dt>
+<dd>The software around a model that gives it tools, a loop, instructions and rules: Copilot's agent mode, Claude Code, Mistral Vibe.</dd>
+
+<dt>Hook</dt>
+<dd>A script the harness runs before or after an agent's action; it can block the action whatever the model decides.</dd>
+
+<dt>Intended purpose</dt>
+<dd>What a product is for, as its maker states it. Under the EU MDR it decides whether software is a medical device.</dd>
+
+<dt>INVEST</dt>
+<dd>A check for user stories: Independent, Negotiable, Valuable, Estimable, Small, Testable.</dd>
+
+<dt>Lethal trifecta</dt>
+<dd>An agent session with private data, untrusted content and a way to send data out, all at once. Remove at least one.</dd>
+
+<dt>MCP (Model Context Protocol)</dt>
+<dd>An open protocol for connecting extra tools and data sources to a harness.</dd>
+
+<dt>MoSCoW</dt>
+<dd>Priorities decided by the client: Must, Should, Could, Won't (this time).</dd>
+
+<dt>Prompt injection</dt>
+<dd>Text in something the agent reads (an issue, a web page, a tool's output) that steers it like an instruction.</dd>
+
+<dt>Quality gate</dt>
+<dd>The automatic, deterministic checks every change must pass before it moves on (stage 6).</dd>
+
+<dt>Required check</dt>
+<dd>A CI check that branch protection makes mandatory: if it fails, the pull request cannot be merged.</dd>
+
+<dt>SOUP (software of unknown provenance)</dt>
+<dd>A term from IEC 62304: software you use but did not develop under your own process, such as a package from pub.dev. Each one is recorded, assessed and watched.</dd>
+
+<dt>Spec Kit</dt>
+<dd>GitHub's toolkit for spec-driven development: spec, plan, tasks, implementation.</dd>
+
+<dt>Sub-agent</dt>
+<dd>An agent started by another agent for one part of a task, with its own small, fresh context.</dd>
+
+<dt>Synthetic data</dt>
+<dd>Made-up data with the shape of real data. The only data used in this course.</dd>
+
+<dt>Synthetic user</dt>
+<dd>A user role-played by a language model. A source of hypotheses, never of evidence.</dd>
+
+<dt>Three-point estimate</dt>
+<dd>An estimate from an optimistic, a most likely and a pessimistic value: E = (O + 4M + P) / 6, given as a range.</dd>
+
+<dt>Token</dt>
+<dd>The unit a model reads and writes: a word or part of a word.</dd>
+
+<dt>Total cost of ownership</dt>
+<dd>One-off cost, plus running cost, plus the client's own time and duties, over the whole period of use.</dd>
+
+<dt>Trailer</dt>
+<dd>A <code>Key: value</code> line at the end of a commit message, such as <code>Refs: GOAL-1</code>, that Git and other tools can search.</dd>
+
+<dt>User story</dt>
+<dd>A need written from the point of view of the person who has it: "As a …, I want …, so that …".</dd>
+
+<dt>Worktree</dt>
+<dd>A second working folder of the same Git repository, on its own branch, so that two agents never edit the same files.</dd>
+
+</dl>
