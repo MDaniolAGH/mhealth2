@@ -9,6 +9,20 @@ export default defineConfig({
 	trailingSlash: 'always',
 	// Keep line breaks inside the widgets' code snippets.
 	compressHTML: false,
+	// Stable asset names (no content hash). GitHub Pages lets browsers cache
+	// HTML for 10 minutes; with hashed names, a page cached before a deploy
+	// asks for CSS/JS that the deploy deleted and renders as bare HTML.
+	vite: {
+		build: {
+			rollupOptions: {
+				output: {
+					assetFileNames: '_astro/[name][extname]',
+					entryFileNames: '_astro/[name].js',
+					chunkFileNames: '_astro/[name].js',
+				},
+			},
+		},
+	},
 	integrations: [
 		starlight({
 			title: {
