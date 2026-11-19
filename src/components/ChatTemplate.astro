@@ -1,0 +1,242 @@
+---
+/**
+ * §4 "What the model really sees": the chat as the app shows it, next to the
+ * one document the model actually reads (system prompt, special tokens,
+ * real o200k_base token IDs). Generate a reply and watch it being appended
+ * to that document, token by token, until <|im_end|>. Switch the template
+ * off to see the base-model habit: it just continues the text.
+ * English and Polish.
+ */
+import { langOf } from '../i18n/ui';
+const lang = langOf(Astro);
+
+const copy = {
+	en: {
+		kicker: 'What the model really sees',
+		you: 'What you see', model: 'What the model reads',
+		hidden: 'The app’s system prompt is hidden from you.',
+		msg: 'Your message', presets: 'Try:',
+		gen: '▶ Generate the reply', again: '↺ Reset',
+		template: 'Chat template', templateOn: 'Assistant: with chat template', templateOff: 'Base model: no template',
+		ids: 'Show token IDs',
+		count: 'Your message: <b>{a}</b> tokens · the model reads: <b>{b}</b> tokens',
+		loading: 'Loading the tokenizer…',
+		stop: '<code>&lt;|im_end|&gt;</code>: the app stops reading here and shows the bubble.',
+		nostop: 'No end marker: a base model would keep going until a length limit.',
+		system: 'You are a helpful assistant. Answer briefly. Today is {date}.',
+		moralOn: 'There is no chat inside the model. The app turns the conversation into <b>one document</b> with special tokens, and the model continues it. The reply is just the most likely continuation after <code>assistant</code>, in the style it learned from example conversations in fine-tuning.',
+		moralOff: 'Without the template, the same text is just the start of a document. The model does what pre-training taught it: <b>continue the document</b>. It does not answer, because nothing tells it that a reply is expected.',
+		note: 'Token IDs: GPT-4o’s o200k_base vocabulary. Special tokens follow the chat format used by the open-source gpt-tokenizer library; the exact formats of hosted models are not fully public. Replies are illustrative.',
+		items: [
+			{ user: 'What is the best way to track mood after surgery?', reply: 'A short daily self-report works well: one score and an optional note, at the same time each day. Your care team can tell you what to record.', base: '\nWhat is the best way to track pain after surgery?\nWhat is the best way to track sleep after surgery?\nAsked 3 years ago, 12 answers' },
+			{ user: 'Write a haiku about unit tests.', reply: 'Green bars at midnight /\nthe code I feared to refactor /\nnow sleeps without dreams.', base: '\n\nWrite a haiku about integration tests.\nWrite a haiku about code review.\n\nPosted in a writing prompts forum' },
+			{ user: 'Hi!', reply: 'Hi! How can I help you today?', base: ' I’m new here and I have a question about my Flutter app. When I run flutter test I get' },
+		],
+		custom: { reply: 'Good question. Here is what I would suggest, step by step:', base: '\n\nI have the same question. Did anyone find an answer?' },
+	},
+	pl: {
+		kicker: 'Co naprawdę widzi model',
+		you: 'Co widzisz ty', model: 'Co czyta model',
+		hidden: 'System prompt aplikacji jest przed tobą ukryty.',
+		msg: 'Twoja wiadomość', presets: 'Spróbuj:',
+		gen: '▶ Wygeneruj odpowiedź', again: '↺ Od nowa',
+		template: 'Chat template', templateOn: 'Asystent: z chat template', templateOff: 'Model bazowy: bez szablonu',
+		ids: 'Pokaż ID tokenów',
+		count: 'Twoja wiadomość: <b>{a}</b> tokenów · model czyta: <b>{b}</b> tokenów',
+		loading: 'Ładuję tokenizer…',
+		stop: '<code>&lt;|im_end|&gt;</code>: tu aplikacja przestaje czytać i pokazuje dymek.',
+		nostop: 'Brak znacznika końca: model bazowy pisałby dalej, aż do limitu długości.',
+		system: 'You are a helpful assistant. Answer briefly. Today is {date}.',
+		moralOn: 'W modelu nie ma żadnego czatu. Aplikacja zamienia rozmowę w <b>jeden dokument</b> ze specjalnymi tokenami, a model go kontynuuje. Odpowiedź to po prostu najbardziej prawdopodobny ciąg dalszy po <code>assistant</code>, w stylu wyuczonym z przykładowych rozmów podczas fine-tuningu.',
+		moralOff: 'Bez szablonu ten sam tekst to zwykły początek dokumentu. Model robi to, czego nauczył go pre-training: <b>kontynuuje dokument</b>. Nie odpowiada, bo nic mu nie mówi, że oczekuje się odpowiedzi.',
+		note: 'ID tokenów: słownik o200k_base modelu GPT-4o. Specjalne tokeny według formatu czatu z otwartej biblioteki gpt-tokenizer; dokładne formaty modeli w chmurze nie są w pełni publiczne. Odpowiedzi są przykładowe.',
+		items: [
+			{ user: 'Jak najlepiej śledzić nastrój po operacji?', reply: 'Dobrze sprawdza się krótki codzienny wpis: jedna ocena i opcjonalna notatka, o tej samej porze. Zespół leczący powie ci, co warto zapisywać.', base: '\nJak najlepiej śledzić ból po operacji?\nJak najlepiej śledzić sen po operacji?\nPytanie sprzed 3 lat, 12 odpowiedzi' },
+			{ user: 'Napisz haiku o testach jednostkowych.', reply: 'Zielone paski /\nkod, którego się bałem, /\nśpi dziś spokojnie.', base: '\n\nNapisz haiku o testach integracyjnych.\nNapisz haiku o code review.\n\nWątek na forum o pisaniu' },
+			{ user: 'Cześć!', reply: 'Cześć! W czym mogę pomóc?', base: ' Jestem tu nowy i mam pytanie o moją aplikację we Flutterze. Kiedy uruchamiam flutter test, dostaję' },
+		],
+		custom: { reply: 'Dobre pytanie. Oto co proponuję, krok po kroku:', base: '\n\nMam to samo pytanie. Ktoś znalazł odpowiedź?' },
+	},
+}[lang];
+---
+
+<div class="biz-widget chatt not-content" data-copy={JSON.stringify(copy)}>
+	<div class="biz-head">
+		<p class="biz-kicker">{copy.kicker}</p>
+		<div class="llmflow__mode" role="group" aria-label={copy.template}>
+			<button type="button" class="llmflow__mode-btn is-on" data-tpl="on">{copy.templateOn}</button>
+			<button type="button" class="llmflow__mode-btn" data-tpl="off">{copy.templateOff}</button>
+		</div>
+	</div>
+	<div class="chatt__input">
+		<label>
+			<span>{copy.msg}</span>
+			<input type="text" value={copy.items[0].user} maxlength="160" />
+		</label>
+		<div class="chatt__presets">
+			<span class="sdlc-legend__hint">{copy.presets}</span>
+			{copy.items.map((it, k) => <button type="button" class="chatt__preset" data-i={k}>{it.user}</button>)}
+		</div>
+	</div>
+	<div class="chatt__grid">
+		<div class="chatt__pane chatt__app">
+			<p class="chatt__label">📱 {copy.you}</p>
+			<p class="chatt__hidden">🔒 {copy.hidden}</p>
+			<div class="chatt__bubbles"></div>
+		</div>
+		<div class="chatt__pane chatt__doc">
+			<p class="chatt__label">🧠 {copy.model} <label class="chatt__ids"><input type="checkbox" /> {copy.ids}</label></p>
+			<div class="chatt__tokens" aria-live="polite"><span class="chatt__loading">{copy.loading}</span></div>
+			<p class="chatt__end"></p>
+		</div>
+	</div>
+	<div class="chatt__bar">
+		<button type="button" class="sdlc-btn sdlc-btn--primary" data-act="gen">{copy.gen}</button>
+		<button type="button" class="sdlc-btn" data-act="reset">{copy.again}</button>
+		<span class="chatt__count"></span>
+	</div>
+	<p class="chatt__moral"></p>
+	<p class="chatt__note">{copy.note}</p>
+</div>
+
+<script>
+	type Enc = { encode: (s: string) => number[]; decode: (t: number[]) => string };
+	const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+	let encP: Promise<Enc> | null = null;
+	const loadEnc = () => (encP ??= import('gpt-tokenizer/encoding/o200k_base') as Promise<Enc>);
+
+	document.querySelectorAll<HTMLElement>('.chatt').forEach((box) => {
+		const C = JSON.parse(box.dataset.copy || '{}');
+		const input = box.querySelector<HTMLInputElement>('.chatt__input input')!;
+		const bubbles = box.querySelector<HTMLElement>('.chatt__bubbles')!;
+		const toks = box.querySelector<HTMLElement>('.chatt__tokens')!;
+		const end = box.querySelector<HTMLElement>('.chatt__end')!;
+		const count = box.querySelector<HTMLElement>('.chatt__count')!;
+		const moral = box.querySelector<HTMLElement>('.chatt__moral')!;
+		const ids = box.querySelector<HTMLInputElement>('.chatt__ids input')!;
+		const genBtn = box.querySelector<HTMLButtonElement>('[data-act="gen"]')!;
+		const date = new Date().toISOString().slice(0, 10);
+		const system = String(C.system).replace('{date}', date);
+		let tpl = true;
+		let enc: Enc | null = null;
+		let run = 0;
+
+		const show = (t: string) => t.replace(/ /g, '·').replace(/\n/g, '⏎');
+		const chip = (text: string, id: number | null, cls = '') => {
+			const s = document.createElement('span');
+			s.className = 'chatt__tok ' + cls;
+			s.innerHTML = '<span></span><small></small>';
+			s.firstElementChild!.textContent = show(text);
+			s.lastElementChild!.textContent = id === null ? '' : String(id);
+			return s;
+		};
+		const special = (name: string) => chip(`<|${name}|>`, null, 'is-special');
+		const addText = (text: string, cls = '') => {
+			const out: HTMLElement[] = [];
+			enc!.encode(text).forEach((id) => {
+				const c = chip(enc!.decode([id]), id, cls);
+				toks.appendChild(c);
+				out.push(c);
+			});
+			return out.length;
+		};
+		const turn = (role: string, content: string, cls: string) => {
+			toks.appendChild(special('im_start'));
+			addText(role, 'is-role');
+			toks.appendChild(special('im_sep'));
+			addText(content, cls);
+			toks.appendChild(special('im_end'));
+		};
+		const reply = () => {
+			const k = C.items.findIndex((it: any) => it.user === input.value.trim());
+			const src = k >= 0 ? C.items[k] : C.custom;
+			return tpl ? src.reply : src.base;
+		};
+		const bubble = (cls: string, text: string) => {
+			const b = document.createElement('p');
+			b.className = 'chatt__bubble ' + cls;
+			b.textContent = text;
+			bubbles.appendChild(b);
+			return b;
+		};
+		const build = () => {
+			if (!enc) return;
+			run++;
+			toks.textContent = '';
+			bubbles.textContent = '';
+			end.innerHTML = '';
+			const msg = input.value.trim() || '…';
+			let userCount = enc.encode(msg).length;
+			if (tpl) {
+				turn('system', system, 'is-system');
+				turn('user', msg, 'is-user');
+				toks.appendChild(special('im_start'));
+				addText('assistant', 'is-role');
+				toks.appendChild(special('im_sep'));
+			} else {
+				addText(msg, 'is-user');
+			}
+			const cursor = document.createElement('span');
+			cursor.className = 'chatt__cursor';
+			toks.appendChild(cursor);
+			bubble('is-user', msg);
+			const total = toks.querySelectorAll('.chatt__tok').length;
+			count.innerHTML = String(C.count).replace('{a}', String(userCount)).replace('{b}', String(total));
+			moral.innerHTML = tpl ? C.moralOn : C.moralOff;
+			box.classList.toggle('is-base', !tpl);
+			genBtn.disabled = false;
+		};
+		const generate = () => {
+			if (!enc) return;
+			build();
+			genBtn.disabled = true;
+			const my = run;
+			const text = reply();
+			const ts = enc.encode(text);
+			const cursor = toks.querySelector('.chatt__cursor')!;
+			const b = bubble('is-bot' + (tpl ? '' : ' is-base'), '');
+			let i = 0;
+			const step = () => {
+				if (my !== run) return;
+				if (i < ts.length) {
+					const piece = enc!.decode([ts[i]]);
+					toks.insertBefore(chip(piece, ts[i], 'is-gen is-new'), cursor);
+					b.textContent += piece;
+					i++;
+					reduce ? step() : setTimeout(step, 70);
+					return;
+				}
+				if (tpl) {
+					toks.insertBefore(special('im_end'), cursor);
+					end.innerHTML = C.stop;
+				} else end.innerHTML = C.nostop;
+				cursor.remove();
+				const total = toks.querySelectorAll('.chatt__tok').length;
+				count.innerHTML = String(C.count).replace('{a}', String(enc!.encode(input.value.trim()).length)).replace('{b}', String(total));
+			};
+			step();
+		};
+
+		ids.addEventListener('change', () => box.classList.toggle('show-ids', ids.checked));
+		input.addEventListener('input', build);
+		box.querySelectorAll<HTMLButtonElement>('.chatt__preset').forEach((b) =>
+			b.addEventListener('click', () => { input.value = C.items[Number(b.dataset.i)].user; build(); }),
+		);
+		box.querySelectorAll<HTMLButtonElement>('[data-tpl]').forEach((b) =>
+			b.addEventListener('click', () => {
+				tpl = b.dataset.tpl === 'on';
+				box.querySelectorAll('[data-tpl]').forEach((x) => x.classList.toggle('is-on', x === b));
+				build();
+			}),
+		);
+		genBtn.addEventListener('click', generate);
+		box.querySelector('[data-act="reset"]')!.addEventListener('click', build);
+
+		const io = new IntersectionObserver((es) => {
+			if (!es.some((e) => e.isIntersecting)) return;
+			io.disconnect();
+			loadEnc().then((e) => { enc = e; build(); });
+		}, { rootMargin: '400px' });
+		io.observe(box);
+	});
+</script>

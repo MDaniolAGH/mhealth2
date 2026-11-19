@@ -13,9 +13,9 @@ import Predict from '../../../../components/Predict.astro';
 import Tldr from '../../../../components/Tldr.astro';
 import AtWork from '../../../../components/AtWork.astro';
 import Done from '../../../../components/Done.astro';
-import StageMorph from '../../../../components/StageMorph.astro';
+import ChatTemplate from '../../../../components/ChatTemplate.astro';
 import MemoryDesk from '../../../../components/MemoryDesk.astro';
-import CheeseMap from '../../../../components/CheeseMap.astro';
+import SourceCheck from '../../../../components/SourceCheck.astro';
 import GuessMeter from '../../../../components/GuessMeter.astro';
 import LlmFlow from '../../../../components/LlmFlow.astro';
 
@@ -95,8 +95,6 @@ Przykład jest celowo po angielsku: tak wyglądają prompt i kandydaci na nastę
 
 Model trenowany tylko na tekstach z sieci to **model bazowy**: Karpathy nazywa go symulatorem dokumentów z internetu. Daj mu początek strony, a on dopisze resztę. Nie odpowiada na pytania – pisze to, co zwykle pojawia się dalej.
 
-<StageMorph />
-
 Asystent powstaje dzięki dalszemu treningowi, w kilku etapach. Karpathy porównuje to do szkolnego podręcznika:
 
 <Picker
@@ -123,6 +121,10 @@ Asystent powstaje dzięki dalszemu treningowi, w kilku etapach. Karpathy porówn
 	]}
 />
 
+Czy asystent to więc inny rodzaj modelu? Nie. To nadal model, który dopisuje ciąg dalszy dokumentu. Aplikacja czatu zamienia rozmowę w jeden dokument ze specjalnymi tokenami, a fine-tuning nauczył model, jak takie dokumenty się kończą. Wpisz wiadomość, wygeneruj odpowiedź i zobacz, gdzie trafia. Potem przełącz na model bazowy.
+
+<ChatTemplate />
+
 ## 5. Dwa rodzaje pamięci
 
 <Predict id="memory" question="Pytasz model o szczegół kodu Mood Trackera. Kiedy łatwiej o trafną odpowiedź: gdy model opiera się na tym, czego nauczył się w treningu, czy gdy plik jest w jego kontekście?">
@@ -138,7 +140,7 @@ Gdy plik jest w **kontekście**. Rozróżnienie Karpathy'ego: wiedza w parametra
 | Aktualne? | zamrożone w chwili końca treningu | tak aktualne jak to, co do niego wrzucisz |
 | Twoja kontrola | żadna | pełna: na tym polega context engineering |
 
-Spróbuj: zadaj poniższe pytania przy pustym biurku, a potem połóż na nim właściwy dokument. Zapełnij biurko dużymi rzeczami i zobacz, co spada: pełne context window też coś gubi.
+Spróbuj: wybierz pytanie i zobacz odpowiedź przy pustym biurku. Potem połóż plik na biurku, przeczytaj, co w nim jest, i zobacz, z której linii korzysta teraz odpowiedź. Dołóż duże rzeczy i zobacz, co spada: pełne context window też coś gubi.
 
 <MemoryDesk />
 
@@ -154,7 +156,9 @@ Umiejętności modeli są też nierówne. Karpathy porównuje je do **Swiss chee
 - **9.11 czy 9.9?** Niektóre modele twierdziły, że 9.11 jest większe – możliwe, że dlatego, że w wielu tekstach, na przykład w numeracji wersetów Biblii albo w numerach wersji, 9.11 występuje po 9.9.
 - **Model potrzebuje tokenów, żeby myśleć.** Na każdy token przypada stała porcja obliczeń. Odpowiedź ściśnięta w jeden token to bardzo mało „myślenia”. Praca krok po kroku, w wielu tokenach albo z pomocą narzędzia, jest dużo pewniejsza.
 
-<CheeseMap />
+Tak to wygląda w praktyce. Model napisał krótki opis Mood Trackera. Każde zdanie brzmi równie pewnie, ale pochodzą z trzech różnych miejsc. Rozpoznasz z których?
+
+<SourceCheck />
 
 <Sorter
 	title="Wystarczy sam model czy potrzeba narzędzia albo sprawdzenia?"

@@ -13,9 +13,9 @@ import Predict from '../../../components/Predict.astro';
 import Tldr from '../../../components/Tldr.astro';
 import AtWork from '../../../components/AtWork.astro';
 import Done from '../../../components/Done.astro';
-import StageMorph from '../../../components/StageMorph.astro';
+import ChatTemplate from '../../../components/ChatTemplate.astro';
 import MemoryDesk from '../../../components/MemoryDesk.astro';
-import CheeseMap from '../../../components/CheeseMap.astro';
+import SourceCheck from '../../../components/SourceCheck.astro';
 import GuessMeter from '../../../components/GuessMeter.astro';
 import LlmFlow from '../../../components/LlmFlow.astro';
 
@@ -95,8 +95,6 @@ Sample ten times at temperature 1, then at 0.2, then at 2. This is why the same 
 
 A model trained only on web text is a **base model**: Karpathy calls it an internet document simulator. Give it the start of a page, and it continues the page. It does not answer questions; it writes what usually comes next.
 
-<StageMorph />
-
 The assistant comes from more training, in stages. Karpathy compares it to a school textbook:
 
 <Picker
@@ -123,6 +121,10 @@ The assistant comes from more training, in stages. Karpathy compares it to a sch
 	]}
 />
 
+So is the assistant a different kind of model? No. It is still a document completer. The chat app wraps your conversation into one document with special tokens, and fine-tuning taught the model how documents like that continue. Type a message, generate the reply and watch where it goes. Then switch to the base model.
+
+<ChatTemplate />
+
 ## 5. Two kinds of memory
 
 <Predict id="memory" question="You ask a model about a detail of the Mood Tracker's code. When is it more likely to be right: when it relies on what it learned in training, or when the file is in its context?">
@@ -138,7 +140,7 @@ When the file is in the **context**. Karpathy's distinction: knowledge in the pa
 | Up to date? | frozen at the end of training | as current as what you put in |
 | Your control | none | complete: that is context engineering |
 
-Try it: ask the questions below with an empty desk, then put the right document on it. Fill the desk with big items and watch what falls off: a full context window drops things too.
+Try it: pick a question and look at the answer with an empty desk. Then put a file on the desk, read what is in it, and see which line the answer now uses. Add the big items and watch what falls off: a full context window loses things too.
 
 <MemoryDesk />
 
@@ -154,7 +156,9 @@ Capabilities are also uneven. Karpathy compares them to **Swiss cheese**: brilli
 - **9.11 or 9.9?** Some models have said 9.11 is bigger, possibly because in many texts, such as Bible verses or version numbers, 9.11 comes after 9.9.
 - **Models need tokens to think.** Each token gets a fixed amount of computation. An answer squeezed into one token has had little "thinking"; working step by step, in many tokens, or with a tool, is more reliable.
 
-<CheeseMap />
+Here is how this looks in practice. A model wrote a short overview of the Mood Tracker. Every sentence sounds equally sure, but they come from three different places. Can you tell which?
+
+<SourceCheck />
 
 <Sorter
 	title="Fine for a model on its own, or needs a tool or a check?"

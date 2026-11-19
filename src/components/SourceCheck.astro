@@ -1,0 +1,157 @@
+---
+/**
+ * §6 "Where did each sentence come from?": a fluent model answer about the
+ * Mood Tracker. Students mark every claim as coming from the context, from
+ * training memory, or from nowhere; the reveal colours the answer by source
+ * and says how to check each claim. The context shown is the course's
+ * ARCHITECTURE.md excerpt and the real pubspec.yaml line. English and Polish.
+ */
+import { langOf } from '../i18n/ui';
+const lang = langOf(Astro);
+
+type Claim = { text: string; src: 'ctx' | 'mem' | 'none'; why: string; check: string };
+const copy = {
+	en: {
+		kicker: 'Where did each sentence come from?',
+		given: 'What the model was given',
+		ask: 'You asked: “Give me a short overview of the Mood Tracker for my report.”',
+		answer: 'The model’s answer',
+		task: 'Mark each sentence, then check.',
+		kinds: { ctx: '📄 Context', mem: '🧠 Memory', none: '❓ No source' },
+		legend: { ctx: 'in the files it was given', mem: 'from training: plausible, maybe outdated', none: 'invented, or nothing was checked' },
+		checkBtn: 'Check my answers', again: 'Try again',
+		score: '{n} of {t} right.',
+		howTo: 'How to check:',
+		moral: 'All six sentences sound equally sure. Only the first two can be traced to the context. In your reports, every claim needs a source you have opened, and every “it works” needs a command you have run.',
+		claims: [
+			{ text: 'The Mood Tracker is a Flutter app that talks to a FastAPI server over HTTP/JSON.', src: 'ctx', why: 'It is in ARCHITECTURE.md, which was in the context.', check: 'Open ARCHITECTURE.md, section Containers.' },
+			{ text: 'It uses the http package, version ^1.2.2.', src: 'ctx', why: 'Read from pubspec.yaml, line 19.', check: 'pubspec.yaml:19.' },
+			{ text: 'When the state changes, setState() makes Flutter rebuild the widget.', src: 'mem', why: 'General Flutter knowledge, not in the files. Probably right, because it is everywhere in the training data.', check: 'The Flutter docs, if it matters for your report.' },
+			{ text: 'Flutter 3.24 is the latest stable release, so the project is up to date.', src: 'mem', why: 'From memory, frozen at the training cut-off, and the project’s Flutter version is not in the context at all.', check: 'flutter --version and the Flutter release notes.' },
+			{ text: 'Studies show that daily mood logging improves adherence by 37% (Kowalski et al., 2021).', src: 'none', why: 'An invented study and an invented number, in the style of a citation.', check: 'Search for it in Zotero or Google Scholar. If you cannot open it, you cannot cite it.' },
+			{ text: 'All tests pass, so the app is ready for the next feature.', src: 'none', why: 'Nothing was run in this conversation. “All tests pass” is just a likely sentence.', check: 'Run flutter test and paste the summary line.' },
+		] as Claim[],
+	},
+	pl: {
+		kicker: 'Skąd się wzięło każde zdanie?',
+		given: 'Co dostał model',
+		ask: 'Twoje pytanie: „Daj mi krótki opis Mood Trackera do raportu.”',
+		answer: 'Odpowiedź modelu',
+		task: 'Oznacz każde zdanie, potem sprawdź.',
+		kinds: { ctx: '📄 Kontekst', mem: '🧠 Pamięć', none: '❓ Brak źródła' },
+		legend: { ctx: 'jest w plikach, które dostał', mem: 'z treningu: wiarygodne, może nieaktualne', none: 'zmyślone albo niczego nie sprawdzono' },
+		checkBtn: 'Sprawdź', again: 'Jeszcze raz',
+		score: 'Dobrze: {n} z {t}.',
+		howTo: 'Jak sprawdzić:',
+		moral: 'Wszystkie sześć zdań brzmi równie pewnie. Tylko dwa pierwsze da się powiązać z kontekstem. W raportach każde twierdzenie potrzebuje źródła, które otworzyłeś, a każde „działa” – polecenia, które uruchomiłeś.',
+		claims: [
+			{ text: 'Mood Tracker to aplikacja we Flutterze, która rozmawia z serwerem FastAPI przez HTTP/JSON.', src: 'ctx', why: 'Jest w ARCHITECTURE.md, który był w kontekście.', check: 'Otwórz ARCHITECTURE.md, sekcja Containers.' },
+			{ text: 'Używa pakietu http w wersji ^1.2.2.', src: 'ctx', why: 'Odczytane z pubspec.yaml, linia 19.', check: 'pubspec.yaml:19.' },
+			{ text: 'Gdy stan się zmienia, setState() sprawia, że Flutter przebudowuje widget.', src: 'mem', why: 'Ogólna wiedza o Flutterze, nie ma jej w plikach. Pewnie prawda, bo jest wszędzie w danych treningowych.', check: 'Dokumentacja Fluttera, jeśli to ważne dla raportu.' },
+			{ text: 'Flutter 3.24 to najnowsza stabilna wersja, więc projekt jest aktualny.', src: 'mem', why: 'Z pamięci, zamrożonej w dniu odcięcia treningu, a wersji Fluttera w projekcie w ogóle nie ma w kontekście.', check: 'flutter --version i release notes Fluttera.' },
+			{ text: 'Badania pokazują, że codzienne zapisywanie nastroju poprawia adherence o 37% (Kowalski i in., 2021).', src: 'none', why: 'Zmyślone badanie i zmyślona liczba, w stylu cytatu.', check: 'Poszukaj w Zotero albo Google Scholar. Jeśli nie możesz tego otworzyć, nie możesz tego cytować.' },
+			{ text: 'Wszystkie testy przechodzą, więc aplikacja jest gotowa na kolejną funkcję.', src: 'none', why: 'W tej rozmowie nic nie zostało uruchomione. „Testy przechodzą” to tylko prawdopodobne zdanie.', check: 'Uruchom flutter test i wklej linię z podsumowaniem.' },
+		] as Claim[],
+	},
+}[lang];
+const kinds = ['ctx', 'mem', 'none'] as const;
+---
+
+<div class="biz-widget srcchk not-content">
+	<p class="biz-kicker">{copy.kicker}</p>
+	<div class="srcchk__given">
+		<p class="srcchk__label">{copy.given}</p>
+		<pre><b>ARCHITECTURE.md</b>{'\n'}## Containers{'\n'}Flutter app → HTTP/JSON with a Bearer token → FastAPI server → SQLite file.</pre>
+		<pre><b>pubspec.yaml</b>{'\n'}<i>18</i>  path: ^1.9.0{'\n'}<i>19</i>  http: ^1.2.2</pre>
+		<p class="srcchk__ask">{copy.ask}</p>
+	</div>
+	<p class="srcchk__label">{copy.answer}</p>
+	<p class="srcchk__answer">
+		{copy.claims.map((c, k) => <><span class="srcchk__span" data-i={k}><sup>{k + 1}</sup>{c.text}</span>{' '}</>)}
+	</p>
+	<div class="srcchk__legend">
+		{kinds.map((k) => <span class={`srcchk__key is-${k}`}><b>{copy.kinds[k]}</b> {copy.legend[k]}</span>)}
+	</div>
+	<p class="srcchk__task">{copy.task}</p>
+	<ol class="srcchk__list">
+		{
+			copy.claims.map((c, k) => (
+				<li class="srcchk__row" data-i={k} data-src={c.src}>
+					<span class="srcchk__n">{k + 1}</span>
+					<span class="srcchk__text">{c.text}</span>
+					<span class="srcchk__btns" role="group">
+						{kinds.map((kind) => <button type="button" class={`srcchk__btn is-${kind}`} data-kind={kind} aria-pressed="false">{copy.kinds[kind]}</button>)}
+					</span>
+					<span class="srcchk__why" hidden><b></b> {c.why} <em>{copy.howTo} {c.check}</em></span>
+				</li>
+			))
+		}
+	</ol>
+	<div class="srcchk__bar">
+		<button type="button" class="sdlc-btn sdlc-btn--primary" data-act="check" disabled>{copy.checkBtn}</button>
+		<button type="button" class="sdlc-btn" data-act="again" hidden>{copy.again}</button>
+		<span class="srcchk__score" aria-live="polite" data-tpl={copy.score}></span>
+	</div>
+	<p class="srcchk__moral" hidden>{copy.moral}</p>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.srcchk').forEach((box) => {
+		const rows = Array.from(box.querySelectorAll<HTMLElement>('.srcchk__row'));
+		const checkBtn = box.querySelector<HTMLButtonElement>('[data-act="check"]')!;
+		const againBtn = box.querySelector<HTMLButtonElement>('[data-act="again"]')!;
+		const score = box.querySelector<HTMLElement>('.srcchk__score')!;
+		const moral = box.querySelector<HTMLElement>('.srcchk__moral')!;
+		const picked = (r: HTMLElement) => r.querySelector<HTMLElement>('[aria-pressed="true"]')?.dataset.kind;
+		const update = () => {
+			checkBtn.disabled = rows.some((r) => !picked(r));
+			rows.forEach((r) => {
+				const span = box.querySelector<HTMLElement>(`.srcchk__span[data-i="${r.dataset.i}"]`)!;
+				span.dataset.mark = picked(r) || '';
+			});
+		};
+		rows.forEach((r) =>
+			r.querySelectorAll<HTMLButtonElement>('.srcchk__btn').forEach((b) =>
+				b.addEventListener('click', () => {
+					if (box.classList.contains('is-checked')) return;
+					r.querySelectorAll('.srcchk__btn').forEach((x) => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+					update();
+				}),
+			),
+		);
+		checkBtn.addEventListener('click', () => {
+			let n = 0;
+			rows.forEach((r) => {
+				const ok = picked(r) === r.dataset.src;
+				if (ok) n++;
+				r.classList.add(ok ? 'is-ok' : 'is-wrong');
+				r.querySelector<HTMLElement>(`.srcchk__btn[data-kind="${r.dataset.src}"]`)!.classList.add('is-truth');
+				const why = r.querySelector<HTMLElement>('.srcchk__why')!;
+				why.hidden = false;
+				why.querySelector('b')!.textContent = ok ? '✓' : '✗';
+				box.querySelector<HTMLElement>(`.srcchk__span[data-i="${r.dataset.i}"]`)!.dataset.src = r.dataset.src!;
+			});
+			box.classList.add('is-checked');
+			score.textContent = String(score.dataset.tpl).replace('{n}', String(n)).replace('{t}', String(rows.length));
+			moral.hidden = false;
+			checkBtn.hidden = true;
+			againBtn.hidden = false;
+		});
+		againBtn.addEventListener('click', () => {
+			box.classList.remove('is-checked');
+			rows.forEach((r) => {
+				r.classList.remove('is-ok', 'is-wrong');
+				r.querySelectorAll('.srcchk__btn').forEach((x) => { x.setAttribute('aria-pressed', 'false'); x.classList.remove('is-truth'); });
+				r.querySelector<HTMLElement>('.srcchk__why')!.hidden = true;
+				const span = box.querySelector<HTMLElement>(`.srcchk__span[data-i="${r.dataset.i}"]`)!;
+				delete span.dataset.src;
+			});
+			score.textContent = '';
+			moral.hidden = true;
+			checkBtn.hidden = false;
+			againBtn.hidden = true;
+			update();
+		});
+		update();
+	});
+</script>
