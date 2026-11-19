@@ -5,6 +5,11 @@ description: What a useful AGENTS.md contains, which tools read it, and why a ru
 
 import Quiz from '../../../components/Quiz.astro';
 import Predict from '../../../components/Predict.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={4} items={["<code>AGENTS.md</code> = the agent's rules, read on every task.", "Keep it short, and point to the other documents.", "A rule a tool can check belongs in the tool."]} />
 
 `AGENTS.md` is a Markdown file in the root of a repository, written for coding agents rather than for people. Many agents read it automatically at the start of each task, so it is their **entry point** into the project. You wrote your pair's first version in W2.
 
@@ -64,6 +69,10 @@ Section 7 has a full template.
 	explain="<code>AGENTS.md</code> says <b>how to work</b> and is read on every task. <code>ARCHITECTURE.md</code> says <b>what the system is</b>, and is read when a task needs it. <code>AGENTS.md</code> points to it."
 />
 
+<AtWork>Many open-source repositories now have an <code>AGENTS.md</code>. Contributing one, with a check behind each important rule, is a small and visible open-source contribution.</AtWork>
+
 :::tip[Do this in your project]
 Pick one rule in your `AGENTS.md` that is marked "convention, not checked", or that you have had to repeat to the agent. Turn it into a test or a lint rule, run it, and move the rule to "checked by `<test>`".
 :::
+
+<Done />

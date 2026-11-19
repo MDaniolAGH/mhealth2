@@ -12,11 +12,14 @@ interface Props {
 	/** Optional feedback for each option, shown when that option is picked wrongly. */
 	why?: string[];
 }
+import { t } from '../i18n/ui';
 const { question, options, answer, explain = '', why = [] } = Astro.props;
+const T = t(Astro);
+const i18n = JSON.stringify({ correctFirst: T.correctFirst, correctAfter: T.correctAfter, notThis: T.notThis });
 ---
 
-<div class="quiz not-content" data-answer={answer}>
-	<p class="quiz__label">Check yourself</p>
+<div class="quiz not-content" data-answer={answer} data-i18n={i18n}>
+	<p class="quiz__label">{T.checkYourself}</p>
 	<p class="quiz__q" set:html={question} />
 	<ol class="quiz__options">
 		{
@@ -34,7 +37,7 @@ const { question, options, answer, explain = '', why = [] } = Astro.props;
 	<div class="quiz__explain" hidden set:html={explain} />
 	<noscript>
 		<details>
-			<summary>Answer</summary>
+			<summary>{T.answer}</summary>
 			<p>{String.fromCharCode(65 + answer)}. <Fragment set:html={explain} /></p>
 		</details>
 	</noscript>
@@ -43,6 +46,7 @@ const { question, options, answer, explain = '', why = [] } = Astro.props;
 <script>
 	document.querySelectorAll<HTMLElement>('.quiz').forEach((quiz) => {
 		const answer = Number(quiz.dataset.answer);
+		const L = JSON.parse(quiz.dataset.i18n || '{}');
 		const feedback = quiz.querySelector<HTMLElement>('.quiz__feedback')!;
 		const explain = quiz.querySelector<HTMLElement>('.quiz__explain')!;
 		let tries = 0;
@@ -53,12 +57,12 @@ const { question, options, answer, explain = '', why = [] } = Astro.props;
 				if (Number(btn.dataset.i) === answer) {
 					btn.classList.add('is-right');
 					quiz.classList.add('is-solved');
-					feedback.textContent = tries === 1 ? 'Correct, first time.' : `Correct, after ${tries} tries.`;
+					feedback.textContent = tries === 1 ? L.correctFirst : String(L.correctAfter).replace('{n}', String(tries));
 					explain.hidden = !explain.innerHTML.trim();
 				} else {
 					btn.classList.add('is-wrong');
 					btn.disabled = true;
-					feedback.textContent = btn.dataset.why || 'Not this one. Why not? Think about it, then try again.';
+					feedback.textContent = btn.dataset.why || L.notThis;
 				}
 			});
 		});

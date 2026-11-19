@@ -8,10 +8,12 @@ interface Props {
 	items: string[];
 	title?: string;
 }
+import { t } from '../i18n/ui';
 const { id, items, title } = Astro.props;
+const T = t(Astro);
 ---
 
-<div class="checklist not-content" data-id={id}>
+<div class="checklist not-content" data-id={id} data-ticked={T.ticked}>
 	{title && <p class="checklist__title">{title}</p>}
 	<ul>
 		{
@@ -40,7 +42,7 @@ const { id, items, title } = Astro.props;
 		boxes.forEach((b, i) => (b.checked = saved.includes(i)));
 		const render = () => {
 			const done = boxes.filter((b) => b.checked).length;
-			count.textContent = `${done} of ${boxes.length} ticked`;
+			count.textContent = String(list.dataset.ticked).replace('{done}', String(done)).replace('{total}', String(boxes.length));
 			list.classList.toggle('is-done', done === boxes.length);
 		};
 		boxes.forEach((b) =>

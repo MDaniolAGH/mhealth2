@@ -6,8 +6,14 @@ description: Acceptance criteria in Given/When/Then, a light INVEST check, MoSCo
 import StageFacts from '../../../components/StageFacts.astro';
 import Quiz from '../../../components/Quiz.astro';
 import Predict from '../../../components/Predict.astro';
+import Scene from '../../../components/Scene.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
 
-<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts criteria and edge cases · <span class="sdlc-chip is-you">You</span> sharpen · the <span class="sdlc-chip is-knowledge">client</span> ranks and defines terms'} input="<code>docs/stories.md</code>" output="Stories with Given/When/Then criteria and a priority; a glossary of terms" />
+<Tldr minutes={6} items={["Given/When/Then makes a story checkable.", "The client ranks: Must, Should, Could, Won't.", "Split by value, not by technical layer."]} />
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts criteria and edge cases · <span class="sdlc-chip is-you">You</span> sharpen · the <span class="sdlc-chip is-client">client</span> ranks and defines terms'} input="<code>docs/stories.md</code>" output="Stories with Given/When/Then criteria and a priority; a glossary of terms" />
 
 ## Given, When, Then
 
@@ -63,6 +69,15 @@ These are AC-4 and AC-5 of the [AI SDLC example](../../ai-sdlc/idea-to-plan/#sta
 
 **MoSCoW** priorities are the client's call; you propose and explain the trade-offs. *Won't (this time)* is a useful answer: it records that something was considered and left out on purpose.
 
+<Scene
+	title="Wednesday, 14:00: a quick call about priorities"
+	messages={[
+		{ who: 'you', name: 'You', text: 'Anna, if we can only finish one thing this sprint: the purpose and contact, or the version?' },
+		{ who: 'client', name: 'Anna', text: 'The purpose and contact. Without them the committee will not approve the next group of participants.' },
+		{ who: 'other', name: 'Tomek', text: 'Then the version next. Until then I can talk people through their phone settings.' },
+	]}
+/>
+
 | Priority | About-screen stories (illustrative) | Why |
 |---|---|---|
 | **Must** | the purpose and the contact (S2) | the ethics committee's request |
@@ -99,6 +114,10 @@ Only if nobody defined the term. With the definition above, support knows that t
 
 </Predict>
 
+<AtWork>Given/When/Then is understood by testers, developers and agents alike: one format, three audiences.</AtWork>
+
 :::tip[Do this in your project]
 Add Given/When/Then criteria to your top three stories, including one edge case each. Ask your client to rank them with MoSCoW. List two words in your brief that people use differently, and write them into a glossary with their edge cases (`/ba-define-terms`).
 :::
+
+<Done />

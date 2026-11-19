@@ -1,0 +1,205 @@
+---
+title: '3. Wiedza o projekcie: na czym opiera się plan'
+description: Dokumenty, które agent czyta, zanim zacznie planować, i dlaczego są długoterminową pamięcią projektu.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import Quiz from '../../../../components/Quiz.astro';
+import Predict from '../../../../components/Predict.astro';
+import Tldr from '../../../../components/Tldr.astro';
+import AtWork from '../../../../components/AtWork.astro';
+import Done from '../../../../components/Done.astro';
+
+<Tldr minutes={5} items={["Agenty zapominają twój projekt po każdej sesji.", "Zapisz w repo architekturę, decyzje, notatki i słowa klienta.", "Niech plan powołuje się na te dokumenty i wskazuje sprzeczności."]} />
+
+:::danger[Najważniejsze wejście do planu]
+Agent kodujący **nie pamięta twojego projektu** między sesjami. Wszystko, czego nauczył się wczoraj, już zapomniał. Jeśli architektura, decyzje, słowa klienta i pułapki nie są zapisane w repozytorium, agent będzie je zgadywać od nowa w każdej sesji – i za każdym razem może zgadnąć inaczej. Dokumenty z tej strony to długoterminowa pamięć projektu, dla agentów i dla ludzi.
+:::
+
+Context window (rozdział 2) to pamięć krótkotrwała: wystarcza na jedno zadanie. **Wiedza o projekcie** to to, co przetrwa między zadaniami: dokumenty w repozytorium, które opisują, czym jest system, dlaczego jest właśnie taki, o co prosił klient i co wyszło na jaw podczas budowania.
+
+| Dokument | Co zapisuje | Plan korzysta z niego, żeby… |
+|---|---|---|
+| `README.md` | Czym jest aplikacja; jak ją zbudować, uruchomić i przetestować | uruchamiać właściwe polecenia |
+| `ARCHITECTURE.md` | Kontenery, warstwy aplikacji i serwera, co może zależeć od czego, jak płyną dane | umieścić zmianę we właściwym miejscu i nadać jej właściwy kształt |
+| `docs/adr/` | Jeden zapis decyzji architektonicznej (ADR) na jedną decyzję: kontekst, decyzja, konsekwencje | szanować decyzje, zamiast podejmować je od nowa |
+| `NOTES.md` | Log pracy: zrobione, w toku, znane problemy, znalezione pułapki | nie powtarzać błędów; kontynuować tam, gdzie skończyła ostatnia sesja |
+| `docs/product.md` | Karta produktu: klient, użytkownicy, intended purpose, ograniczenia, zakres | budować to, czego potrzebuje ten klient, jego własnymi słowami |
+| `docs/client-log.md` | Co klient naprawdę powiedział, z datami | odróżnić fakty podane przez klienta od założeń |
+| Dokumentacja API | Kontrakt backendu: endpointy, pola, błędy (Swagger pod `/docs`) | poprawnie korzystać z danych |
+| `AGENTS.md` | Jak się tu pracuje: cykl, polecenia, zasady, granice (rozdział 4) | przestrzegać zasad i znaleźć dokumenty wymienione wyżej |
+
+`AGENTS.md` mówi, **jak pracować**. Pozostałe dokumenty mówią, **czym jest system i dlaczego**. Trzymaj je osobno: zasady agent czyta w każdym zadaniu, a dokumenty z wiedzą tylko wtedy, gdy zadanie ich wymaga.
+
+<Tabs>
+<TabItem label="ARCHITECTURE.md">
+
+```markdown title="ARCHITECTURE.md (fragment, przykład)"
+# Mood Tracker: architecture
+
+## Containers
+Flutter app → HTTP/JSON with a Bearer token → FastAPI server → SQLite file.
+On the phone: local database (sqflite), token storage (flutter_secure_storage).
+
+## App layers (lib/)
+screens/       UI; watch providers; never import http, sqflite or secure storage
+widgets/       reusable UI
+providers/     Riverpod: state; connects screens to services and data
+repositories/  MoodRepository: API first, local database as a fallback
+services/      HTTP: ApiClient, AuthService; the only place that uses http
+data/          local database (sqflite)
+models/        pure Dart data classes
+
+## Server layers (app/), checked by import-linter
+main → routers → auth → models | schemas → database → config
+
+## Rules
+- Values that differ between builds come from --dart-define (ADR-0002).
+- No new container (database, queue, cache, cloud service) without an ADR.
+```
+
+Przyjrzyj się `repositories/`. To jedna z rzeczy, które zauważy dobry plan (etap 4).
+
+</TabItem>
+<TabItem label="Zapis decyzji">
+
+```markdown title="docs/adr/0002-build-settings-from-dart-define.md (przykład)"
+# ADR-0002: Build settings come from --dart-define
+
+Status: accepted, 2026-11-05
+
+## Context
+The API address differs between the Android emulator, the iOS simulator
+and a phone. Editing config.dart before each build is easy to forget, and
+a configuration package would be one more SOUP item to register and keep
+up to date.
+
+## Decision
+Values that differ between builds are read with String.fromEnvironment in
+lib/config.dart and set with --dart-define, with a safe default.
+
+## Consequences
+No new dependency. A build without the define uses the default (the
+Android emulator's 10.0.2.2), so other devices must pass the address.
+```
+
+**SOUP** (*software of unknown provenance*, czyli oprogramowanie o nieznanym pochodzeniu – pojęcie z normy IEC 62304 dla oprogramowania wyrobów medycznych) to oprogramowanie, którego używasz, ale które nie powstało w twoim własnym procesie, np. pakiet z pub.dev. Każdy taki element się rejestruje, ocenia i monitoruje pod kątem problemów. Dlatego nowy pakiet nigdy nie jest „za darmo”.
+
+</TabItem>
+<TabItem label="NOTES.md">
+
+```markdown title="NOTES.md (przykład)"
+# Notes
+
+## 2026-11-05: handover check (W2)
+- flutter test: all tests pass on Flutter 3.35 (macOS).
+- Trap: golden images were recorded on macOS. On another OS they can
+  differ by a few pixels. Never regenerate them to make a test pass;
+  only on purpose: flutter test --update-goldens <file>.
+- Without --dart-define=API_BASE_URL the app calls 10.0.2.2, which only
+  the Android emulator reaches (ADR-0002).
+
+## 2026-11-20: About screen (GOAL-1, PR #12)   <- written later, at stage 8
+- Done: AboutScreen, VersionService (timeout is a parameter, 5 s).
+- Not verified: iOS simulator; very large font sizes.
+- Trap: a debug build without --dart-define=APP_VERSION shows "dev".
+  Expected, not a bug (ADR-0003).
+```
+
+Drugi wpis powstaje na końcu pracy nad funkcją (etap 8); pokazujemy go tutaj, żeby było widać cały log. **Golden test** porównuje zrzut ekranu widgetu z zatwierdzonym plikiem obrazu i nie przechodzi, jeśli różni się choćby jeden piksel.
+
+</TabItem>
+<TabItem label="docs/product.md">
+
+```markdown title="docs/product.md (fragment, przykład)"
+# Karta produktu
+
+Klient            Klinika rehabilitacyjna (fikcyjna, W1): koordynatorka badania
+Użytkownicy       Dorośli uczestnicy półrocznego badania kliniki
+Intended purpose  „Dziennik nastroju prowadzony samodzielnie przez uczestników
+                  badania kliniki. Nie służy do diagnozy ani leczenia.”
+                  (dziennik klienta, 2026-11-12)
+Kontakt           <TODO: client>
+Ograniczenia      W trakcie developmentu tylko dane syntetyczne.
+                  Żadnych nowych usług w chmurze.
+```
+
+Intended purpose jest cytatem z dziennika klienta, z datą. Kontakt to widoczny placeholder, bo nikt ci go jeszcze nie podał.
+
+</TabItem>
+</Tabs>
+
+**Poproś agenta, żeby planował na podstawie tej wiedzy – i żeby to napisał.** Plan, który nie podaje swoich źródeł, mógł zostać zgadnięty:
+
+```text title="Prompt do planowania (przykład)"
+Zanim zaczniesz planować, przeczytaj AGENTS.md, ARCHITECTURE.md, docs/adr/,
+docs/product.md i najnowsze wpisy w NOTES.md.
+
+Zaplanuj GOAL-1 na podstawie docs/spec-about.md. W planie:
+- wypisz dokumenty, z których korzystasz, i co wziąłeś z każdego z nich;
+- wskaż wszystko, w czym dokumenty i kod się nie zgadzają;
+- wypisz pytania, na które dokumenty nie odpowiadają, i rozdziel pytania
+  do klienta od pytań technicznych.
+Oznacz każde twierdzenie jako FACT (z file:line), HYPOTHESIS albo UNKNOWN.
+
+Nie zmieniaj jeszcze żadnego pliku.
+```
+
+<Predict id="wrong-doc" question="Co jest gorsze dla agenta: brak <code>ARCHITECTURE.md</code> czy nieaktualny <code>ARCHITECTURE.md</code>?">
+
+Nieaktualny. Bez dokumentu agent musi przynajmniej przeczytać kod. Z błędnym ufa temu, co czyta, i każdy plan zaczyna od fałszywego założenia – z pełnym przekonaniem. Dlatego prompt do planowania prosi o sprzeczności między dokumentami a kodem.
+
+</Predict>
+
+:::tip[Jak utrzymać wiedzę w użytecznym stanie]
+- **Krótko i aktualnie wygrywa z długo i kompletnie.** Jedna strona `ARCHITECTURE.md`, która jest prawdziwa, jest warta więcej niż dziesięć nieaktualnych.
+- **Docs as code.** Dokumenty żyją w repozytorium i zmieniają się **w tym samym pull requeście** co kod, który opisują (etap 8). Reviewerzy sprawdzają je tak jak kod.
+- **Błędny dokument jest gorszy niż żaden.** Agent ufa temu, co czyta.
+- **Zrób z `AGENTS.md` spis treści.** Agenty czytają go najpierw, więc linijka w stylu „Architecture: see `ARCHITECTURE.md`; decisions: `docs/adr/`” sprawia, że reszta zostanie znaleziona.
+- **Fakty od klienta bierzesz tylko z dziennika klienta.** W `AGENTS.md` Mood Trackera: „This is the only source of client facts; anything else is an assumption.”
+- W przejętym projekcie sekcja *Architecture* w `AGENTS.md` to malutki dokument architektury. W repozytorium twojej pary daj architekturze, decyzjom i notatkom osobne pliki już od pierwszych zajęć.
+:::
+
+<Quiz
+	question="Dlaczego agent musi przeczytać <code>ARCHITECTURE.md</code>, zapisy decyzji i <code>NOTES.md</code>, zanim zacznie planować?"
+	options={[
+		'Każda sesja zaczyna się pusta, a bez nich agent zgaduje – z taką samą pewnością, z jaką podaje fakty',
+		'Agenty są zbudowane tak, że odmawiają planowania, dopóki nie przeczytają każdego dokumentu w repo',
+		'Pełne okno kontekstu sprawia, że model jest dokładniejszy, więc im więcej dokumentów, tym lepiej',
+		'Dokumenty zastępują kryteria akceptacji, więc plan już ich nie potrzebuje',
+	]}
+	answer={0}
+	why={[
+		'',
+		'Nie odmawiają – i właśnie w tym problem. I tak planują, na podstawie zgadywania.',
+		'Więcej kontekstu kosztuje więcej i może rozpraszać (rozdział 2). Liczą się właściwe dokumenty, a nie ich liczba.',
+		'Kryteria mówią, co zbudować; dokumenty mówią, jak zbudowany jest ten system. Plan potrzebuje jednego i drugiego.',
+	]}
+	explain="Nowa sesja nie wie nic o twoim projekcie. To, co nie jest zapisane, zostaje zgadnięte, a zgadywanka brzmi dokładnie tak samo jak fakt."
+/>
+
+<Quiz
+	question="Ktoś z zespołu mówi, że kontakt na ekranie About to <code>study@clinic.example</code> – pamięta to ze spotkania. Gdzie ten adres musi się znaleźć, zanim agent będzie mógł go użyć?"
+	options={[
+		'W prompcie z zadaniem, żeby agent od razu go zobaczył',
+		'W komentarzu w kodzie obok miejsca, w którym jest wyświetlany',
+		'W <code>docs/client-log.md</code>, z datą, a potem w karcie produktu',
+		'Nigdzie: jeśli ta osoba jest pewna, agent może go po prostu użyć',
+	]}
+	answer={2}
+	why={[
+		'Prompt znika razem z sesją. Następna sesja nie będzie wiedzieć, skąd wziął się ten adres.',
+		'Komentarz nie jest źródłem. Nie widać z niego, kto zdecydował ani kiedy.',
+		'',
+		'To, co ktoś pamięta ze spotkania, jest założeniem, dopóki nie zostanie zapisane z datą i źródłem.',
+	]}
+	explain="Fakt od klienta potrzebuje źródła, które przetrwa spotkanie i czat. Dopóki nie ma go w dzienniku klienta, jest założeniem, a ekran pokazuje „jeszcze niepotwierdzone”."
+/>
+
+<AtWork><code>ARCHITECTURE.md</code> i kilka ADR-ów sprawiają, że twój projekt da się zrecenzować w kilka minut – osobie z zespołu, klientowi albo przyszłemu pracodawcy.</AtWork>
+
+:::tip[Zrób to w swoim projekcie]
+Uruchom powyższy prompt do planowania na swoim repozytorium, z linijką *„Nie zmieniaj żadnego pliku.”* Napraw w pull requeście jedną sprzeczność między dokumentami a kodem, którą agent znajdzie.
+:::
+
+<Done />

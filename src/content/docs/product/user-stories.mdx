@@ -7,8 +7,14 @@ import StageFacts from '../../../components/StageFacts.astro';
 import MultiCheck from '../../../components/MultiCheck.astro';
 import Sorter from '../../../components/Sorter.astro';
 import Predict from '../../../components/Predict.astro';
+import Scene from '../../../components/Scene.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
 
-<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts and critiques · <span class="sdlc-chip is-you">You</span> cut and trace · the <span class="sdlc-chip is-knowledge">client</span> approves'} input="The client log, the decision, the purpose, the stakeholder table" output="<code>docs/stories.md</code>: stories with a source, and a separate list of ideas" />
+<Tldr minutes={5} items={["Need first, solution later.", "No source, no story.", "The agent's extra stories go on the Ideas list."]} />
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts and critiques · <span class="sdlc-chip is-you">You</span> cut and trace · the <span class="sdlc-chip is-client">client</span> approves'} input="The client log, the decision, the purpose, the stakeholder table" output="<code>docs/stories.md</code>: stories with a source, and a separate list of ideas" />
 
 A **user story** is a need the client agreed to, written from the point of view of the person who has it:
 
@@ -19,6 +25,17 @@ The course's `ba-requirements` skill writes the same thing as a requirement: *"[
 1. **Need before solution.** "Participants know whom to contact" is a need. "A contact button in the app bar" is an idea about how to meet it. Ideas stay ideas until the client approves them.
 2. **Every story has a source**: a line in the client log, a stakeholder, an observation. No source, no story: it goes on the *Ideas* list.
 3. **Small.** A story you cannot finish and check in a few days is several stories (next page).
+
+<Scene
+	title="Wednesday, 9:30: stories from the client log"
+	messages={[
+		{ who: 'you', name: 'You', text: '@Copilot write user stories from <code>docs/client-log.md</code> only. Cite the log line for each one.' },
+		{ who: 'agent', name: 'Copilot', text: 'Here are 15 user stories for the About screen, grouped by user.' },
+		{ who: 'you', name: 'You', text: 'How many of them cite a line that says what the story claims?' },
+		{ who: 'agent', name: 'Copilot', text: 'Six. For the other nine I used features that apps like this usually have.' },
+		{ who: 'you', name: 'You', text: 'Then those nine go on the Ideas list. We bring them to Anna as questions, not as a plan.' },
+	]}
+/>
 
 <MultiCheck
 	title="What is wrong with this agent-written story? Tick every problem."
@@ -90,6 +107,10 @@ Mostly plausible stories nobody asked for: features that "apps like this usually
 
 </Predict>
 
+<AtWork>Stories with sources are how you avoid the classic “but I never asked for this” at the demo.</AtWork>
+
 :::tip[Do this in your project]
 Ask the agent for stories from your client log, with the citation rule above. Open every cited line and check it says what the story claims. Move the rest to *Ideas*, and bring the Ideas list to your client as questions, not as a plan.
 :::
+
+<Done />

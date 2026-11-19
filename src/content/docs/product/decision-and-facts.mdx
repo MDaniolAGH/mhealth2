@@ -7,14 +7,32 @@ import StageFacts from '../../../components/StageFacts.astro';
 import Sorter from '../../../components/Sorter.astro';
 import Quiz from '../../../components/Quiz.astro';
 import Predict from '../../../components/Predict.astro';
+import Scene from '../../../components/Scene.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
 
-<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts · <span class="sdlc-chip is-you">You</span> check · the <span class="sdlc-chip is-knowledge">client</span> confirms'} input="The brief, <code>docs/client-log.md</code>" output="<code>docs/decision.md</code>, <code>docs/assumptions.md</code>, a stakeholder table" />
+<Tldr minutes={7} items={["Name the decision before any solution.", "Fact = a source you opened. Everything else is an assumption.", "Synthetic users are hypotheses, not evidence."]} />
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts · <span class="sdlc-chip is-you">You</span> check · the <span class="sdlc-chip is-client">client</span> confirms'} input="The brief, <code>docs/client-log.md</code>" output="<code>docs/decision.md</code>, <code>docs/assumptions.md</code>, a stakeholder table" />
 
 <span id="decision" class="stage-anchor"></span>
 
 ## The decision before the solution
 
 A client rarely needs "an app". They need to **make a decision**. Name it before you propose anything, or the agent will name a solution for you, and every later document will be about that solution.
+
+<Scene
+	title="Monday, 11:00: asking Copilot for the decision"
+	messages={[
+		{ who: 'client', name: 'Anna', text: 'Honestly, we just need an About page.' },
+		{ who: 'you', name: 'You', text: '@Copilot write the decision Anna has to make. Use only the brief and the client log.' },
+		{ who: 'agent', name: 'Copilot', text: 'Decision: implement an About screen using <code>package_info_plus</code>, showing the app version and a support contact.' },
+		{ who: 'you', name: 'You', text: 'That is a solution, with a package in it. Rewrite it as a decision: no technology names, and at least one option without software.' },
+		{ who: 'agent', name: 'Copilot', text: 'Anna must decide how participants learn what the app is for and whom to contact, and how Tomek learns which version they run: in the app, on paper, or both.' },
+		{ who: 'client', name: 'Anna', text: 'Yes. That is exactly what I need to decide. 👍' },
+	]}
+/>
 
 > *[Who] must decide whether to [option A], [option B] or [option C], so that [goal], within [key constraints].*
 
@@ -66,6 +84,16 @@ Every recommendation rests on assumptions. Make them visible, so they can be che
 - **Unknown**: something you know you do not know. It becomes a question.
 
 Rank assumptions by the **damage if they are wrong**, not by how likely they feel. And record where each came from: *validated*, *client said (date)*, *agent-generated* or *unknown*. An agent-generated statement is never a fact, however confident it sounds.
+
+<Scene
+	title="Monday, 11:20: one line in the assumption log"
+	messages={[
+		{ who: 'agent', name: 'Copilot', text: 'FACT: participants prefer information inside the app.' },
+		{ who: 'you', name: 'You', text: 'Source?' },
+		{ who: 'agent', name: 'Copilot', text: 'This is a common finding in mobile app design.' },
+		{ who: 'you', name: 'You', text: 'Then it is an ASSUMPTION, not a fact. Impact if wrong: high. Check: ask three participants, or show them a mock-up.' },
+	]}
+/>
 
 <Sorter
 	title="Fact, assumption or unknown?"
@@ -129,6 +157,10 @@ The About screen shows no data about the participant. Keep it that way: adding t
 	explain="A fact needs a source you have checked. Everything else is an assumption, and that is fine, as long as it is labelled, ranked and has a way to be checked."
 />
 
+<AtWork>A one-sentence decision statement is the fastest way to align a meeting with a client, and a classic move in consulting-style case interviews.</AtWork>
+
 :::tip[Do this in your project]
 Write `docs/decision.md` and `docs/assumptions.md` for your brief, with the course skills `/ba-decision-statement` and `/ba-assumptions`. Then go through the agent's output line by line: every FACT needs a source you have opened; everything else is relabelled. Add one stakeholder who is affected but not paying.
 :::
+
+<Done />

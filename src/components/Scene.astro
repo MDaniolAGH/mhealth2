@@ -1,0 +1,35 @@
+---
+/**
+ * A short scene as a chat: the client, you, the agent and others. Makes the
+ * worked example concrete. "you" messages sit on the right, like a messenger.
+ */
+import { t } from '../i18n/ui';
+interface Message {
+	who: 'client' | 'you' | 'agent' | 'other';
+	name: string;
+	text: string;
+}
+interface Props {
+	title?: string;
+	messages: Message[];
+}
+const { title, messages } = Astro.props;
+const T = t(Astro);
+---
+
+<figure class="scene not-content">
+	<figcaption class="scene__title"><span>{T.sceneLabel}</span>{title && <Fragment set:html={title} />}</figcaption>
+	<ol class="scene__msgs">
+		{
+			messages.map((m) => (
+				<li class={`scene__msg is-${m.who}`}>
+					<span class="scene__avatar" aria-hidden="true">{m.name.slice(0, 1)}</span>
+					<div class="scene__bubble">
+						<b class="scene__name">{m.name}</b>
+						<span set:html={m.text} />
+					</div>
+				</li>
+			))
+		}
+	</ol>
+</figure>

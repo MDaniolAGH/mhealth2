@@ -1,11 +1,12 @@
 ---
-title: 'AI SDLC: From Idea to Merge'
-description: How to build software with a coding agent, one stage at a time, in the Digital Health Engineering Studio.
+title: 'Aplikacje Mobilne w Medycynie - Od Pomysłu do Wprowadzenia na Rynek'
+description: 'Mobile apps in medicine, from idea to market: how to build software with coding agents, from a client''s brief to a merged pull request.'
 template: splash
 hero:
+  title: 'Aplikacje Mobilne w Medycynie'
   image:
     file: ../../assets/hero.svg
-  tagline: A coding agent can write a Flutter screen in minutes. This guide is about everything else. You decide what to build and why, give the agent what it needs to know, check what it did, and stay able to explain the change months later.
+  tagline: '<b>Od Pomysłu do Wprowadzenia na Rynek</b> · From idea to market. A coding agent writes a Flutter screen in minutes. This guide is about everything else: deciding what to build and why, giving the agent what it needs, checking what it did, and explaining it months later.'
   actions:
     - text: Start with the map
       link: ai-sdlc/overview/
@@ -16,6 +17,7 @@ hero:
 ---
 
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import Progress from '../../components/Progress.astro';
 
 ## Part 1 · The AI SDLC: from idea to merge
 
@@ -34,10 +36,10 @@ The guide follows **one feature**, an About screen for the Mood Tracker you took
 
 ## Part 2 · Product development with agents
 
-The business side: from a client's brief to user stories and a one-page recommendation, with an agent drafting and you deciding. Same client, same feature: this is where issue #7 comes from.
+The business side: from a client's message to user stories and a one-page recommendation, with an agent drafting and you deciding. Meet Anna, the study coordinator, and follow her request on an interactive map: this is where issue #7 comes from.
 
 <CardGrid>
-	<LinkCard title="From brief to backlog" description="The discovery map, and who does what: the agent, you, the client. (5 min)" href="product/overview/" />
+	<LinkCard title="From brief to backlog" description="The product map: follow Anna's request from an email to a decision. (6 min)" href="product/overview/" />
 	<LinkCard title="1. Decision, facts, people" description="The decision before the solution; facts, assumptions, synthetic users; stakeholders. (7 min)" href="product/decision-and-facts/" />
 	<LinkCard title="2. Intended purpose" description="Diary or medical device? One sentence decides. (5 min)" href="product/purpose/" />
 	<LinkCard title="3. Questions and observations" description="Questions that change the answer; what the app really does. (5 min)" href="product/questions-and-observation/" />
@@ -45,6 +47,29 @@ The business side: from a client's brief to user stories and a one-page recommen
 	<LinkCard title="5. Testable, ranked, split" description="Given/When/Then, INVEST, MoSCoW, splitting, words with one meaning. (6 min)" href="product/testable-stories/" />
 	<LinkCard title="6. Options and recommendation" description="Hard limits, total cost, three-point estimates, one page. (8 min)" href="product/options-and-recommendation/" />
 </CardGrid>
+
+<Progress parts={[
+	{ title: 'Part 1 · AI SDLC', pages: [
+		{ slug: 'ai-sdlc/overview/', label: 'The pipeline at a glance' },
+		{ slug: 'ai-sdlc/agents/', label: '1. From a prompt to an agent' },
+		{ slug: 'ai-sdlc/context/', label: '2. Context' },
+		{ slug: 'ai-sdlc/knowledge/', label: '3. Project knowledge' },
+		{ slug: 'ai-sdlc/agents-md/', label: '4. AGENTS.md' },
+		{ slug: 'ai-sdlc/idea-to-plan/', label: '5a. Idea to plan' },
+		{ slug: 'ai-sdlc/code-and-gate/', label: '5b. Code and the gate' },
+		{ slug: 'ai-sdlc/tests-to-merge/', label: '5c. Tests to merge' },
+		{ slug: 'ai-sdlc/auditability/', label: '6. Auditability' },
+	] },
+	{ title: 'Part 2 · Product development', pages: [
+		{ slug: 'product/overview/', label: 'From brief to backlog' },
+		{ slug: 'product/decision-and-facts/', label: '1. Decision, facts, people' },
+		{ slug: 'product/purpose/', label: '2. Intended purpose' },
+		{ slug: 'product/questions-and-observation/', label: '3. Questions and observations' },
+		{ slug: 'product/user-stories/', label: '4. User stories' },
+		{ slug: 'product/testable-stories/', label: '5. Testable, ranked, split' },
+		{ slug: 'product/options-and-recommendation/', label: '6. Options and recommendation' },
+	] },
+]} />
 
 ## How to use this guide
 

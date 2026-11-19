@@ -1,0 +1,85 @@
+---
+title: '6. Audytowalność: od kodu z powrotem do celu'
+description: 'Każdy etap zostawia zapis, który wskazuje na poprzedni, więc każdą linię kodu da się prześledzić aż do celu i decyzji, która za nią stoi.'
+---
+
+import AuditWalk from '../../../../components/pl/AuditWalk.astro';
+import Quiz from '../../../../components/Quiz.astro';
+import Predict from '../../../../components/Predict.astro';
+import Tldr from '../../../../components/Tldr.astro';
+import AtWork from '../../../../components/AtWork.astro';
+import Done from '../../../../components/Done.astro';
+
+<Tldr minutes={4} items={["Każdy zapis wskazuje na poprzedni.", "Trailery, pull request, ADR: nawet po miesiącach odpowiesz na „dlaczego?”.", "Zgub jedno ogniwo, a stracisz powód, nie kod."]} />
+
+Na [mapie](../overview/) pasek audytowalności biegnie wzdłuż wszystkich etapów. Każdy etap zostawia **zapis**, który wskazuje na poprzedni, więc z dowolnej linii zmergowanego kodu możesz cofnąć się aż do celu – i do decyzji, która go uzasadniła. Włącz na mapie **Ślad audytowy** i kliknij etap, żeby zobaczyć jego zapis.
+
+A oto sama droga wstecz. Nowa osoba w projekcie twojej pary otwiera kod ekranu About i zadaje całkiem rozsądne pytanie.
+
+<Predict id="trail-break" question="Poniżej możesz zerwać jedno ogniwo śladu: commit, plan albo zapis decyzji. Jak myślisz, które zerwanie wyrządza najwięcej szkody i dlaczego?">
+
+Brakujący zapis decyzji. Commit bez `Refs:` jest irytujący, ale pull request da się jeszcze znaleźć po dacie. Plan, na którego pytania odpowiedziano tylko na czacie, gubi informację, kto zdecydował. Bez ADR znika **powód**: nikt nie odróżni decyzji od przypadku, a następna sesja agenta „naprawi” to, dodając pakiet, którego używa większość kodu w internecie. Wypróbuj wszystkie trzy i porównaj.
+
+</Predict>
+
+Naciśnij **Dlaczego to tu jest?**, żeby iść po śladzie krok po kroku. Potem zerwij ogniwo i przejdź jeszcze raz, żeby zobaczyć, co ginie.
+
+<AuditWalk />
+
+Dlaczego to ważne:
+
+- **Po miesiącach** odpowiedź na „dlaczego?” jest w zapisach, a nie w czyjejś pamięci.
+- **Agenty.** Następna sesja agenta planuje na podstawie tych samych zapisów (rozdział 3). Zerwany ślad dla ludzi to zerwany kontekst dla agentów.
+- **Oprogramowanie regulowane.** Normy dla oprogramowania wyrobów medycznych, takie jak IEC 62304, wymagają, żeby wymagania dało się prześledzić do projektu, testów i środków kontroli ryzyka, a każdy zewnętrzny komponent (SOUP) był zapisany. Przy intended purpose, który podał klient, Mood Tracker nie jest wyrobem medycznym. Inne zdanie o przeznaczeniu mogłoby to zmienić (zob. [rozwój produktu](../../product/purpose/)), a aplikacja i tak przetwarza dane o zdrowiu, więc ten nawyk niewiele kosztuje.
+- **Dwa różne pytania regulacyjne.** To, *czy aplikacja jest wyrobem medycznym*, zależy od jej intended purpose (unijne rozporządzenie w sprawie wyrobów medycznych, MDR). *Czy aplikacja zawiera AI?* to osobne pytanie, na gruncie unijnego AI Act. To, że budujesz aplikację z pomocą agenta, nie robi z niej systemu AI; zrobiłaby to dopiero funkcja AI w samej aplikacji, np. chatbot albo model predykcyjny.
+- **Praca z pomocą AI.** Trailery, pull request i agent log twojej pary zapisują, który agent i model brały udział, ile to kosztowało i kto zrobił review. Na W6 podsumujecie to dla całego semestru.
+
+```bash title="Po śladzie z Gitem"
+git log --oneline --grep="GOAL-1"                        # every commit for the goal
+git log --format='%h %s%n  %(trailers:key=AI-assisted)'  # who assisted each commit
+git blame lib/config.dart                                # which commit wrote each line
+```
+
+<Quiz
+	question="Pytanie z planu „pakiet czy <code>--dart-define</code>?” rozstrzygnięto na czacie, który jest już zamknięty, i nie ma zapisu decyzji. Co przepadło?"
+	options={[
+		'Nic: sam kod pokazuje, którą odpowiedź wybrano',
+		'Wyniki testów, które pokazały, że wersja jest poprawna',
+		'Commit, który wprowadził tekst wersji',
+		'Powód – więc nikt nie odróżni decyzji od zgadywania',
+	]}
+	answer={3}
+	why={[
+		'Kod pokazuje, co wybrano, ale nie dlaczego ani kto.',
+		'Testy wciąż są w CI. Sprawdzają zachowanie, a nie powód.',
+		'Git wciąż ma ten commit. Po prostu nie powie, dlaczego.',
+		'',
+	]}
+	explain="Bez powodu następna osoba albo następna sesja agenta „naprawi” ten wybór, gdy tylko wyda się nietypowy."
+/>
+
+<Quiz
+	question="Która komenda wypisze każdy commit zrobiony dla GOAL-1?"
+	options={[
+		'<code>git log --grep="GOAL-1"</code>',
+		'<code>git blame GOAL-1</code>',
+		'<code>git show GOAL-1</code>',
+		'<code>gh pr view GOAL-1</code>',
+	]}
+	answer={0}
+	why={[
+		'',
+		'git blame działa na pliku, linia po linii, a nie na celu.',
+		'git show potrzebuje commita, taga albo nazwy brancha.',
+		'gh pr view potrzebuje numeru pull requesta albo brancha.',
+	]}
+	explain="Działa to tylko dlatego, że każdy commit ma trailer <code>Refs: GOAL-1</code>. Bez niego commity nadal istnieją, ale nic nie łączy ich z celem."
+/>
+
+<AtWork>W medtechu śledzalność nie jest opcjonalna: audytorzy o nią pytają. Jeśli choć raz zrobisz to na prawdziwym projekcie, masz realną przewagę.</AtWork>
+
+:::tip[Zrób to w swoim projekcie]
+Wybierz jedną linię kodu, którą twoja para zmieniła w tym tygodniu, i przejdź z nią wstecz: `git blame` → pull request → plan → ADR → cel. Tam, gdzie ślad się urywa, dodaj brakujący zapis od razu, póki jeszcze pamiętasz powód.
+:::
+
+<Done />

@@ -8,6 +8,11 @@ import StageStrip from '../../../components/StageStrip.astro';
 import Checklist from '../../../components/Checklist.astro';
 import Quiz from '../../../components/Quiz.astro';
 import Predict from '../../../components/Predict.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={8} items={["Test the criteria, especially the risky edge.", "Update the documents in the same pull request.", "A person approves, on evidence, not on claims."]} />
 
 <StageStrip />
 
@@ -226,6 +231,10 @@ When the pull request is merged, the project knowledge describes the new feature
 	explain="The AI review is one more input. It cannot take responsibility, and text planted in the pull request can steer it (W5)."
 />
 
+<AtWork>Reviewing AI-written code, and knowing what to look for, is daily work in many teams. The checklist on this page is a good start.</AtWork>
+
 :::tip[Do this in your project]
 For your riskiest criterion, read the test before the code exists. Then break the code on purpose and record in the pull request that the test failed. Use the pull-request template, and leave the boxes for checks you did not do unticked.
 :::
+
+<Done />

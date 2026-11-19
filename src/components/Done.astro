@@ -1,0 +1,35 @@
+---
+/** "Mark this page as done", saved in this browser only. Shared by the English and Polish page. */
+import { t } from '../i18n/ui';
+const T = t(Astro);
+---
+
+<div class="done not-content" data-i18n={JSON.stringify({ doneState: T.doneState, doneUndo: T.doneUndo, doneButton: T.doneButton })}>
+	<button type="button" class="sdlc-btn sdlc-btn--primary done__btn">✓ {T.doneButton}</button>
+	<span class="done__state" hidden>
+		<b>✓ {T.doneState}</b> · <button type="button" class="done__undo">{T.doneUndo}</button>
+	</span>
+</div>
+
+<script>
+	function pageKey() {
+		const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+		return 'done:' + location.pathname.slice(base.length).replace(/^\/pl(?=\/)/, '');
+	}
+	document.querySelectorAll<HTMLElement>('.done').forEach((box) => {
+		const btn = box.querySelector<HTMLButtonElement>('.done__btn')!;
+		const state = box.querySelector<HTMLElement>('.done__state')!;
+		const undo = box.querySelector<HTMLButtonElement>('.done__undo')!;
+		const key = pageKey();
+		const render = (on: boolean) => {
+			btn.hidden = on;
+			state.hidden = !on;
+			box.classList.toggle('is-done', on);
+		};
+		let on = false;
+		try { on = localStorage.getItem(key) === '1'; } catch {}
+		render(on);
+		btn.addEventListener('click', () => { try { localStorage.setItem(key, '1'); } catch {} render(true); });
+		undo.addEventListener('click', () => { try { localStorage.removeItem(key); } catch {} render(false); });
+	});
+</script>

@@ -14,11 +14,14 @@ interface Props {
 	intro?: string;
 	options: Option[];
 }
+import { t } from '../i18n/ui';
 const { title, intro, options } = Astro.props;
+const T = t(Astro);
+const i18n = JSON.stringify({ found: T.found, missed: T.missed, alarm: T.alarm, okNot: T.okNot, foundScore: T.foundScore, falseAlarm: T.falseAlarm });
 ---
 
-<div class="biz-widget multicheck not-content">
-	<p class="biz-kicker">Find every problem</p>
+<div class="biz-widget multicheck not-content" data-i18n={i18n}>
+	<p class="biz-kicker">{T.findEvery}</p>
 	<p class="biz-title" set:html={title} />
 	{intro && <div class="biz-intro"><Fragment set:html={intro} /></div>}
 	<ul class="multicheck__options">
@@ -37,8 +40,8 @@ const { title, intro, options } = Astro.props;
 		}
 	</ul>
 	<div class="multicheck__bar">
-		<button type="button" class="sdlc-btn sdlc-btn--primary" data-mc="check">Check my answer</button>
-		<button type="button" class="sdlc-btn" data-mc="reset" hidden>Try again</button>
+		<button type="button" class="sdlc-btn sdlc-btn--primary" data-mc="check">{T.checkAnswer}</button>
+		<button type="button" class="sdlc-btn" data-mc="reset" hidden>{T.tryAgain}</button>
 		<span class="multicheck__score" aria-live="polite"></span>
 	</div>
 	<div class="multicheck__after" hidden>
@@ -49,6 +52,7 @@ const { title, intro, options } = Astro.props;
 <script>
 	document.querySelectorAll<HTMLElement>('.multicheck').forEach((box) => {
 		box.classList.add('is-js');
+		const L = JSON.parse(box.dataset.i18n || '{}');
 		const opts = Array.from(box.querySelectorAll<HTMLElement>('.multicheck__opt'));
 		const check = box.querySelector<HTMLButtonElement>('[data-mc="check"]')!;
 		const reset = box.querySelector<HTMLButtonElement>('[data-mc="reset"]')!;
@@ -62,14 +66,14 @@ const { title, intro, options } = Astro.props;
 				const state = correct ? (ticked ? 'found' : 'missed') : ticked ? 'alarm' : 'ok';
 				o.dataset.state = state;
 				o.querySelector<HTMLElement>('.multicheck__tag')!.textContent =
-					{ found: '✓ Found.', missed: '! Missed.', alarm: '✗ Not a problem.', ok: 'Not a problem.' }[state];
+					{ found: L.found, missed: L.missed, alarm: L.alarm, ok: L.okNot }[state];
 				if (state === 'found') found++;
 				if (state === 'missed') missed++;
 				if (state === 'alarm') alarms++;
 				o.querySelector('input')!.disabled = true;
 			});
 			const total = found + missed;
-			score.textContent = `Found ${found} of ${total} problems` + (alarms ? `, ${alarms} false alarm${alarms > 1 ? 's' : ''}.` : '.');
+			score.textContent = String(L.foundScore).replace('{f}', String(found)).replace('{t}', String(total)) + (alarms ? String(L.falseAlarm).replace('{n}', String(alarms)) : '.');
 			box.classList.add('is-checked');
 			after.hidden = false;
 			check.hidden = true;

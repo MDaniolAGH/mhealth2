@@ -7,6 +7,11 @@ import ContextLab from '../../../components/ContextLab.astro';
 import Subagents from '../../../components/Subagents.astro';
 import Quiz from '../../../components/Quiz.astro';
 import Predict from '../../../components/Predict.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={5} items={["The agent knows only what is in its context.", "More context means more cost, less focus and more risk.", "Missing facts get filled with confident guesses."]} />
 
 The model knows nothing about your project except what is in its **context window** for the current task: the text it can see at once, measured in **tokens** (pieces of words; an English word is about one to two tokens). Everything the agent works from has to fit there.
 
@@ -77,6 +82,10 @@ That is why this pipeline does two things. It gives the agent the facts it needs
 	explain="Everything in the context is sent to the model's provider. A JWT secret lets anyone who has it sign valid login tokens for your server. The same goes for real participants' data: health data is a special category under the GDPR."
 />
 
+<AtWork>On company plans, tokens are real money. Engineers who keep context lean get cheaper, better results, and can explain why.</AtWork>
+
 :::tip[Do this in your project]
 In your next task prompt, list the files and documents the agent should read, and nothing else. When the task is done, write in `NOTES.md` one fact the agent had to guess, and add it to the right document. Then start a fresh session for the next task.
 :::
+
+<Done />

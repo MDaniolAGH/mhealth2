@@ -22,11 +22,14 @@ interface Props {
 }
 const { title, intro, bins, items } = Astro.props;
 const label = Object.fromEntries(bins.map((b) => [b.key, b.label]));
+import { t } from '../i18n/ui';
+const T = t(Astro);
+const i18n = JSON.stringify({ right: T.right, notQuite: T.notQuite, allRight: T.allRight, someRight: T.someRight });
 ---
 
-<div class="biz-widget sorter not-content">
+<div class="biz-widget sorter not-content" data-i18n={i18n}>
 	<div class="biz-head">
-		<p class="biz-kicker">Sort it</p>
+		<p class="biz-kicker">{T.sortIt}</p>
 		<span class="sorter__score" aria-live="polite"></span>
 	</div>
 	<p class="biz-title" set:html={title} />
@@ -36,7 +39,7 @@ const label = Object.fromEntries(bins.map((b) => [b.key, b.label]));
 			items.map((item) => (
 				<li class="sorter__item" data-bin={item.bin}>
 					<p class="sorter__text" set:html={item.text} />
-					<div class="sorter__bins" role="group" aria-label="Choose one">
+					<div class="sorter__bins" role="group" aria-label={T.chooseOne}>
 						{bins.map((b) => (
 							<button type="button" class={`sorter__bin is-${b.tone ?? 'neutral'}`} data-key={b.key}>
 								{b.label}
@@ -53,13 +56,14 @@ const label = Object.fromEntries(bins.map((b) => [b.key, b.label]));
 	</ol>
 	<div class="sorter__done">
 		<span class="sorter__summary"></span>
-		<button type="button" class="sdlc-btn" data-sorter="reset">Start again</button>
+		<button type="button" class="sdlc-btn" data-sorter="reset">{T.startAgain}</button>
 	</div>
 </div>
 
 <script>
 	document.querySelectorAll<HTMLElement>('.sorter').forEach((sorter) => {
 		sorter.classList.add('is-js');
+		const L = JSON.parse(sorter.dataset.i18n || '{}');
 		const items = Array.from(sorter.querySelectorAll<HTMLElement>('.sorter__item'));
 		const score = sorter.querySelector<HTMLElement>('.sorter__score')!;
 		const summary = sorter.querySelector<HTMLElement>('.sorter__summary')!;
@@ -70,8 +74,8 @@ const label = Object.fromEntries(bins.map((b) => [b.key, b.label]));
 			sorter.classList.toggle('is-done', done === items.length);
 			summary.textContent =
 				right === items.length
-					? `All ${right} right. You can explain each one?`
-					: `${right} of ${items.length} right first time. Read the explanations for the others.`;
+					? String(L.allRight).replace('{n}', String(right))
+					: String(L.someRight).replace('{n}', String(right)).replace('{total}', String(items.length));
 		};
 		items.forEach((item) => {
 			item.querySelectorAll<HTMLButtonElement>('.sorter__bin').forEach((btn) => {
@@ -81,7 +85,7 @@ const label = Object.fromEntries(bins.map((b) => [b.key, b.label]));
 					item.dataset.done = right ? 'right' : 'wrong';
 					btn.classList.add(right ? 'is-right' : 'is-wrong');
 					item.querySelector(`.sorter__bin[data-key="${item.dataset.bin}"]`)?.classList.add('is-answer');
-					item.querySelector<HTMLElement>('.sorter__verdict')!.textContent = right ? 'Right. ' : 'Not quite: ';
+					item.querySelector<HTMLElement>('.sorter__verdict')!.textContent = right ? L.right : L.notQuite;
 					render();
 				});
 			});

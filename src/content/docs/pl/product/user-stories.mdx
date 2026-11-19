@@ -1,0 +1,118 @@
+---
+title: '4. User stories: od potrzeby do story'
+description: Pisz stories z potrzeb, na które zgodził się klient – każdą ze źródłem – i oddzielaj pomysły od wymagań.
+---
+
+import StageFacts from '../../../../components/StageFacts.astro';
+import MultiCheck from '../../../../components/MultiCheck.astro';
+import Sorter from '../../../../components/Sorter.astro';
+import Predict from '../../../../components/Predict.astro';
+import Scene from '../../../../components/Scene.astro';
+import Tldr from '../../../../components/Tldr.astro';
+import AtWork from '../../../../components/AtWork.astro';
+import Done from '../../../../components/Done.astro';
+
+<Tldr minutes={5} items={["Najpierw potrzeba, rozwiązanie później.", "Nie ma źródła, nie ma story.", "Dodatkowe stories od agenta trafiają na listę pomysłów."]} />
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> szkicuje i krytykuje · <span class="sdlc-chip is-you">Ty</span> przycinasz i pilnujesz źródeł · <span class="sdlc-chip is-client">klient</span> zatwierdza'} input="Dziennik klienta, decyzja, intended purpose, tabela interesariuszy" output="<code>docs/stories.md</code>: stories ze źródłami i osobna lista pomysłów" />
+
+**User story** to potrzeba, na którą zgodził się klient, zapisana z perspektywy osoby, która ją ma:
+
+> **Jako** *[kto]* **chcę** *[co]*, **żeby** *[po co]*.
+
+Kursowy skill `ba-requirements` zapisuje to samo jako wymaganie: *„[Kto] może/musi [zrobić albo dostać co], żeby [cel].”* Używajcie tego, co woli wasz zespół. Trzy zasady są ważniejsze niż format:
+
+1. **Potrzeba przed rozwiązaniem.** „Uczestnicy wiedzą, z kim się kontaktować” to potrzeba. „Przycisk kontaktu na pasku aplikacji” to pomysł, jak ją spełnić. Pomysły zostają pomysłami, dopóki klient ich nie zatwierdzi.
+2. **Każda story ma źródło**: linijkę w dzienniku klienta, interesariusza, obserwację. Nie ma źródła, nie ma story: trafia na listę *Pomysły*.
+3. **Mała.** Story, której nie da się skończyć i sprawdzić w kilka dni, to w rzeczywistości kilka stories (następna strona).
+
+<Scene
+	title="Środa, 9:30: stories z dziennika klienta"
+	messages={[
+		{ who: 'you', name: 'Ty', text: '@Copilot napisz user stories wyłącznie na podstawie <code>docs/client-log.md</code>. Przy każdej podaj linijkę z dziennika.' },
+		{ who: 'agent', name: 'Copilot', text: 'Oto 15 user stories dla ekranu About, pogrupowanych według użytkowników.' },
+		{ who: 'you', name: 'Ty', text: 'Ile z nich cytuje linijkę, która naprawdę mówi to, co twierdzi story?' },
+		{ who: 'agent', name: 'Copilot', text: 'Sześć. W pozostałych dziewięciu użyłem funkcji, które zwykle mają takie aplikacje.' },
+		{ who: 'you', name: 'Ty', text: 'To te dziewięć idzie na listę pomysłów. Pokażemy je Annie jako pytania, nie jako plan.' },
+	]}
+/>
+
+<MultiCheck
+	title="Co jest nie tak z tą story napisaną przez agenta? Zaznacz każdy problem."
+	intro={'<pre>Jako uczestnik chcę etykietę wersji z package_info_plus,\nżeby aplikacja była szybka, a support@clinic.example mógł mi pomóc.</pre>'}
+	options={[
+		{ text: 'Nazywa rozwiązanie (paczkę i etykietę) zamiast potrzeby', correct: true, why: 'Potrzeba to „wsparcie wie, której wersji używam”. Jak ją pokazać, decyduje się później.' },
+		{ text: 'Dodaje nową paczkę – element SOUP, na który nikt się nie zgodził', correct: true, why: 'To decyzja produktowa ukryta w story. Każdą paczkę trzeba zapisać, ocenić i utrzymywać.' },
+		{ text: 'Słowa „szybka” nie da się przetestować', correct: true, why: 'Szybka dla kogo i mierzona jak? Bez progu nikt nie powie, czy story jest już zrobiona.' },
+		{ text: 'Miesza dwie potrzeby: znajomość wersji i uzyskanie pomocy', correct: true, why: 'To dwie stories, być może dla dwóch różnych osób (wsparcia i uczestników), z różnymi priorytetami.' },
+		{ text: 'Adres kontaktowy jest zmyślony', correct: true, why: 'Nie ma go w żadnym dzienniku klienta. Prawdziwy kontakt to wciąż TODO po stronie klienta.' },
+		{ text: 'Nie ma źródła: z której wypowiedzi klienta pochodzi?', correct: true, why: 'Bez źródła nikt nie sprawdzi, czy klient w ogóle tego chciał.' },
+		{ text: 'Jest napisana z perspektywy uczestnika', correct: false, why: 'Dla user story to dobrze. Pytanie brzmi, czy to w ogóle jest potrzeba uczestnika.' },
+		{ text: 'Jest za krótka, żeby być porządną story', correct: false, why: 'Krótko to dobrze. Problemy są w treści, nie w długości.' },
+	]}
+>
+
+**Lepsza wersja: dwie stories i pomysł**
+
+```text
+S1  Jako osoba ze wsparcia w klinice chcę widzieć, której wersji aplikacji
+    używa uczestnik, żeby wiedzieć, czy zgłoszony problem jest już
+    naprawiony.
+    Źródło: dziennik klienta 2026-11-12 (koordynatorka)
+
+S2  Jako uczestnik chcę widzieć, do czego służy aplikacja i z kim się
+    kontaktować – w słowach zatwierdzonych przez klinikę – żeby wiedzieć,
+    kiedy jej używać i gdzie pytać.
+    Źródło: dziennik klienta 2026-11-12 (prośba komisji bioetycznej)
+
+Pomysły (niezatwierdzone): pokazać wersję za pomocą package_info_plus;
+kod QR prowadzący do strony internetowej badania.
+```
+
+</MultiCheck>
+
+## Wymaganie czy pomysł?
+
+<Sorter
+	title="Wymaganie (uzgodnione, ze źródłem) czy pomysł (jeszcze nie)?"
+	bins={[
+		{ key: 'req', label: 'Wymaganie', tone: 'agent' },
+		{ key: 'idea', label: 'Pomysł', tone: 'neutral' },
+	]}
+	items={[
+		{ text: 'Uczestnicy widzą, z kim się kontaktować w sprawie badania. <em>(dziennik klienta, 2026-11-12)</em>', bin: 'req', why: 'Potrzeba ze źródłem. Sam kontakt to wciąż pytanie do klienta.' },
+		{ text: 'Kod QR, który otwiera stronę internetową badania.', bin: 'idea', why: 'Nikt o to nie prosił. Może to dobry pomysł; czeka na liście pomysłów, aż klient się wypowie.' },
+		{ text: 'Wsparcie wie, której wersji aplikacji używa uczestnik. <em>(koordynatorka, dziennik klienta 2026-11-12)</em>', bin: 'req', why: 'Potrzeba, właściciel, źródło: to wymaganie.' },
+		{ text: 'Ekran About wygląda tak samo jak inna aplikacja kliniki.', bin: 'idea', why: 'Jeśli klient tego nie powiedział, to twój pomysł – albo agenta.' },
+	]}
+/>
+
+## Story to wejście dla agenta
+
+Dobra story z kryteriami **jest** promptem dla AI SDLC: staje się GOAL-1 i `docs/spec-about.md` (etap 3), a agent na jej podstawie planuje. Zespoły, które piszą specyfikacje dla agentów, dostają lepsze plany, bo agent musi mniej zgadywać. Agenci są też dobrymi krytykami stories – jeśli ich o to poprosisz:
+
+```text title="Prompty (Copilot)"
+/ba-requirements docs/client-log.md
+Napisz user stories wyłącznie na podstawie docs/client-log.md. Przy każdej
+podaj linijkę z dziennika. Wszystko bez źródła wpisz pod „Pomysły
+(niezatwierdzone)”.
+
+Bądź surowym recenzentem docs/stories.md. Dla każdej story sprawdź: czy
+nazywa rozwiązanie zamiast potrzeby? Czy da się ją przetestować? Czy to
+dwie stories w jednej? Czy źródło jest prawdziwe? Nie przepisuj stories;
+wypisz problemy.
+```
+
+<Predict id="agent-stories" question="Dajesz agentowi dziennik klienta i prosisz o user stories. Dostajesz piętnaście. W dzienniku klienta jest sześć wypowiedzi. Jak myślisz, co jest w pozostałych dziewięciu?">
+
+Przeważnie wiarygodnie brzmiące stories, o które nikt nie prosił: funkcje, które „zwykle mają takie aplikacje”, rozsądne oczekiwania, rzeczy z kategorii „fajnie by było”. Niektóre mogą być dobrymi pomysłami. Żadna nie jest wymaganiem, dopóki klient się nie zgodzi. Wyłapie je zasada cytowania: story, której linijka źródłowa nie mówi tego, co twierdzi story, trafia na listę pomysłów.
+
+</Predict>
+
+<AtWork>Stories ze źródłami to sposób, żeby na demo nie usłyszeć klasycznego „ale przecież o to nie prosiliśmy”.</AtWork>
+
+:::tip[Zrób to w swoim projekcie]
+Poproś agenta o stories z twojego dziennika klienta, z zasadą cytowania opisaną wyżej. Otwórz każdą cytowaną linijkę i sprawdź, czy mówi to, co twierdzi story. Resztę przenieś do *Pomysłów* i przynieś tę listę klientowi jako pytania, nie jako plan.
+:::
+
+<Done />

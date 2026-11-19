@@ -1,0 +1,289 @@
+---
+title: 'Etapy 1–4: od pomysłu do planu'
+description: 'Przykład, część pierwsza: pomysł, analiza, wymagania techniczne i zatwierdzony plan.'
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import StageFacts from '../../../../components/StageFacts.astro';
+import StageStrip from '../../../../components/StageStrip.astro';
+import Checklist from '../../../../components/Checklist.astro';
+import Quiz from '../../../../components/Quiz.astro';
+import Predict from '../../../../components/Predict.astro';
+import Tldr from '../../../../components/Tldr.astro';
+import AtWork from '../../../../components/AtWork.astro';
+import Done from '../../../../components/Done.astro';
+
+<Tldr minutes={8} items={["Pomysł → cel → kryteria, które da się sprawdzić → plan, który zatwierdzasz.", "Najpierw przypadki brzegowe: tam zgadywanie najczęściej zawodzi.", "Nie ma planu bez źródeł."]} />
+
+<StageStrip />
+
+:::note[Przykład: ekran About]
+Klient, klinika rehabilitacyjna prowadząca sześciomiesięczne badanie (fikcyjny klient z W1), prosi o ekran About w Mood Trackerze: wersja aplikacji, wersja serwera, do czego służy aplikacja i do kogo pisać z pytaniami. To neutralne zadanie z demo na W3, więc nie dotyka żadnego z obszarów, które briefy C01–C07 zostawiają tobie do odkrycia.
+
+Artefakty poniżej zostały **napisane na potrzeby tego przewodnika**. To nie jest zapis prawdziwej sesji z agentem, a liczby i hashe są zmyślone.
+:::
+
+<span id="stage-idea" class="stage-anchor"></span>
+
+## 1. Pomysł
+
+<StageFacts tone="you" who={'<span class="sdlc-chip is-you">Ty</span> albo klient, który chce tej funkcji'} input="Potrzeba użytkownika" output="Szkic i jedno zdanie, zapisane jako issue" />
+
+> *„Uczestnicy ciągle pytają, którą wersję mają, a nasza komisja bioetyczna chce, żeby aplikacja mówiła, do czego służy.”*
+
+Szkic od koordynatora badania pokazuje ekran z nazwą aplikacji, wersją, jednym zdaniem o badaniu i kontaktem. To wystarczy, żeby zacząć rozmowę, więc zapisz to jako issue (tutaj issue #7). Nie wystarczy, żeby zacząć kodować: szkic nie mówi, skąd wziąć wersję, co ma się dziać, gdy serwer nie działa, jakie zdanie o badaniu ani czyj kontakt. (Skąd wzięła się ta prośba i dlaczego ekran About wygrał z innymi opcjami – o tym jest część o [rozwoju produktu](../../product/overview/).)
+
+<span id="stage-analysis" class="stage-anchor"></span>
+
+## 2. Analiza: zdefiniuj cel
+
+<StageFacts tone="you" who={'<span class="sdlc-chip is-you">Ty</span> – spojrzenie biznesowe i techniczne razem'} input="Pomysł; karta produktu i architektura, żeby zobaczyć, czego pomysł dotyka" output="Krótka definicja celu z ID" />
+
+Analiza zamienia pomysł w **cel**. Potrzebuje obu spojrzeń. Strona biznesowa wie, po co ta funkcja; strona techniczna wie, ile kosztuje i czego dotyka. Odpowiedz na cztery pytania i zapisz, co jest poza zakresem:
+
+1. **Co robi ten ekran?**
+2. **Jaką wartość daje?**
+3. **Z czym się integruje?**
+4. **Jakie ograniczenia techniczne obowiązują?**
+
+```text title="GOAL-1: ekran About (z issue #7)"
+Co robi          Ekran About, otwierany z ekranu głównego, który pokazuje
+                 wersję aplikacji, wersję serwera, intended purpose i kontakt
+                 w sprawie pytań o badanie.
+Wartość          Wsparcie techniczne wie, którą wersję ma uczestnik.
+                 Uczestnicy widzą, do czego służy aplikacja, w słowach
+                 zatwierdzonych przez klienta.
+Integruje się z  buildem (numer wersji); GET /version na serwerze;
+                 docs/product.md (intended purpose i kontakt).
+Ograniczenia     Żadnych nowych pakietów (każdy to pozycja SOUP). Działa, gdy
+                 serwer nie odpowiada. Nie pokazuje danych osobowych. Nigdy nie
+                 pokazuje faktu o kliencie, którego klient nie potwierdził.
+Poza zakresem    Strona z licencjami, changelog, sprawdzanie aktualizacji.
+```
+
+<Predict id="hidden-decisions" question="Pomijasz analizę i wpisujesz w agent mode tylko <em>„dodaj ekran About”</em>. Wypisz decyzje, które agent podejmie za klienta, nie pytając nikogo.">
+
+Skąd wziąć wersję (nowy pakiet?), co pokazać, gdy serwer nie działa, jakie zdanie opisuje przeznaczenie aplikacji, czyj kontakt, w jakim języku. Każdy z tych strzałów brzmi rozsądnie i każda z tych decyzji należy do klienta albo do ciebie. GOAL-1 ustala je, zanim powstanie jakikolwiek kod. W demo na W3 liczyliśmy te ukryte decyzje na prawdziwym diffie.
+
+</Predict>
+
+<span id="stage-requirements" class="stage-anchor"></span>
+
+## 3. Wymagania techniczne
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-you">Ty</span> decydujesz · <span class="sdlc-chip is-agent">Agent</span> może napisać szkic i zadawać pytania'} input="Cel, dziennik klienta, dokumentacja architektury i API, <code>AGENTS.md</code>" output="<code>docs/spec-about.md</code>: ponumerowane kryteria, które da się zaobserwować" />
+
+Wymagania to cel zapisany tak, żeby o każdym zdaniu dało się **rozstrzygnąć, czy jest prawdziwe, czy fałszywe** – testem albo uruchomieniem aplikacji. Składa się na nie kilka źródeł:
+
+- **Słowa klienta.** `docs/client-log.md` i karta produktu; makieta, jeśli jest.
+- **Wiedza o projekcie.** Co mówi dokumentacja architektury i API, np. który endpoint zwraca wersję.
+- **Standardy pracy.** Co już ustala `AGENTS.md`, np. żadnych nowych pakietów bez pytania.
+
+Dobry początek: niech agent najpierw będzie krytykiem, tak jak w demo na W3. *„Zanim cokolwiek napiszesz, zadaj mi pytania, których potrzebujesz do tej specyfikacji. Oddziel pytania do klienta od technicznych.”*
+
+```markdown title="docs/spec-about.md"
+# About screen: acceptance criteria (GOAL-1)
+
+AC-1  The home screen's app bar has an About button that opens a screen
+      titled "About".
+AC-2  The screen shows the app version and build number of the build, for
+      example "1.3.0 (12)". A build without them shows "dev".
+AC-3  The screen shows the server's version from GET /version, for example
+      "Server 1.0.0", and "Server: checking…" while it waits.
+AC-4  If the server does not answer within 5 seconds, or answers with an
+      error, the screen shows "Server: unavailable". The rest of the screen
+      works while it waits and afterwards.
+AC-5  The intended purpose and the contact are shown exactly as written in
+      docs/product.md. A value still marked <TODO: client> is shown as
+      "not yet confirmed", never as the placeholder or an invented value.
+AC-6  The existing screens, the login and the mood list do not change.
+
+Out of scope: a licences page, a changelog, update checks.
+```
+
+To samo kryterium można zapisać w formie **EARS** (*Easy Approach to Requirements Syntax*, W3), która wprost pokazuje wyzwalacz i reakcję:
+
+> **AC-4 (EARS)** *If* the server does not answer within 5 seconds, *then* the About screen *shall* show "Server: unavailable".
+
+Większość przypadków brzegowych to zdania typu „If… then… shall”. Jeśli nie umiesz takiego napisać, wymaganie nie jest jeszcze jasne.
+
+<Quiz
+	question="O którym z tych kryteriów da się rozstrzygnąć testem albo uruchomieniem, czy jest spełnione?"
+	options={[
+		'Ekran About ładuje się szybko, nawet na starszych telefonach',
+		'Uczestnicy uważają ekran About za łatwy do zrozumienia',
+		'Kod ekranu About jest czysty i dobrze przetestowany',
+		'Jeśli GET /version nie odpowie w ciągu 5 s, ekran pokazuje „Server: unavailable”',
+	]}
+	answer={3}
+	why={[
+		'„Szybko” nie ma progu. Da się to przetestować, gdy go określisz: „widoczny w ciągu 1 s od dotknięcia About na telefonie referencyjnym”.',
+		'Da się to rozstrzygnąć dopiero wtedy, gdy ustalisz, jak to mierzysz, np. „4 z 5 uczestników znajduje kontakt bez pomocy”.',
+		'Nikt nie zaobserwuje „czystości”. Zamień to na reguły quality gate (etap 6).',
+		'',
+	]}
+	explain="Tylko ostatnie wskazuje obserwowalny wynik i próg. Pozostałe staną się kryteriami, gdy powiesz, co zaobserwujesz i na czym."
+/>
+
+<Predict id="first-test" question="Które kryterium przetestujesz jako pierwsze i dlaczego?">
+
+**AC-4 i AC-5.** To na krawędziach rozsądnie brzmiące zgadywanie najczęściej okazuje się błędne – i tam nikt tego nie zauważy, patrząc na ekran: na twoim laptopie serwer zawsze działa, a placeholder wygląda niewinnie. AC-4 ma granicę, którą da się przetestować dokładnie (odpowiedź tuż przed upływem 5 s się wyświetla; brak odpowiedzi po 5 s – nie). AC-5 chroni słowa samego klienta, które agent w przeciwnym razie by zmyślił.
+
+</Predict>
+
+:::caution[Co tu najczęściej idzie nie tak]
+- Kryteria, których nikt nie zaobserwuje, np. „kod jest czysty”.
+- Brak przypadków brzegowych: serwer nie działa, wartości jeszcze nie ma, bardzo długi tekst, duża czcionka.
+- Agent pisze kryteria, według których potem sam będzie oceniany, a ty ich nie czytasz.
+:::
+
+<span id="stage-plan" class="stage-anchor"></span>
+
+## 4. Plan: co zbudujemy i jak
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> proponuje · <span class="sdlc-chip is-you">Ty</span> zatwierdzasz, poprawiasz albo prosisz o alternatywę'} input={`<code>docs/spec-about.md</code> i <a href="../knowledge/"><b>wiedza o projekcie</b></a>: <code>ARCHITECTURE.md</code>, zapisy decyzji, <code>NOTES.md</code>, <code>docs/product.md</code>, dokumentacja API, <code>AGENTS.md</code>`} output="Zatwierdzony plan z listą źródeł, znalezionymi sprzecznościami i twoimi odpowiedziami na piśmie" />
+
+Poproś agenta o plan, **zanim** cokolwiek zmieni. Plan mówi, *co* powstanie i *jak*: które pliki, jakie podejście, jakie sprawdzenia. Na W3 robiliście to w Spec Kit, narzędziu GitHuba do spec-driven development: spec → plan → zadania → implementacja.
+
+:::danger[Nie ma planu bez wiedzy o projekcie]
+Wskaż agentowi architekturę, zapisy decyzji, kartę produktu i notatki, **zanim** zacznie planować (prompt do planowania z rozdziału 3), i wymagaj, żeby plan **wymienił dokumenty, z których korzystał**. Plan bez źródeł jest zgadnięty. Porównaj dwie wersje poniżej: dzięki wiedzy kod trafił do właściwej warstwy, obyło się bez nowego pakietu, a słowa klienta zostały słowami klienta.
+:::
+
+<Tabs>
+<TabItem label="Plan oparty na wiedzy o projekcie">
+
+```text
+Plan: About screen (GOAL-1)
+
+Based on
+  ARCHITECTURE.md      screens never import http; network calls live in
+                       lib/services/; providers connect screens to services
+  ADR-0002             values that differ between builds use --dart-define
+  docs/product.md      purpose quoted from the client log; contact is
+                       <TODO: client>
+  NOTES.md 2026-11-05  goldens were recorded on macOS: do not regenerate them
+  Contradiction        ARCHITECTURE.md lists lib/repositories/, but
+                       MoodRepository is in lib/data/ (FACT:
+                       lib/data/mood_repository.dart). I will not create the
+                       folder; the document needs fixing.
+
+Files
+  new   lib/services/version_service.dart  fetchServerVersion(timeout:)  AC-3, AC-4
+  new   lib/providers/about_provider.dart  serverVersionProvider         AC-3
+  new   lib/screens/about_screen.dart      the screen                    AC-1..AC-5
+  new   lib/about_content.dart             purpose and contact, copied
+                                           word for word from
+                                           docs/product.md; null = not
+                                           confirmed                     AC-5
+  edit  lib/config.dart                    appVersion                    AC-2
+  edit  lib/screens/home_screen.dart       About button in the app bar   AC-1, AC-6
+  new   test/screens/about_screen_test.dart                             AC-1..AC-5
+  new   test/about_content_test.dart       fails if the text differs
+                                           from docs/product.md          AC-5
+  new   test/architecture_test.dart        screens never import http     (rule)
+
+Approach
+  The timeout is a parameter (5 s by default), so a test can use a server
+  that never answers (AC-4). The screen reads the server version through a
+  provider that tests can override.
+
+Questions
+  1. (client)    The contact is <TODO: client>. Show "not yet confirmed", as
+                 AC-5 says, or hide the row until the client answers?
+  2. (technical) Version: package_info_plus (a new SOUP item) or
+                 --dart-define, as in ADR-0002?
+
+Checks
+  flutter analyze and flutter test; I will report the actual output.
+```
+
+</TabItem>
+<TabItem label="Plan bez tej wiedzy">
+
+```text
+Plan: about page
+
+Files
+  new   lib/screens/about_screen.dart   calls http.get('/version') directly
+  edit  pubspec.yaml                    add package_info_plus for the version
+
+Approach
+  Purpose: "Mood Tracker helps patients monitor and manage depression."
+  Contact: support@moodtracker.app
+  Show a loading spinner until the server answers.
+
+Checks
+  Run the tests.
+```
+
+Każda linia brzmi rozsądnie, a pięć z nich to błędy w tym projekcie. Ekran, który sam woła `http`, łamie architekturę. Nowy pakiet to niezarejestrowana pozycja SOUP, a `AGENTS.md` każe w takiej sytuacji zatrzymać się i zapytać. Intended purpose to zdanie, którego klient nigdy nie powiedział – i do tego **twierdzenie medyczne**, które może zmienić to, jak aplikacja jest regulowana. Adres kontaktowy jest zmyślony. A bez timeoutu spinner kręci się w nieskończoność, gdy serwer nie działa.
+
+</TabItem>
+</Tabs>
+
+Sprawdzaj plan tymi pytaniami. Twoje zaznaczenia zapisują się w tej przeglądarce, więc możesz wrócić do tej listy na labach:
+
+<Checklist
+	id="plan-review"
+	items={[
+		'<b>Wymienia dokumenty</b>, z których korzystał, i są to właściwe dokumenty',
+		'Pasuje do <code>ARCHITECTURE.md</code> i trzyma się każdego istotnego zapisu decyzji',
+		'Każdemu kryterium odpowiada co najmniej jeden krok',
+		'Wszystkie pliki mieszczą się w tym, na co pozwala zadanie; żaden pakiet nie jest dodany bez pytania',
+		'Podejście da się przetestować (tutaj: timeout jest parametrem, więc AC-4 da się przetestować)',
+		'Każdy fakt o kliencie pochodzi z <code>docs/client-log.md</code>; nic nie jest zmyślone',
+		'Pytania agenta mają odpowiedzi <b>na piśmie</b>, a znalezione sprzeczności są poprawione albo zapisane',
+	]}
+/>
+
+<Predict id="plan-flaw" question="Przeczytaj jeszcze raz zatwierdzony plan w pierwszej zakładce. Jedna linia w <b>Files</b> przeczy sekcji <b>Questions</b> z tego samego planu. Która?">
+
+`edit lib/config.dart  appVersion  AC-2`. Czytanie wersji z `lib/config.dart` z góry zakłada odpowiedź na pytanie 2 (`--dart-define`), a przecież pytanie 2 wciąż pyta, czy nie użyć zamiast tego pakietu. Najpierw odpowiedz na pytanie albo uzależnij ten krok od odpowiedzi. Plany, które po cichu zakładają odpowiedzi na własne otwarte pytania, zdarzają się często; wyłapywanie ich to część zatwierdzania planu.
+
+</Predict>
+
+Odpowiedzi na pytania z planu to decyzje, więc trzeba je zapisać: tutaj *„1: pokazuj «not yet confirmed». 2: `--dart-define`, jak w ADR-0002; zapisz to jako ADR.”* Plan jest tani, implementacja nie. Możesz odrzucić plan albo poprosić o dwie alternatywy i wybrać jedną – za ułamek tego, ile kosztuje cofanie kodu.
+
+<Quiz
+	question="Plan proponuje <code>lib/repositories/about_repository.dart</code>. <code>ARCHITECTURE.md</code> wymienia <code>repositories/</code>, ale takiego folderu nie ma. Jak najlepiej zareagować?"
+	options={[
+		'Zapytać, na czym opiera się plan, zdecydować, czy rację ma dokument, czy kod, poprawić jedno z nich i zaplanować od nowa',
+		'Zatwierdzić: dokument mówi, że ta warstwa istnieje, więc agent trzyma się architektury',
+		'Pozwolić agentowi najpierw to zaimplementować, a o folderze zdecydować na review kodu',
+		'Usunąć <code>ARCHITECTURE.md</code>, żeby plan nie był sprzeczny z żadnym dokumentem',
+	]}
+	answer={0}
+	why={[
+		'',
+		'Dokument mija się z kodem. Jeśli za nim pójdziesz, zbudujesz coś na fałszywym założeniu.',
+		'Cofanie kodu kosztuje dużo więcej niż poprawienie planu.',
+		'Wtedy każdy kolejny plan znowu zgaduje architekturę.',
+	]}
+	explain="Sprzeczność między dokumentami a kodem to ważne znalezisko, a nie drobiazg. Rozstrzygnij ją świadomie i zapisz, jak; inaczej następny plan trafi na to samo fałszywe założenie."
+/>
+
+<Quiz
+	question="Co najmocniej wskazuje, że plan jest zgadnięty, a nie oparty na wiedzy o projekcie?"
+	options={[
+		'Jest krótki: mniej niż strona, tylko pięć plików',
+		'Zadaje ci dwa pytania, zanim cokolwiek zmieni',
+		'Nie wymienia żadnych dokumentów, a jego opisu przeznaczenia aplikacji nie ma w dzienniku klienta',
+		'Wymienia testy, które napisze dla każdego kryterium',
+	]}
+	answer={2}
+	why={[
+		'Krótki plan jest w porządku, jeśli jest kompletny.',
+		'Pytania to dobry znak: agent znalazł luki, zamiast je zapychać zgadywaniem.',
+		'',
+		'Przypisanie testów do kryteriów to dokładnie to, co robi dobry plan.',
+	]}
+	explain="Prawdziwy sprawdzian to źródła. Plan, który nie powołuje się na żadne dokumenty, zgadł architekturę, a fakt o kliencie, którego nie da się znaleźć w dzienniku klienta, został zmyślony."
+/>
+
+<AtWork>Pisanie specyfikacji, którą agent potrafi wykonać, a człowiek sprawdzić, szybko staje się jedną z kluczowych umiejętności inżyniera (spec-driven development).</AtWork>
+
+:::tip[Zrób to w swoim projekcie]
+Dla pierwszej funkcji ze swojego briefu napisz `GOAL-n` (cztery pytania plus *poza zakresem*) i `docs/spec-<feature>.md` z co najmniej jednym przypadkiem brzegowym i jednym „to się nie może zmienić”. Zanim agent cokolwiek naszkicuje, poproś go o pytania, na które potrzebuje odpowiedzi – osobno do klienta i osobno techniczne.
+:::
+
+<Done />

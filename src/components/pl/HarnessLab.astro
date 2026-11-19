@@ -1,0 +1,44 @@
+---
+/** Section 1 (Polish): chat versus agent; take parts away from the harness. */
+---
+
+<div class="harness-lab not-content">
+	<div class="agent-compare">
+		<div class="agent-compare__panel">
+			<p class="agent-compare__title">Asystent w czacie</p>
+			<div class="flow">
+				<div class="flow__box is-you">Piszesz prompt</div>
+				<div class="flow__arrow">wklejasz kod</div>
+				<div class="flow__box is-agent">Model</div>
+				<div class="flow__arrow">kopiujesz odpowiedź</div>
+				<div class="flow__box is-you">Uruchamiasz, testujesz i poprawiasz</div>
+			</div>
+			<p class="flow__note">Model nigdy nie widzi, czy jego kod się kompiluje. Każde sprawdzenie robisz ty, ręcznie.</p>
+		</div>
+		<div class="agent-compare__panel">
+			<p class="agent-compare__title">Agent = model + harness</p>
+			<div class="harness">
+				<span class="harness__label">Harness</span>
+				<button type="button" class="harness__part harness__part--tools" data-part="tools" aria-pressed="true"><b>Narzędzia</b><span>czytanie i edycja plików, uruchamianie komend, wyszukiwanie; więcej przez MCP</span></button>
+				<button type="button" class="harness__part harness__part--auto" data-part="automation" aria-pressed="true"><b>Automatyzacja</b><span>pętla: zaplanuj, działaj, obserwuj, powtórz; hooki</span></button>
+				<div class="harness__model">Model</div>
+				<button type="button" class="harness__part harness__part--instr" data-part="instructions" aria-pressed="true"><b>Instrukcje</b><span>prompt z zadaniem i skille agenta</span></button>
+				<button type="button" class="harness__part harness__part--std" data-part="standards" aria-pressed="true"><b>Standardy</b><span><code>AGENTS.md</code>: zasady projektu</span></button>
+			</div>
+			<p class="harness__task">Harness to zestaw skompletowany pod jeden rodzaj zadań.</p>
+		</div>
+	</div>
+	<p class="harness-lab__hint"><b>Spróbuj:</b> kliknij część harnessu, żeby ją zabrać, i zobacz, co ten sam model zrobi bez niej.</p>
+	<div class="harness-lab__result" aria-live="polite"></div>
+	<div class="harness-lab__data">
+		<div data-missing="none"><h4>Pełny harness</h4><p>Agent może działać, sprawdzać własną pracę, trzymać się zadania i przestrzegać zasad projektu. Wciąż potrzebuje twoich kryteriów i twojego review.</p></div>
+		<div data-missing="tools"><h4>Bez narzędzi</h4><p>Nie otworzy plików ani nie uruchomi <code>flutter test</code>. Pisze „wszystkie testy przechodzą”, bo to najbardziej prawdopodobne następne zdanie, a nie dlatego, że cokolwiek się uruchomiło. Wracasz do kopiowania i wklejania.</p></div>
+		<div data-missing="automation"><h4>Bez automatyzacji</h4><p>Robi jedną zmianę i staje. Błąd z analyzera, który pojawia się zaraz potem, to twoja działka: musisz go znaleźć, wkleić z powrotem i zapytać. Jedna runda na każdą pomyłkę.</p></div>
+		<div data-missing="instructions"><h4>Bez instrukcji</h4><p>Brak granic zadania i brak kryteriów. Skoro już siedzi w pliku, „ulepsza” dwa inne ekrany i zmienia nazwę widgetu. Każda zmiana wygląda rozsądnie; razem dają review, którego nikt nie da rady skończyć.</p></div>
+		<div data-missing="standards"><h4>Bez standardów</h4><p>Dodaje pakiet do numeru wersji, woła <code>http</code> prosto z ekranu i pomija testy. Kod wygląda wiarygodnie, ale jest zły dla <em>tego</em> projektu.</p></div>
+	</div>
+</div>
+
+<script>
+	import '../../scripts/sdlc.js';
+</script>

@@ -1,0 +1,58 @@
+---
+/** Progress per part, from the pages the reader marked as done (this browser only). */
+import { t, langOf, fill } from '../i18n/ui';
+import { link } from '../lib/url';
+interface Part {
+	title: string;
+	pages: { slug: string; label: string }[];
+}
+interface Props {
+	parts: Part[];
+}
+const { parts } = Astro.props;
+const T = t(Astro);
+const lang = langOf(Astro);
+---
+
+<div class="progress biz-widget not-content" data-i18n={JSON.stringify({ pagesDone: T.pagesDone })}>
+	<div class="biz-head">
+		<p class="biz-kicker">{T.progressTitle}</p>
+		<span class="progress__note">{T.progressNote}</span>
+	</div>
+	<div class="progress__parts">
+		{
+			parts.map((part) => (
+				<section class="progress__part">
+					<p class="progress__title">{part.title}</p>
+					<div class="progress__bar"><i /></div>
+					<p class="progress__count">{fill(T.pagesDone, { n: 0, total: part.pages.length })}</p>
+					<ol class="progress__pages">
+						{part.pages.map((p) => (
+							<li data-key={`done:/${p.slug}`}>
+								<a href={link(p.slug, lang)}>{p.label}</a>
+							</li>
+						))}
+					</ol>
+				</section>
+			))
+		}
+	</div>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLElement>('.progress').forEach((box) => {
+		const tpl = JSON.parse(box.dataset.i18n || '{}').pagesDone || '{n} of {total} pages done';
+		box.querySelectorAll<HTMLElement>('.progress__part').forEach((part) => {
+			const items = Array.from(part.querySelectorAll<HTMLElement>('li[data-key]'));
+			let done = 0;
+			items.forEach((li) => {
+				let on = false;
+				try { on = localStorage.getItem(li.dataset.key!) === '1'; } catch {}
+				li.classList.toggle('is-done', on);
+				if (on) done++;
+			});
+			part.querySelector<HTMLElement>('.progress__bar i')!.style.width = `${(done / items.length) * 100}%`;
+			part.querySelector<HTMLElement>('.progress__count')!.textContent = tpl.replace('{n}', String(done)).replace('{total}', String(items.length));
+		});
+	});
+</script>

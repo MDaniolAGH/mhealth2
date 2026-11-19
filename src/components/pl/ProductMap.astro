@@ -1,0 +1,170 @@
+---
+/**
+ * The product-development map (Polish): ten stages from the client's brief to a
+ * decision, in three lanes (client, you, agent), with the evidence on the left
+ * and the traceability rail. Same engine as the AI SDLC map (src/scripts/sdlc.js).
+ */
+import { link } from '../../lib/url';
+
+const s = {
+	brief: link('product/decision-and-facts/', 'pl'),
+	decision: link('product/decision-and-facts/#decision', 'pl'),
+	assumptions: link('product/decision-and-facts/#assumptions', 'pl'),
+	purpose: link('product/purpose/', 'pl'),
+	questions: link('product/questions-and-observation/', 'pl'),
+	meeting: link('product/questions-and-observation/#meeting', 'pl'),
+	stories: link('product/user-stories/', 'pl'),
+	criteria: link('product/testable-stories/', 'pl'),
+	options: link('product/options-and-recommendation/#options', 'pl'),
+	recommendation: link('product/options-and-recommendation/#recommendation', 'pl'),
+	evidence: link('product/decision-and-facts/#assumptions', 'pl'),
+};
+
+const flows = {
+	loops: [
+		{ from: 'options', to: 'meeting', label: 'nic nie pasuje → zapytaj', kind: 'fail', layer: 'base', lane: 0.3, dy: 8 },
+		{ from: 'meeting', to: 'decision', label: 'odpowiedzi zmieniają decyzję', kind: 'loop', layer: 'loops', lane: 0.62, dy: 4, labelDy: 0, wideOnly: true },
+		{ from: 'purpose', to: 'decision', label: 'wyrób? → przemyśl', kind: 'loop', layer: 'loops', lane: 0.9, dy: -6, labelAt: 'from' },
+		{ from: 'recommendation', to: 'options', kind: 'loop', layer: 'loops', lane: 'near' },
+	],
+	kb: [
+		{ to: 'assumptions', layer: 'base' },
+		{ from: 'meeting', layer: 'base' },
+		{ to: 'questions', layer: 'knowledge' },
+		{ to: 'stories', layer: 'knowledge' },
+		{ to: 'options', layer: 'knowledge' },
+		{ from: 'recommendation', layer: 'knowledge', label: 'zdecydowane' },
+		{ to: 'brief', layer: 'knowledge', label: 'kolejna prośba' },
+	],
+};
+
+const i18n = JSON.stringify({
+	play: '▶ Przejdź krok po kroku',
+	pause: '❚❚ Pauza',
+	step: 'Krok {n} z {total}',
+	readSection: 'Przeczytaj cały rozdział →',
+	readKb: 'Przeczytaj o dowodach →',
+	traced: 'Podświetlone: każdy etap, przez który da się prześledzić ten zapis wstecz, aż do briefu.',
+});
+---
+
+<div class="sdlc pmap not-content" data-i18n={i18n}>
+	<div class="sdlc-toolbar">
+		<div class="sdlc-toolbar__group" role="group" aria-label="Przejdź mapę krok po kroku">
+			<button type="button" class="sdlc-btn" data-action="prev" aria-label="Poprzedni krok">◀</button>
+			<button type="button" class="sdlc-btn sdlc-btn--primary" data-action="play">▶ Przejdź krok po kroku</button>
+			<button type="button" class="sdlc-btn" data-action="next" aria-label="Następny krok">▶</button>
+			<span class="sdlc-toolbar__status" aria-live="polite"></span>
+		</div>
+		<div class="sdlc-toolbar__group" role="group" aria-label="Warstwy">
+			<span class="sdlc-legend__hint">Pokaż:</span>
+			<button type="button" class="sdlc-chip is-loop" data-layer="loops" aria-pressed="false">Pętle zwrotne</button>
+			<button type="button" class="sdlc-chip is-knowledge" data-layer="knowledge" aria-pressed="false">Przepływy dowodów</button>
+			<button type="button" class="sdlc-chip is-audit" data-layer="audit" aria-pressed="false">Ślad w dokumentach</button>
+		</div>
+	</div>
+
+	<div class="sdlc-legend">
+		<span class="sdlc-legend__hint">Kto:</span>
+		<button type="button" class="sdlc-chip is-client" data-actor="client" aria-pressed="false">Klient</button>
+		<button type="button" class="sdlc-chip is-you" data-actor="you" aria-pressed="false">Ty i twoja para</button>
+		<button type="button" class="sdlc-chip is-agent" data-actor="agent" aria-pressed="false">Agent</button>
+	</div>
+
+	<div class="sdlc-map" role="group" aria-label="Mapa rozwoju produktu: dziesięć etapów od briefu klienta do decyzji, z dowodami po lewej" data-flows={JSON.stringify(flows)}>
+		<div class="sdlc-lane is-client" style="grid-column:4" aria-hidden="true"></div>
+		<div class="sdlc-lane is-you" style="grid-column:5" aria-hidden="true"></div>
+		<div class="sdlc-lane is-agent" style="grid-column:6" aria-hidden="true"></div>
+		<div class="sdlc-lane-title is-knowledge" style="grid-column:2">Dowody</div>
+		<div class="sdlc-lane-title is-client" style="grid-column:4">Klient</div>
+		<div class="sdlc-lane-title is-you" style="grid-column:5">Ty</div>
+		<div class="sdlc-lane-title is-agent" style="grid-column:6">Agent</div>
+		<div class="sdlc-rail" aria-hidden="true"><span>Śledzalność</span><i class="sdlc-rail__fill"></i></div>
+
+		<div class="sdlc-kb is-knowledge" style="grid-row:3 / 11">
+			<a class="sdlc-kb__title" href={s.evidence}>Do&shy;wody</a>
+			<a class="sdlc-kb__doc" href={s.evidence} data-doc="brief" data-feeds="decision assumptions">Brief</a>
+			<a class="sdlc-kb__doc" href={s.evidence} data-doc="log" data-feeds="decision assumptions purpose stories criteria recommendation">Dzien&shy;nik klienta</a>
+			<a class="sdlc-kb__doc" href={s.purpose} data-doc="product" data-feeds="purpose stories options">Karta produktu</a>
+			<a class="sdlc-kb__doc" href={s.questions} data-doc="app" data-feeds="assumptions questions options">Apli&shy;kacja i kod</a>
+			<a class="sdlc-kb__doc" href={s.questions} data-doc="notes" data-feeds="questions stories">Notatki z wywiadów</a>
+			<a class="sdlc-kb__doc" href={s.options} data-doc="sources" data-feeds="options recommendation">Źródła z datą</a>
+		</div>
+
+		<a class="sdlc-stage is-client" href={s.brief} data-stage="brief" data-order="1" data-actors="client" style="--row:2;--col:4"><span class="sdlc-stage__n">1</span><span class="sdlc-stage__t">Brief</span><span class="sdlc-stage__s">prośba klienta</span><span class="sdlc-stage__rec">brief.md</span></a>
+		<a class="sdlc-stage is-client-you" href={s.decision} data-stage="decision" data-order="2" data-actors="client you" style="--row:3;--col:4 / 6"><span class="sdlc-stage__n">2</span><span class="sdlc-stage__t">Decyzja</span><span class="sdlc-stage__s">co trzeba zdecydować, nie zbudować</span><span class="sdlc-stage__rec">decision.md</span></a>
+		<a class="sdlc-stage is-you-agent is-kb-reader" href={s.assumptions} data-stage="assumptions" data-order="3" data-actors="you agent" style="--row:4;--col:5 / 7"><span class="sdlc-stage__n">3</span><span class="sdlc-stage__t">Fakty i założenia</span><span class="sdlc-stage__s">agent szkicuje · ty sprawdzasz źródła</span><span class="sdlc-stage__rec">assumptions.md</span></a>
+		<a class="sdlc-stage is-client-you" href={s.purpose} data-stage="purpose" data-order="4" data-actors="client you" style="--row:5;--col:4 / 6"><span class="sdlc-stage__n">4</span><span class="sdlc-stage__t">Intended purpose</span><span class="sdlc-stage__s">dzienniczek czy wyrób medyczny?</span><span class="sdlc-stage__rec">product.md</span></a>
+		<a class="sdlc-stage is-you-agent" href={s.questions} data-stage="questions" data-order="5" data-actors="you agent" style="--row:6;--col:5 / 7"><span class="sdlc-stage__n">5</span><span class="sdlc-stage__t">Pytania i obserwacje</span><span class="sdlc-stage__s">tylko to, co zmienia odpowiedź</span><span class="sdlc-stage__rec">questions.md</span></a>
+		<a class="sdlc-stage is-client" href={s.meeting} data-stage="meeting" data-order="6" data-actors="client" style="--row:7;--col:4"><span class="sdlc-stage__n">6</span><span class="sdlc-stage__t">Spotkanie z klientem</span><span class="sdlc-stage__s">odpowiedzi z datą</span><span class="sdlc-stage__rec">dziennik klienta</span></a>
+		<a class="sdlc-stage is-you-agent is-kb-reader" href={s.stories} data-stage="stories" data-order="7" data-actors="you agent" style="--row:8;--col:5 / 7"><span class="sdlc-stage__n">7</span><span class="sdlc-stage__t">User stories</span><span class="sdlc-stage__s">najpierw potrzeba, każda ze źródłem</span><span class="sdlc-stage__rec">stories.md</span></a>
+		<a class="sdlc-stage is-client-you" href={s.criteria} data-stage="criteria" data-order="8" data-actors="client you" style="--row:9;--col:4 / 6"><span class="sdlc-stage__n">8</span><span class="sdlc-stage__t">Kryteria i priorytety</span><span class="sdlc-stage__s">Given/When/Then · MoSCoW</span><span class="sdlc-stage__rec">AC + MoSCoW</span></a>
+		<a class="sdlc-stage is-you-agent" href={s.options} data-stage="options" data-order="9" data-actors="you agent" style="--row:10;--col:5 / 7"><span class="sdlc-stage__n">9</span><span class="sdlc-stage__t">Opcje i estymacje</span><span class="sdlc-stage__s">twarde ograniczenia, przedziały</span><span class="sdlc-stage__rec">tabela opcji</span></a>
+		<a class="sdlc-stage is-client-you" href={s.recommendation} data-stage="recommendation" data-order="10" data-actors="client you" style="--row:11;--col:4 / 6"><span class="sdlc-stage__n">10</span><span class="sdlc-stage__t">Rekomendacja</span><span class="sdlc-stage__s">jedna strona · decyduje klient</span><span class="sdlc-stage__rec">recommendation.md</span></a>
+	</div>
+
+	<div class="sdlc-panel" aria-live="polite"><p class="sdlc-panel__empty">Kliknij etap lub dowód albo naciśnij <b>Przejdź krok po kroku</b>, żeby prześledzić prośbę Anny.</p></div>
+
+	<div class="sdlc-layer-info">
+		<div data-layer-info="audit"><h4>Ślad w dokumentach</h4><p>Każdy etap zostawia dokument, który odsyła do swoich źródeł. Kliknij etap, żeby zobaczyć jego zapis i prześledzić go wstecz po pasku śledzalności, aż do briefu.</p></div>
+		<div data-layer-info="loops"><h4>Pętle zwrotne</h4><dl><dt>Nic nie pasuje</dt><dd>Twarde ograniczenia klienta wykluczają każdą opcję: wróć i zapytaj, które ograniczenie da się przesunąć.</dd><dt>Odpowiedzi zmieniają decyzję</dt><dd>Odpowiedź klienta pokazuje, że decyzja była źle postawiona: napisz ją od nowa.</dd><dt>Wyrób? Przemyśl</dt><dd>Przeznaczenie zrobiłoby z aplikacji wyrób medyczny: zanim zrobisz cokolwiek dalej, przemyśl zakres.</dd><dt>Klient mówi „nie”</dt><dd>Rekomendacja zostaje odrzucona: wracasz do opcji, razem z powodem.</dd></dl><p>Rozpoznanie produktu jest narysowane z góry na dół, ale prawdziwe projekty kręcą się w pętlach. Pętla na tym etapie kosztuje jednego maila; ta sama pętla po napisaniu kodu kosztuje tygodnie.</p></div>
+		<div data-layer-info="knowledge"><h4>Przepływy dowodów</h4><p>Dowody zasilają założenia, pytania, user stories i opcje. Każde spotkanie z klientem dodaje datowane wpisy do dziennika klienta, a na końcu decyzja zostaje zapisana, więc kolejna prośba zaczyna od niej. Kliknij dowód, żeby zobaczyć, które etapy go czytają.</p></div>
+	</div>
+
+	<div class="sdlc-details">
+		<div data-detail="brief"><h4>1. Brief</h4><dl><dt>Kto</dt><dd>Klient: Anna, koordynatorka badania</dd><dt>Wejście</dt><dd>Problem opisany słowami klienta</dd><dt>Wyjście</dt><dd>Brief i pierwszy, datowany wpis w dzienniku klienta</dd><dt>Sprawdź</dt><dd>Czy to słowa klienta, a nie twoje?</dd></dl></div>
+		<div data-detail="decision"><h4>2. Decyzja</h4><dl><dt>Kto</dt><dd>Ty ją piszesz; klient ją potwierdza</dd><dt>Wejście</dt><dd>Brief, dziennik klienta</dd><dt>Wyjście</dt><dd>Jedno zdanie: kto decyduje, między jakimi opcjami, do kiedy, w jakich granicach</dd><dt>Sprawdź</dt><dd>Żadnych nazw funkcji ani technologii; przynajmniej jedna opcja, która nie jest oprogramowaniem</dd></dl></div>
+		<div data-detail="assumptions"><h4>3. Fakty i założenia</h4><dl><dt>Kto</dt><dd>Agent szkicuje; ty sprawdzasz każde źródło</dd><dt>Wejście</dt><dd><b>Dowody</b>: brief, dziennik klienta, aplikacja i jej kod</dd><dt>Wyjście</dt><dd>Rejestr założeń, uszeregowany według tego, ile szkody narobią, jeśli są błędne; tabela interesariuszy</dd><dt>Sprawdź</dt><dd>Każdy FACT ma źródło, które sprawdzasz osobiście; syntetyczni użytkownicy nigdy nie są faktem</dd></dl></div>
+		<div data-detail="purpose"><h4>4. Intended purpose</h4><dl><dt>Kto</dt><dd>Klient formułuje przeznaczenie; ty sprawdzasz, co z niego wynika</dd><dt>Wejście</dt><dd>Dziennik klienta, karta produktu, omawiane funkcje</dd><dt>Wyjście</dt><dd>Przeznaczenie w czterech linijkach, cytowane za klientem</dd><dt>Sprawdź</dt><dd>Czy coś przesuwa je w stronę diagnozy albo leczenia? Wtedy stop i zapytaj eksperta</dd></dl></div>
+		<div data-detail="questions"><h4>5. Pytania i obserwacje</h4><dl><dt>Kto</dt><dd>Agent szkicuje i przeszukuje kod; ty wybierasz i odtwarzasz</dd><dt>Wejście</dt><dd>Rejestr założeń, aplikacja, notatki z wywiadów</dd><dt>Wyjście</dt><dd>3–5 pytań w formie „jeśli A → X, jeśli B → Y”; obserwacje z dowodami</dd><dt>Sprawdź</dt><dd>Czy jakakolwiek odpowiedź zmieni twoją rekomendację? Jeśli nie, wyrzuć pytanie</dd></dl></div>
+		<div data-detail="meeting"><h4>6. Spotkanie z klientem</h4><dl><dt>Kto</dt><dd>Klient odpowiada; ty słuchasz i zapisujesz</dd><dt>Wejście</dt><dd>Twoje 3–5 pytań</dd><dt>Wyjście</dt><dd>Datowane wpisy w dzienniku klienta: fakty ze źródłem</dd><dt>Sprawdź</dt><dd>Czy w notatkach jest to, co klient powiedział, a nie to, na co liczysz?</dd></dl></div>
+		<div data-detail="stories"><h4>7. User stories</h4><dl><dt>Kto</dt><dd>Agent szkicuje i krytykuje; ty tniesz i łączysz ze źródłami</dd><dt>Wejście</dt><dd>Dziennik klienta, decyzja, przeznaczenie</dd><dt>Wyjście</dt><dd>User stories ze źródłem i osobna lista pomysłów</dd><dt>Sprawdź</dt><dd>Każda user story wskazuje linię w dzienniku klienta, która mówi to, co twierdzi story</dd></dl></div>
+		<div data-detail="criteria"><h4>8. Kryteria i priorytety</h4><dl><dt>Kto</dt><dd>Ty piszesz kryteria; klient ustala priorytety</dd><dt>Wejście</dt><dd>User stories</dd><dt>Wyjście</dt><dd>Kryteria Given/When/Then z przypadkami brzegowymi; Must, Should, Could, Won't</dd><dt>Sprawdź</dt><dd>Każde kryterium da się potwierdzić albo obalić; priorytety ustalił klient, nie ty</dd></dl></div>
+		<div data-detail="options"><h4>9. Opcje i estymacje</h4><dl><dt>Kto</dt><dd>Agent szkicuje tabele i spiera się z tobą; ty sprawdzasz</dd><dt>Wejście</dt><dd>Uszeregowane user stories, twarde ograniczenia klienta, <b>źródła z datą</b></dd><dt>Wyjście</dt><dd>Tabela opcji z całkowitymi kosztami i estymacjami trzypunktowymi</dd><dt>Sprawdź</dt><dd>Przynajmniej jedna opcja bez oprogramowania; każda liczba ma źródło albo jest oznaczona jako estymacja</dd></dl></div>
+		<div data-detail="recommendation"><h4>10. Rekomendacja</h4><dl><dt>Kto</dt><dd>Ty piszesz jedną stronę; decyduje klient</dd><dt>Wejście</dt><dd>Wszystko powyżej</dd><dt>Wyjście</dt><dd><code>docs/recommendation.md</code>, a potem <b>issue #7</b>, które wchodzi do AI SDLC</dd><dt>Sprawdź</dt><dd>Najpierw odpowiedź; każdy powód wskazuje dowody; kryterium stopu</dd></dl></div>
+		<div data-detail="kb"><h4>Dowody</h4><dl><dt>Co</dt><dd>Wszystko, na czym może się oprzeć twoja rekomendacja, każde ze źródłem i datą</dd><dt>Po co</dt><dd>Agent pisze płynną analizę bez względu na to, czy ma dowody. Te dokumenty to różnica między faktem a wiarygodnie brzmiącym zgadywaniem.</dd><dt>Spróbuj</dt><dd>Kliknij jeden dowód, żeby zobaczyć, które etapy go czytają.</dd></dl></div>
+	</div>
+
+	<div class="sdlc-kb-details">
+		<div data-kb="brief"><h4>Brief: <code>docs/brief.md</code></h4><dl><dt>Co zawiera</dt><dd>Prośba klienta, jego słowami, i to, czym się martwi</dd><dt>Kto czyta</dt><dd>Decyzja, założenia</dd></dl></div>
+		<div data-kb="log"><h4>Dziennik klienta: <code>docs/client-log.md</code></h4><dl><dt>Co zawiera</dt><dd>Wszystko, co powiedział klient, z datą: odpowiedzi, decyzje, sformułowania</dd><dt>Kto czyta</dt><dd>Prawie każdy etap. To <b>jedyne</b> źródło faktów o kliencie</dd></dl></div>
+		<div data-kb="product"><h4>Karta produktu: <code>docs/product.md</code></h4><dl><dt>Co zawiera</dt><dd>Klient, użytkownicy, intended purpose (cytat), ograniczenia, zakres</dd><dt>Kto czyta</dt><dd>Intended purpose, user stories, opcje</dd></dl></div>
+		<div data-kb="app"><h4>Aplikacja i jej kod</h4><dl><dt>Co zawiera</dt><dd>Co naprawdę robi przejęty przez ciebie prototyp, sprawdzone na danych syntetycznych</dd><dt>Kto czyta</dt><dd>Założenia, pytania, opcje</dd></dl></div>
+		<div data-kb="notes"><h4>Notatki z wywiadów</h4><dl><dt>Co zawiera</dt><dd>Zanonimizowane notatki z rozmów z użytkownikami i personelem</dd><dt>Kto czyta</dt><dd>Pytania, user stories</dd><dt>Zasada</dt><dd>Dane osobowe: zanonimizuj je i trzymaj z dala od konsumenckich narzędzi AI</dd></dl></div>
+		<div data-kb="sources"><h4>Źródła z datą</h4><dl><dt>Co zawiera</dt><dd>Ceny, przepisy, fakty o rynku, każde z linkiem i datą</dd><dt>Kto czyta</dt><dd>Opcje, rekomendacja</dd><dt>Zasada</dt><dd>Nie ma źródła, nie ma liczby: oznacz ją jako [UNVERIFIED]</dd></dl></div>
+	</div>
+
+	<div class="sdlc-audits">
+		<div data-audit="brief"><h4>Zapis: brief</h4><dl><dt>Zapis</dt><dd><code>docs/brief.md</code> i pierwszy wpis w dzienniku klienta</dd><dt>Odsyła do</dt><dd>Maila od Anny</dd></dl></div>
+		<div data-audit="decision"><h4>Zapis: decyzja</h4><dl><dt>Zapis</dt><dd><code>docs/decision.md</code>, potwierdzony przez klienta</dd><dt>Odsyła do</dt><dd>Briefu</dd></dl></div>
+		<div data-audit="assumptions"><h4>Zapis: rejestr założeń</h4><dl><dt>Zapis</dt><dd><code>docs/assumptions.md</code>: twierdzenie, typ, źródło, wpływ</dd><dt>Odsyła do</dt><dd>Linii w dzienniku klienta, <code>file:line</code> w aplikacji</dd></dl></div>
+		<div data-audit="purpose"><h4>Zapis: intended purpose</h4><dl><dt>Zapis</dt><dd>Cztery linijki w <code>docs/product.md</code></dd><dt>Odsyła do</dt><dd>Dziennika klienta, 2026-11-12</dd></dl></div>
+		<div data-audit="questions"><h4>Zapis: pytania i obserwacje</h4><dl><dt>Zapis</dt><dd><code>docs/questions.md</code>; obserwacje z dowodami</dd><dt>Odsyła do</dt><dd>Założeń, które sprawdzają</dd></dl></div>
+		<div data-audit="meeting"><h4>Zapis: dziennik klienta</h4><dl><dt>Zapis</dt><dd>Datowane odpowiedzi ze spotkania</dd><dt>Odsyła do</dt><dd>Zadanych pytań</dd></dl></div>
+		<div data-audit="stories"><h4>Zapis: user stories</h4><dl><dt>Zapis</dt><dd><code>docs/stories.md</code>, każda story ze źródłem</dd><dt>Odsyła do</dt><dd>Linii w dzienniku klienta</dd></dl></div>
+		<div data-audit="criteria"><h4>Zapis: kryteria i priorytety</h4><dl><dt>Zapis</dt><dd>Kryteria z ID; ranking MoSCoW od klienta, z datą</dd><dt>Odsyła do</dt><dd>User stories</dd></dl></div>
+		<div data-audit="options"><h4>Zapis: tabela opcji</h4><dl><dt>Zapis</dt><dd>Opcje, twarde ograniczenia, estymacje, źródła z datą</dd><dt>Odsyła do</dt><dd>Decyzji, uszeregowanych user stories</dd></dl></div>
+		<div data-audit="recommendation"><h4>Zapis: rekomendacja</h4><dl><dt>Zapis</dt><dd><code>docs/recommendation.md</code> i decyzja klienta; potem issue #7</dd><dt>Odsyła do</dt><dd>Wszystkiego powyżej, a dalej do GOAL-1 w AI SDLC</dd></dl></div>
+	</div>
+
+	<ol class="sdlc-walk">
+		<li data-stage="brief">Poniedziałek, 9:12. Anna, koordynatorka badania w klinice rehabilitacyjnej, pisze maila: <em>„Uczestnicy ciągle pytają, którą wersję mają, a nasza komisja etyczna chce, żeby aplikacja mówiła, do czego służy. Możecie dodać stronę About?”</em> Zapisujesz to jako brief i pierwszy wpis w dzienniku klienta.</li>
+		<li data-stage="decision">Zanim ktokolwiek wspomni o ekranie, zapisujesz <b>decyzję</b>: jak uczestnicy dowiedzą się, do czego służy aplikacja i z kim się kontaktować, a jak zespół wsparcia pozna wersję: w aplikacji, na papierze czy na oba sposoby. Anna odpisuje: <em>„Tak, dokładnie o to chodzi.”</em></li>
+		<li data-stage="kb">Copilot czyta <b>dowody</b>: brief, dziennik klienta i kod aplikacji. Nic więcej o tym kliencie nie wie.</li>
+		<li data-stage="assumptions">Copilot w minutę szkicuje rejestr założeń. W jednej linii stoi <em>„FACT: uczestnicy wolą informacje w aplikacji”</em>, bez źródła. Zmieniasz jej etykietę na założenie. Ta jedna etykieta to różnica między analizą a fikcją.</li>
+		<li data-stage="purpose">W szkicu tekstu do sklepu Copilot pisze, że aplikacja <em>„pomaga pacjentom zarządzać zdrowiem psychicznym”</em>. Zatrzymujesz się: to twierdzenie medyczne. Prawdziwe przeznaczenie według klienta: <em>„dzienniczek nastroju wypełniany samodzielnie, nieużywany do diagnozy ani leczenia”</em>. Dzienniczek, nie wyrób medyczny.</li>
+		<li data-stage="questions">Copilot szkicuje dwadzieścia pytań; zostawiasz trzy, każde w formie „jeśli A → X, jeśli B → Y”. Odkrywa też, że aplikacja nie ma ekranu About (<code>home_screen.dart</code>). Odtwarzasz to samodzielnie.</li>
+		<li data-stage="meeting">Wtorek. Anna odpowiada: komisja chce, żeby przeznaczenie było <b>w aplikacji</b>; kontakt nie jest jeszcze ustalony; a treść <b>musi dać się zmienić bez nowego release'u</b>. Każda odpowiedź trafia do dziennika klienta, z datą.</li>
+		<li data-stage="kb">Dziennik klienta zawiera teraz odpowiedzi Anny. Od tej chwili to fakty ze źródłem, a nie twoje domysły.</li>
+		<li data-stage="stories">Copilot szkicuje piętnaście user stories. Dziewięć nie ma źródła w dzienniku klienta. Zostawiasz dwie (zespół wsparcia musi znać wersję; uczestnicy potrzebują przeznaczenia i kontaktu), a resztę przenosisz do listy <em>Pomysły</em>.</li>
+		<li data-stage="criteria">Dodajesz kryteria Given/When/Then, w tym „serwer nie odpowiada”. Anna ustala priorytety: przeznaczenie i kontakt to <b>Must</b>, wersja to <b>Should</b>.</li>
+		<li data-stage="options" data-result="fail">Tablica opcji: przy dwóch twardych ograniczeniach Anny (w aplikacji i treść zmienialna bez release'u) <b>żadna opcja nie przechodzi</b>. Uczciwy ruch to nie wybierać po cichu najmniej złej.</li>
+		<li data-stage="meeting">Wracasz do Anny: <em>„Które ograniczenie może się przesunąć?”</em> Ona pyta komisję: treść zmienia się rzadko, więc release jest w porządku. Nowy, datowany wpis w dzienniku klienta.</li>
+		<li data-stage="options" data-result="pass">Teraz ekran About przechodzi. Estymacja trzypunktowa: około <b>11 godzin</b>, realnie od 6 do 16. Copilot broni opcji papierowej; ty zostawiasz jej najmocniejszy punkt: jedno zdanie w formularzu zgody.</li>
+		<li data-stage="recommendation">Jedna strona: ekran About plus jedno zdanie w formularzu zgody, estymacja, ryzyka i kryterium stopu. Anna decyduje: <b>tak</b>. To staje się <b>issue #7</b> i wchodzi do AI SDLC na etapie 1.</li>
+	</ol>
+</div>
+
+<script>
+	import '../../scripts/sdlc.js';
+</script>

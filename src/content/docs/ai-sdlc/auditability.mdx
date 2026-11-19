@@ -6,6 +6,11 @@ description: Every stage leaves a record that points back to the one before it, 
 import AuditWalk from '../../../components/AuditWalk.astro';
 import Quiz from '../../../components/Quiz.astro';
 import Predict from '../../../components/Predict.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={4} items={["Every record points back to the one before.", "Trailers, pull request, ADR: you can answer “why?” months later.", "Lose a link and you lose the reason, not the code."]} />
 
 On the [map](../overview/), the auditability rail runs alongside every stage. Each stage leaves a **record** that points back to the one before it, so you can start from any line of merged code and walk back to the goal, and to the decision, that justified it. Switch on **Audit trail** on the map and click a stage to see its record.
 
@@ -71,6 +76,10 @@ git blame lib/config.dart                                # which commit wrote ea
 	explain="It works only because every commit has a <code>Refs: GOAL-1</code> trailer. Without it, the commits are still there, but nothing connects them to the goal."
 />
 
+<AtWork>In medtech, traceability is not optional: auditors ask for it. Having done it once, on a real project, is a genuine advantage.</AtWork>
+
 :::tip[Do this in your project]
 Pick one line of code your pair changed this week and walk it back: `git blame` → pull request → plan → ADR → goal. Where the trail breaks, add the missing record now, while you still remember the reason.
 :::
+
+<Done />

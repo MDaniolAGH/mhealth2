@@ -10,16 +10,19 @@ interface Props {
 	m: number;
 	p: number;
 }
-const { task, unit = 'hours', o, m, p } = Astro.props;
+import { t } from '../i18n/ui';
+const T = t(Astro);
+const { task, unit = T.hours, o, m, p } = Astro.props;
+const i18n = JSON.stringify({ checkOrder: T.checkOrder, expected: T.expected, longTail: T.longTail });
 ---
 
-<div class="biz-widget estimator not-content" data-unit={unit}>
-	<p class="biz-kicker">Three-point estimate</p>
+<div class="biz-widget estimator not-content" data-unit={unit} data-i18n={i18n}>
+	<p class="biz-kicker">{T.estimate}</p>
 	<p class="biz-title" set:html={task} />
 	<div class="estimator__inputs">
-		<label><span>Optimistic (O)</span><input type="number" min="0" step="0.5" value={o} data-k="o" /></label>
-		<label><span>Most likely (M)</span><input type="number" min="0" step="0.5" value={m} data-k="m" /></label>
-		<label><span>Pessimistic (P)</span><input type="number" min="0" step="0.5" value={p} data-k="p" /></label>
+		<label><span>{T.optimistic}</span><input type="number" min="0" step="0.5" value={o} data-k="o" /></label>
+		<label><span>{T.likely}</span><input type="number" min="0" step="0.5" value={m} data-k="m" /></label>
+		<label><span>{T.pessimistic}</span><input type="number" min="0" step="0.5" value={p} data-k="p" /></label>
 	</div>
 	<div class="estimator__scale" aria-hidden="true">
 		<div class="estimator__range"></div>
@@ -34,13 +37,14 @@ const { task, unit = 'hours', o, m, p } = Astro.props;
 <script>
 	document.querySelectorAll<HTMLElement>('.estimator').forEach((box) => {
 		const unit = box.dataset.unit ?? 'hours';
+		const L = JSON.parse(box.dataset.i18n || '{}');
 		const get = (k: string) => Number(box.querySelector<HTMLInputElement>(`input[data-k="${k}"]`)!.value);
 		const out = box.querySelector<HTMLElement>('.estimator__out')!;
 		const fmt = (x: number) => (Math.round(x * 10) / 10).toString();
 		const render = () => {
 			const o = get('o'), m = get('m'), p = get('p');
 			if (!(o <= m && m <= p) || p <= 0) {
-				out.innerHTML = '<b>Check the order:</b> optimistic ≤ most likely ≤ pessimistic.';
+				out.innerHTML = L.checkOrder;
 				box.classList.add('is-invalid');
 				return;
 			}
@@ -60,8 +64,8 @@ const { task, unit = 'hours', o, m, p } = Astro.props;
 			const eb = box.querySelector<HTMLElement>('.estimator__e')!;
 			eb.style.left = pos(e);
 			eb.textContent = `E ${fmt(e)}`;
-			const skew = p - m > 2 * (m - o) ? ' The pessimistic tail is long: say what could go wrong, and plan for it.' : '';
-			out.innerHTML = `<b>Expected: about ${fmt(e)} ${unit}</b>, likely between ${fmt(lo)} and ${fmt(hi)} (E ± 2 × ${fmt(sd)}). Give the client the range, not the single number.${skew}`;
+			const skew = p - m > 2 * (m - o) ? L.longTail : '';
+			out.innerHTML = String(L.expected).replace('{e}', fmt(e)).replace('{unit}', unit).replace('{lo}', fmt(lo)).replace('{hi}', fmt(hi)).replace('{sd}', fmt(sd)) + skew;
 		};
 		box.querySelectorAll('input').forEach((i) => i.addEventListener('input', render));
 		render();

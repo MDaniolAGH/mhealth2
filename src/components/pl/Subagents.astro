@@ -1,0 +1,19 @@
+---
+/** Section 2 (Polish): a main agent delegating to sub-agents with fresh contexts. */
+---
+
+<div class="ctx not-content">
+	<div class="subagents">
+		<div class="subagents__main"><b>Główny agent</b>: trzyma plan i kryteria, rozdziela części</div>
+		<div class="subagents__child"><b>Sub-agent A</b><br />znajdź każde miejsce, które woła API</div>
+		<div class="subagents__child"><b>Sub-agent B</b><br />napisz serwis wersji</div>
+		<div class="subagents__child"><b>Sub-agent C</b><br />napisz testy do AC-4</div>
+		<div class="subagents__note">Każdy sub-agent startuje z małym, świeżym kontekstem i zwraca krótki wynik, a nie cały swój log pracy.</div>
+	</div>
+</div>
+
+<div class="stat not-content">
+	<span class="stat__num stat__num--ok">Więk&shy;szość</span><span class="stat__txt">tego, co agent pisze bez potrzebnych faktów, wygląda dobrze…</span>
+	<span class="stat__num stat__num--bad">Część</span><span class="stat__txt">…jest zmyślona i napisana dokładnie tym samym pewnym tonem co reszta.</span>
+	<span class="stat__foot">Czytając wynik, nie odróżnisz jednego od drugiego. Pozwala na to tylko porównanie ze źródłem, test albo uruchomienie.</span>
+</div>

@@ -1,0 +1,18 @@
+---
+/** TL;DR at the top of a page: three short points and the reading time. */
+import { t } from '../i18n/ui';
+interface Props {
+	items: string[];
+	minutes?: number;
+}
+const { items, minutes } = Astro.props;
+const T = t(Astro);
+---
+
+<aside class="tldr not-content" aria-label={T.tldr}>
+	<div class="tldr__head">
+		<span class="tldr__label">{T.tldr}</span>
+		{minutes && <span class="tldr__time">⏱ {minutes} {T.minutes}</span>}
+	</div>
+	<ul>{items.map((i) => <li set:html={i} />)}</ul>
+</aside>

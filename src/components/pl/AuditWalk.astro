@@ -1,0 +1,43 @@
+---
+/** Section 6 (Polish): walk back from a line of code to the goal; links can be broken. */
+
+const i18n = JSON.stringify({
+	step: 'Krok {n} z {total}',
+	complete: 'Ślad kompletny',
+	lost: 'Ślad urwany po {n} z {total} kroków',
+});
+---
+
+<div class="audit-walk not-content" data-i18n={i18n}>
+	<div class="audit-walk__controls">
+		<button type="button" class="sdlc-btn sdlc-btn--primary" data-walk="back">↑ Dlaczego to tu jest?</button>
+		<button type="button" class="sdlc-btn" data-walk="reset">Od nowa</button>
+		<span class="audit-walk__count" aria-live="polite"></span>
+	</div>
+	<div class="audit-walk__breaks">
+		<span class="sdlc-legend__hint">Zerwij ogniwo:</span>
+		<label><input type="checkbox" data-break="no-refs" /> opis commita „update”, bez <code>Refs:</code></label>
+		<label><input type="checkbox" data-break="chat-only" /> odpowiedzi do planu tylko w czacie</label>
+		<label><input type="checkbox" data-break="no-adr" /> brak zapisu decyzji</label>
+	</div>
+	<ol class="audit-walk__steps">
+		<li class="audit-walk__step"><b>Linia kodu</b><span class="audit-walk__how"><code>lib/config.dart</code>, linia 14</span><span class="audit-walk__code">const appVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'dev');</span><span class="audit-walk__q">„Każdy tutorial odczytuje wersję przez package_info_plus. Czemu my nie? Mogę go dodać?”</span></li>
+		<li class="audit-walk__step" data-needs="no-refs"><b>Commit</b><span class="audit-walk__how">znaleziony przez <code>git blame -L 14,14 lib/config.dart</code></span><span class="audit-walk__code">3f2a9c1 feat(app): add About screen with app and server version
+Refs: GOAL-1 · ADR: ADR-0003 · AI-assisted: GitHub Copilot (agent)</span></li>
+		<li class="audit-walk__step"><b>Pull request #12</b><span class="audit-walk__how">znaleziony przez <code>gh pr list --state merged --search "GOAL-1"</code></span><span>Przejrzany i zatwierdzony przez inną parę. Opis linkuje do planu i wymienia <code>docs/adr/0003-app-version-from-build.md</code> w sekcji Documentation.</span></li>
+		<li class="audit-walk__step" data-needs="chat-only"><b>Plan</b><span class="audit-walk__how">podlinkowany w pull requeście</span><span class="audit-walk__code">Q2  Version: package_info_plus or --dart-define?
+A2  --dart-define, as in ADR-0002. No new package.
+    Record it as an ADR.   (answered by the pair, 2026-11-19)</span></li>
+		<li class="audit-walk__step" data-needs="no-adr"><b>Zapis decyzji: ADR-0003</b><span class="audit-walk__how">wskazuje na niego plan</span><span><em>Kontekst:</em> każdy pakiet to element SOUP (IEC 62304): potrzebuje wiersza w <code>docs/soup.csv</code>, oceny i aktualizacji przez całe życie aplikacji. <em>Decyzja:</em> build przekazuje wersję przez <code>--dart-define</code>. <em>Konsekwencja:</em> buildy debug pokazują „dev”; jeśli będziemy potrzebować więcej informacji o platformie, wrócimy do tego w nowym ADR.</span></li>
+		<li class="audit-walk__step"><b>Kryterium akceptacji AC-2</b><span class="audit-walk__how">plan przypisuje swoje kroki do kryteriów</span><span>„Ekran pokazuje wersję aplikacji i numer builda, na przykład <code>1.3.0 (12)</code>…”</span></li>
+		<li class="audit-walk__step"><b>Cel: GOAL-1</b><span class="audit-walk__how">wymieniony na początku <code>docs/spec-about.md</code></span><span>Ekran About, z issue #7: „Zespół wsparcia może sprawdzić, której wersji używa uczestnik.”</span></li>
+		<li class="audit-walk__end"><b>Ślad kompletny</b>Brak pakietu to zapisana decyzja z uzasadnieniem, a nie przeoczenie. Żeby to zmienić, napisz nowy ADR, który zastąpi ADR-0003, dodaj wiersz SOUP, a ślad biegnie dalej.</li>
+		<li class="audit-walk__break" data-break="no-refs"><b>Ślad urywa się na commicie</b>Opis brzmi „update” i nie wskazuje żadnego celu. Do jakiej funkcji to było? Możesz tylko zgadywać po dacie, a wyszukiwanie po celu nie znajdzie tego commita.</li>
+		<li class="audit-walk__break" data-break="chat-only"><b>Ślad urywa się na planie</b>Na pytanie „pakiet czy <code>--dart-define</code>?” odpowiedziano w czacie, którego już nie ma. Decyzja czy zgadywanie? Nikt tego nie wie, więc ktoś w końcu to „naprawi”.</li>
+		<li class="audit-walk__break" data-break="no-adr"><b>Ślad urywa się na decyzji</b>Plan mówi „bez nowego pakietu”, ale nie ma zapisu decyzji, na który można by wskazać. Kto to zdecydował i dlaczego? Bez niego powód znika, a kolejna sesja agenta dodaje <code>package_info_plus</code>, bo tak robi większość kodu w internecie.</li>
+	</ol>
+</div>
+
+<script>
+	import '../../scripts/sdlc.js';
+</script>

@@ -6,6 +6,11 @@ description: The whole AI SDLC on one interactive map, from an idea to a merged 
 import PipelineMap from '../../../components/PipelineMap.astro';
 import Checklist from '../../../components/Checklist.astro';
 import Predict from '../../../components/Predict.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={5} items={["An agent types fast. People decide, check and explain.", "Ten stages; each one leaves a record you can point to.", "Try the map: walk one feature from idea to merge."]} />
 
 A coding agent writes a Flutter screen in minutes. Someone still has to:
 
@@ -79,6 +84,10 @@ They were about **19% slower** with AI tools, and afterwards still believed they
 
 The [product development](../../product/overview/) part of this guide covers the work before stage 1: from the client's brief to the request that becomes issue #7.
 
+<AtWork>Being able to walk someone through the trail of a feature you built with an agent (goal, criteria, plan, pull request, review) is a strong portfolio piece. It shows judgement, not just output.</AtWork>
+
 :::tip[Do this in your project (10 min)]
 Sketch the ten stages for the first feature of your brief. For each stage, write who does it and what record it leaves behind. Put a photo of the sketch in `NOTES.md`.
 :::
+
+<Done />

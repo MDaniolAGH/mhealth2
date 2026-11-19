@@ -1,0 +1,174 @@
+---
+title: '6. Opcje, estymacje i rekomendacja'
+description: Porównuj prawdziwe opcje, także te bez oprogramowania, pod kątem całkowitego kosztu i twardych ograniczeń; estymuj uczciwie; rekomenduj na jednej stronie.
+---
+
+import StageFacts from '../../../../components/StageFacts.astro';
+import OptionsBoard from '../../../../components/OptionsBoard.astro';
+import Estimator from '../../../../components/Estimator.astro';
+import Sorter from '../../../../components/Sorter.astro';
+import Quiz from '../../../../components/Quiz.astro';
+import Predict from '../../../../components/Predict.astro';
+import Scene from '../../../../components/Scene.astro';
+import Tldr from '../../../../components/Tldr.astro';
+import AtWork from '../../../../components/AtWork.astro';
+import Done from '../../../../components/Done.astro';
+
+<Tldr minutes={8} items={["Zawsze uwzględniaj opcję bez oprogramowania.", "Decydują twarde ograniczenia klienta, nie twój gust.", "Podawaj przedział, nie jedną liczbę."]} />
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> szkicuje tabele i spiera się z tobą · <span class="sdlc-chip is-you">Ty</span> sprawdzasz i odpowiadasz za rekomendację · <span class="sdlc-chip is-client">klient</span> decyduje'} input="Decyzja, intended purpose, uszeregowane stories, odpowiedzi na twoje pytania" output="Tabela opcji, estymacje, <code>docs/recommendation.md</code>; potem issue #7" />
+
+<span id="options" class="stage-anchor"></span>
+
+## Opcje, także te bez oprogramowania
+
+Najtańsza licencja rzadko jest najtańszą opcją. Zawsze porównuj co najmniej:
+
+- **zostawić jak jest albo uprościć**;
+- **zmienić sposób pracy** – z niewielką zmianą w oprogramowaniu albo bez niej;
+- **użyć istniejącego produktu albo usługi**;
+- **dostosować istniejącą aplikację**.
+
+Porównuj je pod kątem **całkowitego kosztu posiadania (TCO)**: jednorazowej pracy, kosztów bieżących oraz **czasu i obowiązków samego klienta** przez cały czas trwania badania. Ekran, który przy każdej zmianie treści wymaga nowego wydania aplikacji, za każdym razem coś klienta kosztuje.
+
+<Predict id="cheapest" question="Potrzeba kliniki: uczestnicy wiedzą, do czego służy aplikacja i z kim się kontaktować, a wsparcie wie, której wersji używa uczestnik. Zanim spojrzysz na tablicę: która opcja według ciebie wygra?">
+
+To zależy od **twardych ograniczeń** klienta, a nie od twoich preferencji. Jeśli komisja bioetyczna upiera się, że cel ma podawać sama aplikacja, zostaje tylko ekran. Jeśli treść musi dać się zmienić w ciągu tygodnia bez wydania, ekran odpada. Jeśli obowiązują oba ograniczenia, nie zostaje nic – a uczciwa rekomendacja to wrócić do klienta. Włącz ograniczenia poniżej i patrz, co się dzieje.
+
+</Predict>
+
+<OptionsBoard
+	need="Potrzeba: uczestnicy wiedzą, do czego służy aplikacja i z kim się kontaktować; wsparcie wie, której wersji używa uczestnik. (Godziny pracy zespołu są przykładowe.)"
+	limits={[
+		{ key: 'inapp', label: 'Cel musi podawać sama aplikacja' },
+		{ key: 'wording', label: 'Treść można zmienić w ciągu tygodnia, bez wydania aplikacji' },
+		{ key: 'budget', label: 'Najwyżej 12 godzin pracy zespołu w tym sprincie' },
+	]}
+	budgetKey="budget"
+	budget={12}
+	options={[
+		{ name: 'A. Bez zmian', what: 'Nic się nie zmienia. Wsparcie prosi uczestników, żeby zajrzeli do ustawień telefonu.', o: 0, m: 0, p: 0, duties: 'tłumaczenie ustawień przy każdym telefonie', risk: 'prośba komisji bioetycznej nie zostaje spełniona', breaks: [{ limit: 'inapp', why: 'Aplikacja nie podaje swojego celu.' }] },
+		{ name: 'B. Formularz zgody i wydrukowana kartka', what: 'Jedno zdanie w formularzu zgody; wydrukowana kartka z celem, kontaktem i instrukcją, jak znaleźć wersję w ustawieniach telefonu.', o: 1, m: 2, p: 4, duties: 'dodruk przy każdej zmianie tekstu', risk: 'kartki się gubią; ścieżka w ustawieniach jest różna na różnych telefonach', breaks: [{ limit: 'inapp', why: 'Cel jest na papierze, nie w aplikacji.' }] },
+		{ name: 'C. Ekran About w aplikacji', what: 'GOAL-1: cel, kontakt, wersja aplikacji i serwera – w aplikacji.', o: 6, m: 10, p: 20, duties: 'każda zmiana treści wymaga nowego wydania', risk: 'cykl wydań; agent, który dopisze do tekstu twierdzenie medyczne', breaks: [{ limit: 'wording', why: 'Tekst jest częścią buildu: jego zmiana wymaga wydania.' }] },
+		{ name: 'D. Strona internetowa badania i tekst w sklepie', what: 'Strona badania prowadzona przez klinikę i opis w sklepie podają cel i kontakt.', o: 1, m: 2, p: 5, duties: 'aktualizowanie strony', risk: 'uczestnicy nie czytają opisów w sklepie; może się wśliznąć twierdzenie medyczne', breaks: [{ limit: 'inapp', why: 'Cel jest poza aplikacją.' }] },
+	]}
+/>
+
+Zwróć uwagę na trzy rzeczy. Po pierwsze, to nie tablica wybrała, tylko ograniczenia klienta. Po drugie, kiedy żadna opcja nie przetrwa, przydatna odpowiedź to powiedzieć, **które ograniczenie poluzować**, a nie po cichu wybrać najmniej złą opcję. Po trzecie, każda liczba na tablicy to estymacja, więc następne pytanie brzmi: jak dobre są te estymacje?
+
+<Scene
+	title="Czwartek: żadna opcja nie pasuje"
+	messages={[
+		{ who: 'you', name: 'Ty', text: 'Anno, przy obu waszych ograniczeniach nic nie pasuje: cel musi być w aplikacji, a treść ma się zmieniać bez wydania. Które z nich może się przesunąć?' },
+		{ who: 'client', name: 'Anna', text: 'Zapytam komisję.' },
+		{ who: 'client', name: 'Anna', text: '(piątek) Zmiany treści będą rzadkie. Nowe wydanie jest OK.' },
+		{ who: 'you', name: 'Ty', text: '@Copilot przedstaw jak najmocniejsze argumenty za opcją, którą zaraz odrzucimy.' },
+		{ who: 'agent', name: 'Copilot', text: 'Wydrukowana kartka jest tańsza i dociera do uczestników nawet wtedy, gdy aplikacja jest zamknięta.' },
+		{ who: 'you', name: 'Ty', text: 'Słuszna uwaga. Zostajemy przy ekranie About i dodajemy jedno zdanie do formularza zgody.' },
+	]}
+/>
+
+## Estymacje: przedział, nie liczba
+
+**Estymacja trzypunktowa** wymaga wartości optymistycznej (O), najbardziej prawdopodobnej (M) i pesymistycznej (P) i łączy je: **E = (O + 4M + P) / 6**, z rozrzutem około **(P − O) / 6**. Klientowi podawaj przedział, nie jedną liczbę. Zmień wartości poniżej i zobacz, jak wartość oczekiwana przesuwa się razem z pesymistycznym ogonem.
+
+<Estimator task="Opcja C, ekran About, w godzinach pracy zespołu: implementacja, testy, review, dokumentacja" o={6} m={10} p={20} />
+
+Agenci przyspieszają pisanie kodu. Nie przyspieszają rozmów z klientem, sprawdzania pracy agenta, review ani pracy regulacyjnej – a do tego dokładają trochę nowej pracy. Dlatego z agentami estymacje powinny być **szersze, nie węższe**. Agent może naszkicować O, M i P dla każdego zadania; traktuj je jak hipotezy. W W6 porównasz je z liniami *Time* w swoim logu agenta – tak estymacje stają się coraz lepsze.
+
+:::note[Przetestuj ryzykowne założenie prototypem do wyrzucenia]
+Założenie o największym wpływie to często „ludzie będą z tego korzystać”. Możesz je sprawdzić w dzień albo dwa: klikalny prototyp zrobiony w narzędziu do prototypowania (np. v0, Lovable albo Bolt) albo szybka makieta we Flutterze, pokazana trzem–pięciu osobom. Opisz, czego się dowiedzieliście **i czego nie przetestowaliście**. Potem prototyp idzie do kosza: nie ma architektury, gate'a ani rejestru SOUP, więc nigdy nie jest punktem wyjścia dla prawdziwego kodu. Używaj wyłącznie danych syntetycznych, żadnych prawdziwych pacjentów.
+:::
+
+<span id="recommendation" class="stage-anchor"></span>
+
+## Rekomendacja na jednej stronie
+
+Klient powinien móc podjąć decyzję po przeczytaniu jednej strony. Kursowy skill `ba-recommendation` używa takiej struktury:
+
+1. **Rekomendacja**: jedno zdanie, które odpowiada na decyzję.
+2. **Dlaczego**: trzy do pięciu powodów, każdy oparty na dowodach od tego klienta.
+3. **Zakres**: co wchodzi, a co wyraźnie nie wchodzi.
+4. **Koszt i obowiązki**: jednorazowy, bieżący i to, co zostaje po stronie klienta.
+5. **Ryzyka**: trzy najważniejsze i co robimy z każdym z nich.
+6. **Co mogłoby to zmienić**: założenia, od których zależy rekomendacja, i wynik, przy którym trzeba się zatrzymać (**kryterium stopu**).
+7. **Następny krok**: jedno konkretne działanie i kto je wykona.
+
+```text title="docs/recommendation.md (fragment, przykład)"
+Rekomendacja    Dodać do aplikacji ekran About (opcja C) i jedno zdanie
+                w formularzu zgody (część opcji B).
+Dlaczego        Komisja bioetyczna poprosiła, żeby aplikacja podawała swój cel
+                (dziennik klienta 2026-11-12); wsparcie potrzebuje wersji (ten
+                sam wpis); C mieści się w budżecie sprintu (E ≈ 11 h,
+                przedział ok. 6–16 h).
+Co mogłoby      Jeśli komisja zaakceptuje sam formularz zgody, wybieramy B
+to zmienić      i rezygnujemy ze zmiany w oprogramowaniu. Jeśli treść musi
+                zmieniać się co miesiąc, ładujemy tekst z serwera (nowa decyzja).
+Kryterium       Jeśli klient nie wskaże kontaktu przed wydaniem, ekran trafia
+stopu           do wydania bez niego, a my mówimy klientowi, że to ryzyko.
+Następny krok   Koordynatorka zadaje komisji pytanie 1 do piątku.
+```
+
+Agent dobrze szkicuje taką stronę. Niech pracuje dla ciebie, a nie tylko z tobą:
+
+```text title="Prompty (Copilot)"
+Przedstaw jak najmocniejsze argumenty za opcją, którą odrzuciliśmy. Korzystaj
+tylko z dowodów z docs/ i z dziennika klienta.
+
+Wypisz fakty, które zmieniłyby tę rekomendację, i przy każdym najtańszy
+sposób, żeby to sprawdzić. Każdą liczbę oznacz jako SOURCED (ze źródłem
+i datą) albo ESTIMATE (z podstawą szacunku). Wszystko inne oznacz jako
+[UNVERIFIED].
+```
+
+Pierwszy prompt chroni cię przed agentem, który przytakuje temu, co – jak mu się wydaje – wolisz. Drugi nie wpuszcza zmyślonych liczb, takich jak ceny, wielkość rynku czy statystyki, do dokumentu, na podstawie którego klient będzie działał.
+
+Kiedy klient podejmie decyzję, rekomendacja staje się **issue #7**, a ekran About wchodzi do [AI SDLC na etapie 1](../../ai-sdlc/idea-to-plan/#stage-idea).
+
+<Quiz
+	question="W tabeli opcji od agenta jest zdanie: „Badania rynku pokazują, że 72% uczestników badań woli informacje w aplikacji.” Nie ma źródła. Co robisz?"
+	options={[
+		'Usuwasz liczbę albo oznaczasz ją [UNVERIFIED], dopóki nie znajdziesz źródła',
+		'Zostawiasz ją: i tak wspiera opcję, którą rekomendujesz',
+		'Zaokrąglasz ją do „około 70%”, żeby brzmiała mniej precyzyjnie',
+		'Pytasz agenta, z jakiego badania pochodzi, i cytujesz jego odpowiedź',
+	]}
+	answer={0}
+	why={[
+		'',
+		'To, że zgadza się z tobą, jest właśnie tym, co czyni zmyśloną liczbę groźną.',
+		'Zaokrąglona zmyślona liczba nadal jest zmyślona.',
+		'Agenci potrafią zmyślić także badanie. Cytuj tylko źródła, które sprawdzisz na własne oczy.',
+	]}
+	explain="Liczba bez źródła, które sprawdzisz na własne oczy, nie jest dowodem. W dokumencie, na podstawie którego klient działa, to zagrożenie."
+/>
+
+## Posortuj jeszcze raz
+
+<Sorter
+	title="Ta sama lista co na pierwszej stronie. Czy coś się zmieniło?"
+	bins={[
+		{ key: 'agent', label: 'Agent', tone: 'agent' },
+		{ key: 'you', label: 'Ty', tone: 'you' },
+		{ key: 'client', label: 'Klient', tone: 'client' },
+		{ key: 'nobody', label: 'Jeszcze nikt', tone: 'neutral' },
+	]}
+	items={[
+		{ text: 'Naszkicować dwadzieścia możliwych pytań do koordynatorki badania', bin: 'agent', why: 'Szkicowanie jest tanie; wybieranie należy do ciebie.' },
+		{ text: 'Wybrać trzy pytania, które naprawdę zadasz koordynatorce', bin: 'you', why: 'Tylko te, których odpowiedzi zmieniają twoją rekomendację.' },
+		{ text: 'Powiedzieć, czy komisja bioetyczna wymaga podania celu w samej aplikacji', bin: 'client', why: 'Fakt ze świata klienta – i twarde ograniczenie na tablicy opcji.' },
+		{ text: 'Znaleźć miejsce, w którym aplikacja ustawia numer wersji – z plikiem i linią', bin: 'agent', why: 'Agent szuka; ty odtwarzasz.' },
+		{ text: 'Napisać zdanie, które mówi, do czego służy aplikacja', bin: 'client', why: 'Intended purpose decyduje, czy aplikacja jest wyrobem medycznym. Nigdy agent.' },
+		{ text: 'Zdecydować, kto odpowiada na pytania uczestników po zakończeniu badania', bin: 'nobody', why: 'Nadal nikt: zostaje na liście pytań, a w rekomendacji jako ryzyko.' },
+		{ text: 'Sprawdzić, czy każda user story wskazuje linijkę w dzienniku klienta', bin: 'you', why: 'Każdą cytowaną linijkę otwórz samodzielnie.' },
+		{ text: 'Ułożyć stories według priorytetów: Must, Should, Could albo Won\'t', bin: 'client', why: 'Decyduje klient; ty wyjaśniasz kompromisy.' },
+	]}
+/>
+
+<AtWork>Jednostronicowa rekomendacja z estymacją w formie przedziału i kryterium stopu wygląda jak praca kogoś z doświadczeniem.</AtWork>
+
+:::tip[Zrób to w swoim projekcie]
+Napisz na jednej stronie `docs/recommendation.md` dla swojego briefu – z co najmniej jedną opcją bez oprogramowania, estymacją trzypunktową i kryterium stopu. Uruchom na swoim szkicu dwa prompty z tej strony i popraw to, co znajdą. Właśnie tę stronę, razem ze źródłami, zapamięta klient albo pracodawca.
+:::
+
+<Done />

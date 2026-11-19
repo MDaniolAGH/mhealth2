@@ -1,6 +1,9 @@
 ---
 /** A row of the ten stages, coloured by who does the work, for the stage pages. */
 import { link } from '../lib/url';
+import { t, langOf } from '../i18n/ui';
+const T = t(Astro);
+const lang = langOf(Astro);
 
 const stages = [
 	['1', 'Idea', 'idea-to-plan/#stage-idea', 'you'],
@@ -18,10 +21,10 @@ const stages = [
 
 <ul class="stage-strip not-content" aria-label="The ten stages">
 	{
-		stages.map(([n, label, path, who]) => (
+		stages.map(([n, label, path, who], i) => (
 			<li>
-				<a class={`is-${who}`} href={link(`ai-sdlc/${path}`)}>
-					<b>{n}</b> {label}
+				<a class={`is-${who}`} href={link(`ai-sdlc/${path}`, lang)}>
+					<b>{n}</b> {T.stages[i]}
 				</a>
 			</li>
 		))

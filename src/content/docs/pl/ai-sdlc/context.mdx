@@ -1,0 +1,91 @@
+---
+title: '2. Kontekst: co wie agent'
+description: Co trafia do okna kontekstu agenta, ile to kosztuje i dlaczego brakujące fakty są uzupełniane wiarygodnie brzmiącymi zgadywankami.
+---
+
+import ContextLab from '../../../../components/pl/ContextLab.astro';
+import Subagents from '../../../../components/pl/Subagents.astro';
+import Quiz from '../../../../components/Quiz.astro';
+import Predict from '../../../../components/Predict.astro';
+import Tldr from '../../../../components/Tldr.astro';
+import AtWork from '../../../../components/AtWork.astro';
+import Done from '../../../../components/Done.astro';
+
+<Tldr minutes={5} items={["Agent wie tylko to, co jest w jego kontekście.", "Więcej kontekstu to wyższy koszt, gorsze skupienie i większe ryzyko.", "Brakujące fakty są uzupełniane pewnymi siebie zgadywankami."]} />
+
+Model nie wie nic o twoim projekcie poza tym, co jest w jego **context window** przy bieżącym zadaniu: w tekście, który widzi naraz, mierzonym w **tokenach** (kawałkach słów; angielskie słowo to mniej więcej jeden–dwa tokeny). Wszystko, na czym pracuje agent, musi się tam zmieścić.
+
+<Predict id="ctx-more" question="Współczesne okna kontekstu mieszczą setki tysięcy tokenów. Dlaczego nie wrzucić tam całego repozytorium, tak na wszelki wypadek?">
+
+Z trzech powodów. **Koszt**: każdy krok pętli agenta przetwarza cały kontekst od nowa, a ty płacisz za tokeny. **Skupienie**: ważne fakty konkurują z całą resztą, a stare logi się piętrzą. **Ryzyko**: wszystko, co jest w kontekście, trafia do dostawcy modelu, łącznie z sekretami i danymi o zdrowiu. Wypróbuj poniżej ustawienie „Wszystko, na wszelki wypadek” i obserwuj wskaźniki.
+
+</Predict>
+
+**Zbuduj kontekst** dla zadania z ekranem About (rozdział 5): zaznacz, co ma do niego trafić, albo wybierz gotowe ustawienie, i obserwuj rozmiar, koszt, skupienie i luki.
+
+<ContextLab />
+
+W kontekście działającego agenta są:
+
+- **Zasady**: `AGENTS.md` i prompt z zadaniem.
+- **Wiedza o projekcie**: architektura, zapisy decyzji, notatki i karta produktu, które przeczytał (rozdział 3).
+- **Kod**, który agent otworzył.
+- **Log pracy**: jego własne wcześniejsze kroki i każdy wynik narzędzia, np. długi przebieg testów.
+- **Zmiany**: diffy zrobione do tej pory.
+
+Okna kontekstu w obecnych modelach są duże: setki tysięcy tokenów, a w kilku modelach milion. Rozmiar, którym model się chwali, i rozmiar, z którego dobrze korzysta, to nie to samo. Zapełnianie okna to i tak zły pomysł:
+
+- **Koszt.** Każdy krok pętli przetwarza kontekst od nowa. Od czerwca 2026 r. Copilot rozlicza się za tokeny, w **GitHub AI Credits**, według stawki danego modelu; inni dostawcy też liczą za tokeny. Długa sesja z dużym kontekstem kosztuje więcej przy każdym kroku. Cache sprawia, że powtarzany kontekst jest tańszy, ale nie darmowy.
+- **Skupienie.** Niepotrzebne pliki i nieaktualne wyniki narzędzi konkurują z tym, co ważne. Długa sesja powoli zapełnia się starymi logami i agent może przestać przestrzegać zasad, których świeża sesja przestrzega.
+- **Sub-agenty pomagają.** Duże zadanie można podzielić tak, żeby każda część zaczynała od świeżego, małego kontekstu:
+
+<Subagents />
+
+Odwrotny błąd to **brakujące informacje**. Model nie zatrzymuje się, gdy brakuje mu faktu; zapełnia lukę czymś, co brzmi wiarygodnie. Przy ekranie About najgroźniejsza luka to własne słowa klienta: agent, który nie przeczytał `docs/product.md`, napisze intended purpose i adres kontaktowy, a oba będą wyglądać dokładnie jak prawdziwe.
+
+Dlatego ten pipeline robi dwie rzeczy. Daje agentowi fakty, których potrzebuje: cel, kryteria i przede wszystkim **wiedzę o projekcie**. I wymaga **dowodów**: testów napisanych pod twoje kryteria i checków, które działają bez niczyjej opinii. Test zamienia „wygląda dobrze” w „sprawdzone”.
+
+:::tip[Co włożyć do kontekstu, a co pominąć]
+- **Włóż**: kryteria, pliki, których dotyczy zmiana, potrzebne dokumenty projektu, zasady projektu.
+- **Pomiń**: całe repozytorium „na wszelki wypadek”, starą historię czatu, niezwiązane logi.
+- **Nigdy nie wkładaj** haseł, kluczy API, serwerowego `.env` ani prawdziwych danych osobowych czy danych o zdrowiu. Kontekst trafia do dostawcy modelu. To, co dostawca może przechowywać i jak długo, zależy od twojego planu: plany firmowe i prywatne mają różne warunki. Wiedz, na którym jesteś.
+- **Wybierz najmniejszy model, który spełnia twoje kryteria**, i **zaczynaj nową sesję**, kiedy zadanie jest skończone – po tym, jak zapiszesz w `NOTES.md`, co następna sesja musi wiedzieć.
+:::
+
+<Quiz
+	question="Agent nie miał dostępu do <code>docs/product.md</code> i napisał intended purpose dla ekranu About. Co jest najbardziej prawdopodobne?"
+	options={[
+		'Zatrzymuje się i odmawia dalszej pracy, dopóki ktoś nie da mu tego pliku',
+		'Pisze wiarygodnie brzmiące zdanie, tym samym pewnym siebie tonem co resztę',
+		'Zostawia widoczny placeholder i wpisuje go na listę pytań do ciebie',
+		'Szuka kliniki w internecie i wysyła klientowi maila z pytaniem',
+	]}
+	answer={1}
+	why={[
+		'Modele rzadko zatrzymują się z powodu brakującego faktu; dopisują tekst.',
+		'',
+		'Tylko jeśli każą mu tak twoje zasady. Dlatego AGENTS.md Mood Trackera mówi: never invent client facts, use <TODO: client>.',
+		'Nie ma kanału do klienta, a internet nie wie, co ten klient zdecydował.',
+	]}
+	explain="Model zapełnia luki najbardziej prawdopodobnym tekstem. Placeholder zostawia tylko wtedy, gdy każą mu tak zasady: <em>never invent facts the client must provide; use a visible <code>&lt;TODO: client&gt;</code></em>."
+/>
+
+<Quiz
+	question="Co z tej listy nigdy nie powinno trafić do kontekstu agenta, niezależnie od zadania?"
+	options={[
+		'Trzy pliki, których dotyczy zmiana',
+		'<code>ARCHITECTURE.md</code> i zapisy decyzji',
+		'Najnowsze wpisy z <code>NOTES.md</code>',
+		'Serwerowy plik <code>.env</code> z sekretnym kluczem JWT',
+	]}
+	answer={3}
+	explain="Wszystko, co jest w kontekście, trafia do dostawcy modelu. Kto ma sekret JWT, może podpisywać ważne tokeny logowania do twojego serwera. To samo dotyczy prawdziwych danych uczestników: dane o zdrowiu to według RODO szczególna kategoria danych."
+/>
+
+<AtWork>W firmowych planach tokeny to prawdziwe pieniądze. Inżynierowie, którzy trzymają kontekst w ryzach, dostają tańsze i lepsze wyniki – i umieją wyjaśnić dlaczego.</AtWork>
+
+:::tip[Zrób to w swoim projekcie]
+W następnym prompcie z zadaniem wypisz pliki i dokumenty, które agent ma przeczytać, i nic więcej. Kiedy zadanie będzie gotowe, zapisz w `NOTES.md` jeden fakt, który agent musiał zgadywać, i dodaj go do właściwego dokumentu. Potem zacznij nową sesję do następnego zadania.
+:::
+
+<Done />

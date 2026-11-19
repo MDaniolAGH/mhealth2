@@ -9,6 +9,11 @@ import StageStrip from '../../../components/StageStrip.astro';
 import Checklist from '../../../components/Checklist.astro';
 import Quiz from '../../../components/Quiz.astro';
 import Predict from '../../../components/Predict.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={8} items={["Idea → goal → testable criteria → a plan you approve.", "Edge cases first: that is where guesses go wrong.", "No plan without sources."]} />
 
 <StageStrip />
 
@@ -275,6 +280,10 @@ Answers to the plan's questions are decisions, so they belong in the record: her
 	explain="The real test is sources. A plan that cites no documents has guessed the architecture, and a client fact you cannot trace to the client log was invented."
 />
 
+<AtWork>Writing a spec that an agent can carry out, and a person can check, is fast becoming a core engineering skill (spec-driven development).</AtWork>
+
 :::tip[Do this in your project]
 For your brief's first feature, write `GOAL-n` (the four questions plus *out of scope*) and `docs/spec-<feature>.md` with at least one edge case and one "must not change". Before the agent drafts anything, ask it for the questions it needs answered, separating questions for the client from technical ones.
 :::
+
+<Done />

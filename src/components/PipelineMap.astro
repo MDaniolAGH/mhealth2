@@ -20,6 +20,24 @@ const s = {
 	knowledge: link('ai-sdlc/knowledge/'),
 	agentsMd: link('ai-sdlc/agents-md/'),
 };
+
+// Feedback loops and knowledge flows, drawn by src/scripts/sdlc.js.
+const flows = {
+	loops: [
+		{ from: 'gate', to: 'implementation', label: 'fail → fix', kind: 'fail', layer: 'base', lane: 0.28, dy: 10 },
+		{ from: 'tests', to: 'implementation', label: 'tests fail', kind: 'loop', layer: 'loops', lane: 0.58, dy: 1, labelDy: 26, wideOnly: true },
+		{ from: 'review', to: 'implementation', label: 'changes requested', kind: 'loop', layer: 'loops', lane: 0.88, dy: -8, labelAt: 'from' },
+		{ from: 'plan', to: 'requirements', label: 'unclear → rewrite', kind: 'loop', layer: 'loops', lane: 'near' },
+	],
+	kb: [
+		{ to: 'plan', layer: 'base' },
+		{ from: 'docs', layer: 'base' },
+		{ to: 'requirements', layer: 'knowledge' },
+		{ to: 'implementation', layer: 'knowledge' },
+		{ from: 'review', layer: 'knowledge', label: 'merged' },
+		{ to: 'idea', layer: 'knowledge', label: 'next iteration' },
+	],
+};
 ---
 
 <div class="sdlc not-content">
@@ -45,7 +63,7 @@ const s = {
 		<button type="button" class="sdlc-chip is-tool" data-actor="tool" aria-pressed="false">Deterministic tools</button>
 	</div>
 
-	<div class="sdlc-map" role="group" aria-label="AI SDLC pipeline: ten stages from idea to merge, with the project knowledge on the left">
+	<div class="sdlc-map" role="group" aria-label="AI SDLC pipeline: ten stages from idea to merge, with the project knowledge on the left" data-flows={JSON.stringify(flows)}>
 		<div class="sdlc-lane sdlc-lane--you is-you" aria-hidden="true"></div>
 		<div class="sdlc-lane sdlc-lane--agent is-agent" aria-hidden="true"></div>
 		<div class="sdlc-lane sdlc-lane--tool is-tool" aria-hidden="true"></div>
@@ -91,6 +109,12 @@ const s = {
 		<div data-detail="pr"><h4>9. Pull request</h4><dl><dt>Who</dt><dd>The agent drafts the description; you correct it and submit it</dd><dt>In</dt><dd>Commits, test and gate results, documentation changes</dd><dt>Out</dt><dd>What and why, how to review, evidence, documents changed, AI assistance</dd><dt>Check</dt><dd>Every claim in it is backed by output you saw</dd></dl></div>
 		<div data-detail="review"><h4>10. Review and merge</h4><dl><dt>Who</dt><dd>A person: your partner or another pair reviews, the owner merges</dd><dt>In</dt><dd>The pull request, the architecture, the decision records, the client log</dd><dt>Out</dt><dd>A review record and the merge; the knowledge now describes the new feature</dd><dt>Check</dt><dd>The review checklist; the author can explain every line</dd></dl></div>
 		<div data-detail="kb"><h4>Project knowledge</h4><dl><dt>What</dt><dd>The documents in the repository that describe the system and why it is the way it is</dd><dt>Why</dt><dd>A coding agent starts every session knowing nothing about your project. These documents are how it learns the architecture, the client's words and earlier decisions instead of guessing them.</dd><dt>Try</dt><dd>Click one document on the map to see which stages read it.</dd></dl></div>
+	</div>
+
+	<div class="sdlc-layer-info">
+		<div data-layer-info="audit"><h4>Audit trail</h4><p>Every stage now shows the record it leaves behind. Click a stage to see its record and to trace it back along the rail.</p></div>
+		<div data-layer-info="loops"><h4>Feedback loops</h4><dl><dt>Gate fails</dt><dd>The exact error goes back to the agent, which fixes the code.</dd><dt>Tests fail</dt><dd>Back to implementation, or to the plan if the approach was wrong.</dd><dt>Changes requested</dt><dd>The reviewer sends the pull request back.</dd><dt>Plan unclear</dt><dd>A plan that cannot be approved often means the criteria are unclear: rewrite them.</dd></dl><p>The pipeline is drawn top to bottom, but real work loops. Each loop is cheaper the earlier it starts.</p></div>
+		<div data-layer-info="knowledge"><h4>Knowledge flows</h4><p>The project knowledge feeds requirements, the <b>plan</b> and implementation. Documentation updates it in the same pull request; after the merge, the next iteration starts from the updated knowledge. Click a document to see exactly which stages read it.</p></div>
 	</div>
 
 	<div class="sdlc-kb-details">

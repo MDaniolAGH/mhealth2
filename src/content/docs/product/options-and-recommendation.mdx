@@ -9,8 +9,14 @@ import Estimator from '../../../components/Estimator.astro';
 import Sorter from '../../../components/Sorter.astro';
 import Quiz from '../../../components/Quiz.astro';
 import Predict from '../../../components/Predict.astro';
+import Scene from '../../../components/Scene.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
 
-<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts tables and argues against you · <span class="sdlc-chip is-you">You</span> check and own the advice · the <span class="sdlc-chip is-knowledge">client</span> decides'} input="The decision, the purpose, the ranked stories, the answers to your questions" output="An options table, estimates, <code>docs/recommendation.md</code>; then issue #7" />
+<Tldr minutes={8} items={["Always include an option without software.", "The client's hard limits decide, not your taste.", "Give a range, not a single number."]} />
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts tables and argues against you · <span class="sdlc-chip is-you">You</span> check and own the advice · the <span class="sdlc-chip is-client">client</span> decides'} input="The decision, the purpose, the ranked stories, the answers to your questions" output="An options table, estimates, <code>docs/recommendation.md</code>; then issue #7" />
 
 <span id="options" class="stage-anchor"></span>
 
@@ -49,6 +55,18 @@ It depends on the client's **hard limits**, not on your preference. If the ethic
 />
 
 Three things to notice. First, the board did not choose: the client's limits did. Second, when no option survives, the useful answer is to say **which limit to relax**, not to pick the least bad option quietly. Third, every number on the board is an estimate, so the next question is how good the estimates are.
+
+<Scene
+	title="Thursday: no option fits"
+	messages={[
+		{ who: 'you', name: 'You', text: 'Anna, with both of your limits nothing fits: the purpose must be in the app, and the wording must change without a release. Which one can move?' },
+		{ who: 'client', name: 'Anna', text: 'Let me ask the committee.' },
+		{ who: 'client', name: 'Anna', text: '(Friday) Wording changes will be rare. A new release is fine.' },
+		{ who: 'you', name: 'You', text: '@Copilot argue for the option we are about to reject, as well as you can.' },
+		{ who: 'agent', name: 'Copilot', text: 'The printed sheet is cheaper, and it reaches participants even when the app is closed.' },
+		{ who: 'you', name: 'You', text: 'Fair point. We keep the About screen, and add one sentence to the consent form.' },
+	]}
+/>
 
 ## Estimates: a range, not a number
 
@@ -145,6 +163,10 @@ Once the client decides, the recommendation becomes **issue #7**, and the About 
 	]}
 />
 
+<AtWork>A one-page recommendation with a range estimate and a kill criterion reads like the work of someone with experience.</AtWork>
+
 :::tip[Do this in your project]
 Write `docs/recommendation.md` for your brief on one page, with at least one option that is not software, a three-point estimate, and a kill criterion. Run the two prompts above on your draft and change what they find. This page, with its sources, is what a client or an employer remembers.
 :::
+
+<Done />

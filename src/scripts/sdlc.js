@@ -36,6 +36,19 @@
   }
 
   function n(v) { return Math.round(v * 10) / 10; }
+
+  /* Text from the widget's data-i18n JSON (for the Polish pages), with the
+     English text as the fallback; {name} placeholders are filled from vars. */
+  function T(root, key, fallback, vars) {
+    var d = root.__i18n;
+    if (d === undefined) {
+      try { d = JSON.parse(root.getAttribute("data-i18n") || "{}"); } catch (e) { d = {}; }
+      root.__i18n = d;
+    }
+    var out = d[key] || fallback;
+    Object.keys(vars || {}).forEach(function (k) { out = out.split("{" + k + "}").join(vars[k]); });
+    return out;
+  }
   function pt(x, y) { return { x: x, y: y }; }
   function dist(a, b) { return Math.hypot(b.x - a.x, b.y - a.y); }
 
@@ -198,6 +211,16 @@
 
     /* ----- drawing ----- */
 
+    /* What to draw besides the forward flow comes from the map's data-flows
+       JSON: feedback loops and the flows to and from the knowledge column.
+       { loops: [{from, to, label, kind: "fail"|"loop", layer: "base"|"loops",
+                  lane: 0..1 (share of the space right of the lanes) | "near",
+                  dy, labelAt: "from"|"mid", labelDy, wideOnly}],
+         kb:    [{to | from, layer: "base"|"knowledge", label}] } */
+    var flows = {};
+    try { flows = JSON.parse(map.dataset.flows || "{}"); } catch (e) { flows = {}; }
+    var lanes = Array.prototype.slice.call(map.querySelectorAll(".sdlc-lane"));
+
     function draw() {
       while (wires.firstChild) wires.removeChild(wires.firstChild);
       paths = {};
@@ -227,63 +250,58 @@
           connect(box(ordered[i]), box(ordered[i + 1])), "", "sdlc-m-grey");
       }
 
-      var lanesRight = box(map.querySelector(".sdlc-lane--tool")).r;
+      var lanesRight = Math.max.apply(null, lanes.map(function (l) { return box(l).r; }));
       var room = map.clientWidth - lanesRight;
       var wide = room >= 30;
-      var impl = box(stages.implementation);
-      var gate = box(stages.gate);
-      var tests = box(stages.tests);
-      var review = box(stages.review);
-      var plan = box(stages.plan);
-      var reqs = box(stages.requirements);
-      var docs = box(stages.docs);
-      var idea = box(stages.idea);
       var kb = box(kbBox);
-      var into = impl.r + 2;
 
-      // Loops nest: the innermost (gate) enters implementation lowest.
-      var x1 = lanesRight + room * 0.28;
-      var x2 = lanesRight + room * 0.58;
-      var x3 = lanesRight + room * 0.88;
-      var yGate = impl.cy + 10;
-      var yTests = impl.cy + 1;
-      var yReview = impl.cy - 8;
+      (flows.loops || []).forEach(function (L) {
+        if (!stages[L.from] || !stages[L.to]) return;
+        var a = box(stages[L.from]);
+        var b = box(stages[L.to]);
+        var g = L.layer === "base" ? base : loops;
+        var fail = L.kind === "fail";
+        var cls = fail ? "is-gate-loop" : "is-loop";
+        var mk = fail ? "sdlc-m-fail" : "sdlc-m-loop";
+        var tcls = fail ? "t-fail" : "t-loop";
+        var ty = b.cy + (L.dy || 0);
+        var key = L.from + ">" + L.to;
+        if (L.lane === "near") {
+          var xp = Math.max(a.r, b.r) + 16;
+          add(g, key, ortho([pt(a.r, a.cy), pt(xp, a.cy), pt(xp, ty), pt(b.r + 2, ty)]), cls, mk);
+          if (L.label) label(g, L.label, xp + 5, (a.cy + ty) / 2 + 3, tcls);
+          return;
+        }
+        var x = lanesRight + room * (L.lane || 0.5);
+        add(g, key, ortho([pt(a.r, a.cy), pt(x, a.cy), pt(x, ty), pt(b.r + 2, ty)]), cls, mk);
+        if (!L.label || (L.wideOnly && !wide)) return;
+        if (L.labelAt === "from") label(g, L.label, a.r + 8, a.cy - 5, tcls);
+        else label(g, L.label, x - 4, (ty + a.cy) / 2 + (L.labelDy || 0), tcls, true);
+      });
 
-      add(base, "gate>implementation",
-        ortho([pt(gate.r, gate.cy), pt(x1, gate.cy), pt(x1, yGate), pt(into, yGate)]),
-        "is-gate-loop", "sdlc-m-fail");
-      label(base, "fail → fix", x1 - 4, (yGate + gate.cy) / 2, "t-fail", true);
-
-      add(loops, "tests>implementation",
-        ortho([pt(tests.r, tests.cy), pt(x2, tests.cy), pt(x2, yTests), pt(into, yTests)]),
-        "is-loop", "sdlc-m-loop");
-      if (wide) label(loops, "tests fail", x2 - 4, (yTests + tests.cy) / 2 + 26, "t-loop", true);
-
-      add(loops, "review>implementation",
-        ortho([pt(review.r, review.cy), pt(x3, review.cy), pt(x3, yReview), pt(into, yReview)]),
-        "is-loop", "sdlc-m-loop");
-      label(loops, "changes requested", review.r + 8, review.cy - 5, "t-loop");
-
-      var xp = plan.r + 16;
-      add(loops, "plan>requirements",
-        ortho([pt(plan.r, plan.cy), pt(xp, plan.cy), pt(xp, reqs.cy), pt(reqs.r + 2, reqs.cy)]),
-        "is-loop", "sdlc-m-loop");
-      label(loops, "unclear → rewrite", xp + 5, (plan.cy + reqs.cy) / 2 + 3, "t-loop");
-
-      // Knowledge feeds the plan; documentation feeds the knowledge.
-      add(base, "kb>plan", ortho([pt(kb.r, plan.cy), pt(plan.x - 1, plan.cy)]), "is-kb", "sdlc-m-kb");
-      add(base, "docs>kb", ortho([pt(docs.x, docs.cy), pt(kb.r + 1, docs.cy)]), "is-kb", "sdlc-m-kb");
-
-      add(know, "kb>requirements", ortho([pt(kb.r, reqs.cy), pt(reqs.x - 1, reqs.cy)]), "is-kb-extra", "sdlc-m-kb");
-      add(know, "kb>implementation", ortho([pt(kb.r, impl.cy), pt(impl.x - 1, impl.cy)]), "is-kb-extra", "sdlc-m-kb");
-      add(know, "review>kb",
-        ortho([pt(review.x, review.cy), pt(kb.cx, review.cy), pt(kb.cx, kb.b + 1)], 10),
-        "is-kb-extra", "sdlc-m-kb");
-      label(know, "merged", kb.cx + 5, kb.b + 14, "t-kb");
-      add(know, "kb>idea",
-        ortho([pt(kb.cx, kb.y), pt(kb.cx, idea.cy), pt(idea.x - 1, idea.cy)], 10),
-        "is-kb-extra", "sdlc-m-kb");
-      label(know, "next iteration", kb.cx + 5, idea.cy - 5, "t-kb");
+      (flows.kb || []).forEach(function (F) {
+        var key = F.to ? "kb>" + F.to : F.from + ">kb";
+        var st = stages[F.to || F.from];
+        if (!st) return;
+        var s0 = box(st);
+        var g = F.layer === "knowledge" ? know : base;
+        var cls = F.layer === "knowledge" ? "is-kb-extra" : "is-kb";
+        var inside = s0.cy >= kb.y + 8 && s0.cy <= kb.b - 8;
+        var above = s0.cy < kb.y + 8;
+        var pts;
+        if (F.to) {
+          if (inside) pts = [pt(kb.r, s0.cy), pt(s0.x - 1, s0.cy)];
+          else pts = [pt(kb.cx, above ? kb.y : kb.b), pt(kb.cx, s0.cy), pt(s0.x - 1, s0.cy)];
+        } else {
+          if (inside) pts = [pt(s0.x, s0.cy), pt(kb.r + 1, s0.cy)];
+          else pts = [pt(s0.x, s0.cy), pt(kb.cx, s0.cy), pt(kb.cx, above ? kb.y - 1 : kb.b + 1)];
+        }
+        add(g, key, ortho(pts, inside ? 7 : 10), cls, "sdlc-m-kb");
+        if (F.label && !inside) {
+          if (above) label(g, F.label, kb.cx + 5, s0.cy - 5, "t-kb");
+          else label(g, F.label, kb.cx + 5, F.to ? s0.cy - 5 : kb.b + 14, "t-kb");
+        }
+      });
 
       if (state.doc) drawDoc(state.doc);
       if (state.at) { stopTravel(); setBall(home(state.at)); }
@@ -435,7 +453,7 @@
     }
 
     function sectionLink(node) {
-      return '<p><a href="' + node.getAttribute("href") + '">Read the full section →</a></p>';
+      return '<p><a href="' + node.getAttribute("href") + '">' + T(root, "readSection", "Read the full section →") + '</a></p>';
     }
 
     function trace(key) {
@@ -466,7 +484,7 @@
       if (state.audit) {
         trace(key);
         setPanel(html(".sdlc-audits", "audit", key) +
-          "<p>Highlighted: every stage this record can be traced back through, up to the idea.</p>" + sectionLink(s),
+          "<p>" + T(root, "traced", "Highlighted: every stage this record can be traced back through, up to the idea.") + "</p>" + sectionLink(s),
           cssVar("--sdlc-audit"));
       } else {
         setPanel(html(".sdlc-details", "detail", key) + sectionLink(s), chipOf(s));
@@ -479,8 +497,8 @@
       if (!doc) return;
       var d = box(doc);
       var kb = box(kbBox);
-      var you = box(map.querySelector(".sdlc-lane--you"));
-      var trunk = (kb.r + you.x) / 2;
+      var firstLane = Math.min.apply(null, lanes.map(function (l) { return box(l).x; }));
+      var trunk = (kb.r + firstLane) / 2;
       (doc.dataset.feeds || "").split(" ").forEach(function (k) {
         if (!stages[k]) return;
         var s = box(stages[k]);
@@ -506,13 +524,13 @@
       });
       drawDoc(key);
       setPanel(html(".sdlc-kb-details", "kb", key) +
-        '<p><a href="' + link.getAttribute("href") + '">Read about project knowledge →</a></p>', chipOf(kbBox));
+        '<p><a href="' + link.getAttribute("href") + '">' + T(root, "readKb", "Read about project knowledge →") + '</a></p>', chipOf(kbBox));
     }
 
     /* ----- walk-through ----- */
 
     function updateStatus() {
-      status.textContent = state.step >= 0 ? "Step " + (state.step + 1) + " of " + steps.length : "";
+      status.textContent = state.step >= 0 ? T(root, "step", "Step {n} of {total}", { n: state.step + 1, total: steps.length }) : "";
       prevBtn.disabled = state.step <= 0;
       nextBtn.disabled = state.step >= steps.length - 1;
     }
@@ -535,7 +553,7 @@
         if (state.audit) trace(st.stage);
       }
       var detail = html(".sdlc-details", "detail", st.stage);
-      setPanel('<span class="sdlc-panel__step">Step ' + (i + 1) + " of " + steps.length + "</span>" +
+      setPanel('<span class="sdlc-panel__step">' + T(root, "step", "Step {n} of {total}", { n: i + 1, total: steps.length }) + "</span>" +
         '<p class="sdlc-panel__narr">' + st.html + "</p>" + detail, chipOf(node));
       updateStatus();
       moveBall(forward ? prev : null, st.stage, {
@@ -551,13 +569,13 @@
     function stop() {
       if (state.timer) clearInterval(state.timer);
       state.timer = null;
-      playBtn.textContent = "▶ Walk through";
+      playBtn.textContent = T(root, "play", "▶ Walk through");
     }
 
     function play() {
       if (state.timer) { stop(); return; }
       if (state.step >= steps.length - 1) state.step = -1;
-      playBtn.textContent = "❚❚ Pause";
+      playBtn.textContent = T(root, "pause", "❚❚ Pause");
       go(state.step + 1, true);
       state.timer = setInterval(function () {
         if (state.step >= steps.length - 1) { stop(); return; }
@@ -587,7 +605,7 @@
         stop();
         clearFilter();
         setPanel(html(".sdlc-details", "detail", "kb") +
-          '<p><a href="' + kbTitle.getAttribute("href") + '">Read about project knowledge →</a></p>', chipOf(kbBox));
+          '<p><a href="' + kbTitle.getAttribute("href") + '">' + T(root, "readKb", "Read about project knowledge →") + '</a></p>', chipOf(kbBox));
         return;
       }
       var stage = event.target.closest("a.sdlc-stage");
@@ -621,27 +639,17 @@
           state.audit = on;
           if (on) {
             if (state.selected) selectStage(state.selected);
-            else setPanel("<h4>Audit trail</h4><p>Every stage now shows the record it leaves behind. " +
-              "Click a stage to see its record and to trace it back along the rail.</p>", cssVar("--sdlc-audit"));
+            else setPanel(html(".sdlc-layer-info", "layer-info", "audit"), cssVar("--sdlc-audit"));
           } else {
             untrace();
             if (state.selected) selectStage(state.selected);
           }
         }
         if (layer === "loops" && on) {
-          setPanel("<h4>Feedback loops</h4><dl>" +
-            "<dt>Gate fails</dt><dd>The exact error goes back to the agent, which fixes the code.</dd>" +
-            "<dt>Tests fail</dt><dd>Back to implementation, or to the plan if the approach was wrong.</dd>" +
-            "<dt>Changes requested</dt><dd>The reviewer sends the pull request back.</dd>" +
-            "<dt>Plan unclear</dt><dd>A plan that cannot be approved often means the criteria are unclear: rewrite them.</dd>" +
-            "</dl><p>The pipeline is drawn top to bottom, but real work loops. Each loop is cheaper the earlier it starts.</p>",
-            cssVar("--sdlc-loop"));
+          setPanel(html(".sdlc-layer-info", "layer-info", "loops"), cssVar("--sdlc-loop"));
         }
         if (layer === "knowledge" && on) {
-          setPanel("<h4>Knowledge flows</h4><p>The project knowledge feeds requirements, the <b>plan</b> and " +
-            "implementation. Documentation updates it in the same pull request; after the merge, the next " +
-            "iteration starts from the updated knowledge. Click a document to see exactly which stages read it.</p>",
-            chipOf(kbBox));
+          setPanel(html(".sdlc-layer-info", "layer-info", "knowledge"), chipOf(kbBox));
         }
       });
     });
@@ -693,7 +701,7 @@
       pos = 0;
       steps[0].classList.add("is-shown", "is-current");
       back.disabled = false;
-      count.textContent = "Step 1 of " + steps.length;
+      count.textContent = T(w, "step", "Step {n} of {total}", { n: 1, total: steps.length });
     }
 
     function step() {
@@ -701,19 +709,19 @@
       if (next >= steps.length) {
         show(end);
         back.disabled = true;
-        count.textContent = "Trail complete";
+        count.textContent = T(w, "complete", "Trail complete");
         return;
       }
       var need = steps[next].dataset.needs;
       if (need && broken(need) && breaks[need]) {
         show(breaks[need]);
         back.disabled = true;
-        count.textContent = "Trail lost after " + (pos + 1) + " of " + steps.length + " steps";
+        count.textContent = T(w, "lost", "Trail lost after {n} of {total} steps", { n: pos + 1, total: steps.length });
         return;
       }
       pos = next;
       show(steps[pos]);
-      count.textContent = "Step " + (pos + 1) + " of " + steps.length;
+      count.textContent = T(w, "step", "Step {n} of {total}", { n: pos + 1, total: steps.length });
     }
 
     back.addEventListener("click", step);
@@ -782,9 +790,9 @@
         });
         if (c.count) c.count.textContent = String(handoffs);
       });
-      status.textContent = shown ? "Step " + shown + " of " + total : "";
+      status.textContent = shown ? T(race, "step", "Step {n} of {total}", { n: shown, total: total }) : "";
       nextBtn.disabled = shown >= total;
-      nextBtn.textContent = shown === 0 ? "▶ Start" : "▶ Next step";
+      nextBtn.textContent = shown === 0 ? T(race, "start", "▶ Start") : T(race, "next", "▶ Next step");
     }
 
     nextBtn.addEventListener("click", function () { if (shown < total) { shown++; render(); } });
@@ -837,7 +845,7 @@
         seg.className = "ctx-lab__seg";
         seg.style.setProperty("--k", getComputedStyle(b.closest(".ctx-item")).getPropertyValue("--k"));
         seg.style.width = (t / Math.max(total, WINDOW) * 100) + "%";
-        seg.title = b.closest(".ctx-item").textContent.trim() + ": about " + k(t) + " tokens";
+        seg.title = b.closest(".ctx-item").textContent.trim() + T(lab, "segTitle", ": about {k} tokens", { k: k(t) });
         bar.appendChild(seg);
       });
       // Re-scale the segments once the total is known, so an overflowing context fills the bar.
@@ -850,35 +858,35 @@
       });
       var over = total > WINDOW;
       bar.classList.toggle("is-over", over);
-      used.textContent = "used: about " + k(total) + (over ? " (does not fit)" : "");
+      used.textContent = T(lab, "used", "used: about {k}", { k: k(total) }) + (over ? T(lab, "over", " (does not fit)") : "");
 
       var missing = essential.filter(function (b) { return !b.checked; }).map(function (b) { return b.dataset.need; });
       var cost = total / lean;
       var focus = total ? relevant / total : 0;
 
-      meter("cost", total ? (cost < 1 ? "below the lean context" : "≈ " + (Math.round(cost * 10) / 10) + "× lean") : "–",
+      meter("cost", total ? (cost < 1 ? T(lab, "belowLean", "below the lean context") : T(lab, "xLean", "≈ {x}× lean", { x: Math.round(cost * 10) / 10 })) : "–",
         total / WINDOW * 100, cost > 3 ? fail : cost > 1.5 ? warn : ok);
-      meter("focus", total ? Math.round(focus * 100) + "% relevant" : "–", focus * 100,
+      meter("focus", total ? T(lab, "relevant", "{p}% relevant", { p: Math.round(focus * 100) }) : "–", focus * 100,
         focus < 0.3 ? fail : focus < 0.7 ? warn : ok);
-      meter("gaps", missing.length ? missing.length + " of " + essential.length : "none",
+      meter("gaps", missing.length ? T(lab, "nOf", "{n} of {total}", { n: missing.length, total: essential.length }) : T(lab, "none", "none"),
         missing.length / essential.length * 100, missing.length ? fail : ok);
 
       var msg;
       var colour;
       if (dangers.length) {
-        msg = "<b>Stop.</b> This context contains " + dangers.join(" and ") + ". Everything in the context is sent to the model's provider. Secrets and real health data never go in, whatever the task.";
+        msg = T(lab, "stop", "<b>Stop.</b> This context contains {what}. Everything in the context is sent to the model's provider. Secrets and real health data never go in, whatever the task.", { what: dangers.join(T(lab, "and", " and ")) });
         colour = fail;
       } else if (over) {
-        msg = "<b>It does not fit.</b> The harness will have to drop or summarise something, and you do not control what. The facts that matter may be the ones that go.";
+        msg = T(lab, "notFit", "<b>It does not fit.</b> The harness will have to drop or summarise something, and you do not control what. The facts that matter may be the ones that go.");
         colour = fail;
       } else if (missing.length) {
-        msg = "<b>Missing facts:</b> " + missing.join(", ") + ". The agent will not stop; it will fill these gaps with plausible guesses.";
+        msg = T(lab, "missing", "<b>Missing facts:</b> {what}. The agent will not stop; it will fill these gaps with plausible guesses.", { what: missing.join(", ") });
         colour = warn;
       } else if (focus < 0.5) {
-        msg = "<b>Complete, but mostly noise.</b> Every fact is there, buried in " + k(total - relevant) + " tokens of unrelated text, paid for again on every step of the loop.";
+        msg = T(lab, "noise", "<b>Complete, but mostly noise.</b> Every fact is there, buried in {k} tokens of unrelated text, paid for again on every step of the loop.", { k: k(total - relevant) });
         colour = warn;
       } else {
-        msg = "<b>Lean and complete.</b> Everything this task needs and little else: cheap per step, and nothing for the agent to guess.";
+        msg = T(lab, "lean", "<b>Lean and complete.</b> Everything this task needs and little else: cheap per step, and nothing for the agent to guess.");
         colour = ok;
       }
       verdict.innerHTML = msg;
@@ -889,7 +897,7 @@
       boxes.forEach(function (b) {
         if (name === "lean") b.checked = !!b.dataset.need;
         else if (name === "all") b.checked = !b.dataset.danger;
-        else b.checked = b.dataset.need === "the criteria";
+        else b.checked = b.hasAttribute("data-bare");
       });
       render();
     }
@@ -943,7 +951,7 @@
         var target = btn.dataset.caught;
         var stopAt = layers.findIndex(function (l) { return l.dataset.layer === target; });
         var text = lab.querySelector('.gate-lab__data [data-defect="' + target + '"]');
-        result.innerHTML = "<p>Following the defect down through the layers…</p>";
+        result.innerHTML = "<p>" + T(lab, "following", "Following the defect down through the layers…") + "</p>";
         var stepMs = reducedMotion ? 0 : 420;
         drop.style.transition = "none";
         drop.style.top = "-0.6rem";
@@ -956,14 +964,14 @@
             drop.style.top = yOf(layer) + "px";
             if (i < stopAt) {
               layer.classList.add("is-through");
-              status(layer, "↓ passes");
+              status(layer, T(lab, "passes", "↓ passes"));
               return;
             }
             layer.classList.add("is-caught");
-            status(layer, "✋ stopped here");
+            status(layer, T(lab, "stopped", "✋ stopped here"));
             drop.classList.add("is-hit");
             layers.forEach(function (rest, k) {
-              if (k > stopAt) { rest.classList.add("is-unreached"); status(rest, "not reached"); }
+              if (k > stopAt) { rest.classList.add("is-unreached"); status(rest, T(lab, "unreached", "not reached")); }
             });
             result.innerHTML = text ? text.innerHTML : "";
           }, stepMs * (i + 1)));

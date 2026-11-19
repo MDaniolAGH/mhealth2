@@ -7,16 +7,18 @@ interface Props {
 	id: string;
 	question: string;
 }
+import { t } from '../i18n/ui';
 const { id, question } = Astro.props;
+const T = t(Astro);
 ---
 
-<div class="predict not-content" data-id={id}>
-	<p class="predict__label">Predict first</p>
+<div class="predict not-content" data-id={id} data-compare={T.compare}>
+	<p class="predict__label">{T.predictFirst}</p>
 	<p class="predict__q" set:html={question} />
-	<textarea class="predict__input" rows="2" placeholder="Your prediction, in a sentence or two" aria-label="Your prediction"></textarea>
+	<textarea class="predict__input" rows="2" placeholder={T.predictPlaceholder} aria-label={T.predictPlaceholder}></textarea>
 	<div class="predict__bar">
-		<button type="button" class="predict__reveal" disabled>Reveal</button>
-		<span class="predict__hint">Write something first: a guess you commit to teaches more than one you skip.</span>
+		<button type="button" class="predict__reveal" disabled>{T.reveal}</button>
+		<span class="predict__hint">{T.predictHint}</span>
 	</div>
 	<div class="predict__answer" hidden>
 		<slot />
@@ -47,7 +49,7 @@ const { id, question } = Astro.props;
 			answer.hidden = false;
 			box.classList.add('is-revealed');
 			reveal.hidden = true;
-			hint.textContent = 'Compare: what did you get right, and what did you miss?';
+			hint.textContent = box.dataset.compare || '';
 		});
 		update();
 	});

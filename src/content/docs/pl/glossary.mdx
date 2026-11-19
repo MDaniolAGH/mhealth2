@@ -1,0 +1,107 @@
+---
+title: Słowniczek
+description: Krótkie definicje pojęć używanych w tym przewodniku.
+---
+
+<dl class="glossary">
+
+<dt>Acceptance criterion (kryterium akceptacji)</dt>
+<dd>Zdanie, o którym test albo uruchomienie aplikacji może rozstrzygnąć, czy jest prawdziwe, np. AC-4. Często zapisywane jako Given/When/Then.</dd>
+
+<dt>ADR (architecture decision record, zapis decyzji architektonicznej)</dt>
+<dd>Krótki dokument o jednej decyzji: jej kontekst, sama decyzja i jej konsekwencje. Trzymany w <code>docs/adr/</code>.</dd>
+
+<dt>Agent</dt>
+<dd>Model językowy w harnessie, dzięki któremu może czytać pliki, uruchamiać polecenia, oglądać wyniki i próbować jeszcze raz.</dd>
+
+<dt>Agent skill</dt>
+<dd>Folder z plikiem instrukcji <code>SKILL.md</code>, który agent wczytuje tylko wtedy, gdy zadanie tego wymaga, np. kursowe skille <code>ba-*</code> i <code>mh-*</code>.</dd>
+
+<dt><code>AGENTS.md</code></dt>
+<dd>Plik Markdown w katalogu głównym repozytorium z zasadami dla agentów kodujących. Ich punkt wejścia do projektu.</dd>
+
+<dt>AI Credits</dt>
+<dd>Jednostka, w której GitHub Copilot rozlicza się od czerwca 2026 r. Ubywa ich według liczby tokenów przetworzonych przez dany model.</dd>
+
+<dt>Assumption (założenie)</dt>
+<dd>Coś, co uznajemy za prawdę bez potwierdzenia. Przydaje się tylko wtedy, gdy jest na tyle konkretne, że może okazać się błędne.</dd>
+
+<dt>CI (continuous integration, ciągła integracja)</dt>
+<dd>Sprawdzenia, które uruchamiają się automatycznie przy każdym pushu albo pull requeście, np. w GitHub Actions.</dd>
+
+<dt>Context window (okno kontekstu)</dt>
+<dd>Cały tekst, który model widzi naraz podczas zadania, mierzony w tokenach.</dd>
+
+<dt>Deterministic (deterministyczny)</dt>
+<dd>To samo wejście, ten sam wynik, za każdym razem. Kompilatory i narzędzia do uruchamiania testów takie są; modele językowe nie.</dd>
+
+<dt>EARS</dt>
+<dd><em>Easy Approach to Requirements Syntax</em>: wzorce zdań do zapisywania wymagań, np. „If [trigger], then [system] shall [response]”.</dd>
+
+<dt>Golden test</dt>
+<dd>Test, który porównuje zrzut ekranu widgetu z zatwierdzonym plikiem obrazu i nie przechodzi, jeśli się różnią.</dd>
+
+<dt>Harness</dt>
+<dd>Oprogramowanie wokół modelu, które daje mu tools, pętlę, instrukcje i zasady: agent mode w Copilocie, Claude Code, Mistral Vibe.</dd>
+
+<dt>Hook</dt>
+<dd>Skrypt, który harness uruchamia przed akcją agenta albo po niej; może ją zablokować, cokolwiek zdecyduje model.</dd>
+
+<dt>Intended purpose (przewidziane zastosowanie)</dt>
+<dd>Do czego służy produkt, tak jak określa to jego producent. Według unijnego MDR to od niego zależy, czy oprogramowanie jest wyrobem medycznym.</dd>
+
+<dt>INVEST</dt>
+<dd>Test dla user stories: Independent, Negotiable, Valuable, Estimable, Small, Testable (niezależna, negocjowalna, wartościowa, dająca się oszacować, mała, testowalna).</dd>
+
+<dt>Lethal trifecta</dt>
+<dd>Sesja agenta, która naraz ma dostęp do prywatnych danych, styka się z niezaufanymi treściami i ma sposób, żeby wysłać dane na zewnątrz. Usuń przynajmniej jedno z tych trzech.</dd>
+
+<dt>MCP (Model Context Protocol)</dt>
+<dd>Otwarty protokół do podłączania do harnessu dodatkowych tools i źródeł danych.</dd>
+
+<dt>MoSCoW</dt>
+<dd>Priorytety ustalane przez klienta: Must, Should, Could, Won't (tym razem).</dd>
+
+<dt>Prompt injection</dt>
+<dd>Tekst w czymś, co agent czyta (w issue, na stronie internetowej, w wyniku narzędzia), który steruje nim jak polecenie.</dd>
+
+<dt>Quality gate</dt>
+<dd>Automatyczne, deterministyczne sprawdzenia, które każda zmiana musi przejść, zanim pójdzie dalej (etap 6).</dd>
+
+<dt>Required check (wymagany check)</dt>
+<dd>Check w CI, który ochrona brancha czyni obowiązkowym: jeśli nie przejdzie, pull requesta nie da się zmergować.</dd>
+
+<dt>SOUP (software of unknown provenance, oprogramowanie o nieznanym pochodzeniu)</dt>
+<dd>Pojęcie z IEC 62304: oprogramowanie, którego używasz, ale które nie powstało w twoim własnym procesie, np. pakiet z pub.dev. Każdy taki element się rejestruje, ocenia i monitoruje.</dd>
+
+<dt>Spec Kit</dt>
+<dd>Zestaw narzędzi GitHuba do spec-driven development: spec, plan, zadania, implementacja.</dd>
+
+<dt>Sub-agent</dt>
+<dd>Agent uruchomiony przez innego agenta do jednej części zadania, z własnym, małym i świeżym kontekstem.</dd>
+
+<dt>Synthetic data (dane syntetyczne)</dt>
+<dd>Zmyślone dane o takim samym kształcie jak prawdziwe. Jedyne dane, których używamy na tym kursie.</dd>
+
+<dt>Synthetic user (syntetyczny użytkownik)</dt>
+<dd>Użytkownik, w którego rolę wciela się model językowy. Źródło hipotez, nigdy dowodów.</dd>
+
+<dt>Three-point estimate (estymacja trzypunktowa)</dt>
+<dd>Estymacja z trzech wartości: optymistycznej, najbardziej prawdopodobnej i pesymistycznej: E = (O + 4M + P) / 6, podawana jako przedział.</dd>
+
+<dt>Token</dt>
+<dd>Jednostka, którą model czyta i pisze: słowo albo kawałek słowa.</dd>
+
+<dt>Total cost of ownership (całkowity koszt posiadania, TCO)</dt>
+<dd>Koszt jednorazowy plus koszty bieżące plus czas i obowiązki samego klienta, liczone przez cały okres używania.</dd>
+
+<dt>Trailer</dt>
+<dd>Linijka <code>Key: value</code> na końcu opisu commita, np. <code>Refs: GOAL-1</code>, którą Git i inne narzędzia potrafią przeszukiwać.</dd>
+
+<dt>User story</dt>
+<dd>Potrzeba zapisana z punktu widzenia osoby, która ją ma: „Jako …, chcę …, żeby …”.</dd>
+
+<dt>Worktree</dt>
+<dd>Drugi folder roboczy tego samego repozytorium Git, na własnym branchu, dzięki czemu dwa agenty nigdy nie edytują tych samych plików.</dd>
+
+</dl>

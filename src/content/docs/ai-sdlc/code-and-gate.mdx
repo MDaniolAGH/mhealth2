@@ -9,6 +9,11 @@ import StageStrip from '../../../components/StageStrip.astro';
 import GateLab from '../../../components/GateLab.astro';
 import Quiz from '../../../components/Quiz.astro';
 import Predict from '../../../components/Predict.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={7} items={["Small commits on a branch, each saying why.", "The gate: deterministic checks, the same verdict every time.", "A green gate is not a correct feature."]} />
 
 <StageStrip />
 
@@ -250,6 +255,10 @@ The handover's `AGENTS.md` lists this rule as "not checked by a test yet". With 
 	explain="A rule weakened to make one change pass stops protecting every later change. If a rule has to change, that is a decision with a record, not a side effect of a diff."
 />
 
+<AtWork>Setting up a required CI check takes about half an hour, and shows that you understand how teams work.</AtWork>
+
 :::tip[Do this in your project]
 Add the quality-gate workflow to your repository, mark its jobs as required checks for `main`, and open a pull request that deliberately fails one of them. Put a screenshot of the blocked merge in your dossier, then close the pull request.
 :::
+
+<Done />

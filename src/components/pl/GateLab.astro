@@ -1,0 +1,59 @@
+---
+/** Stage 6 (Polish): drop a defect through the layers of defence ("Swiss cheese"). */
+
+const i18n = JSON.stringify({
+	following: 'Śledzę defekt w dół, przez kolejne warstwy…',
+	passes: '↓ przechodzi',
+	stopped: '✋ zatrzymany tutaj',
+	unreached: 'tu nie dotarł',
+});
+---
+
+<div class="gate-lab not-content" data-i18n={i18n}>
+	<div class="gate-lab__defects">
+		<span class="sdlc-legend__hint">Wrzuć defekt:</span>
+		<button type="button" class="gate-defect" data-caught="analyze">brakujący import</button>
+		<button type="button" class="gate-defect" data-caught="style">kod w innym stylu</button>
+		<button type="button" class="gate-defect" data-caught="arch">ekran, który importuje <code>http</code></button>
+		<button type="button" class="gate-defect" data-caught="secrets">tajny klucz JWT w commicie</button>
+		<button type="button" class="gate-defect" data-caught="deps">pakiet ze znaną podatnością</button>
+		<button type="button" class="gate-defect" data-caught="golden">padding karty nastroju zmienia się o 8 px</button>
+		<button type="button" class="gate-defect" data-caught="tests">spinner, który nie znika, gdy serwer nie działa</button>
+		<button type="button" class="gate-defect" data-caught="human">intended purpose, którego klient nigdy nie podał</button>
+	</div>
+	<p class="gate-lab__now" aria-live="polite">Defekt: <b>jeszcze żaden</b></p>
+	<div class="gate-lab__body">
+		<div class="gate-lab__track" aria-hidden="true"><i class="gate-lab__drop"></i></div>
+		<div class="gate-lab__stack">
+			<div class="gate-group gate-group--gate">
+				<p class="gate-group__label">Quality gate (etap 6): automatyczny, za każdym razem ten sam werdykt</p>
+				<div class="gate-layer" data-layer="analyze"><span class="gate-layer__n">1</span><span class="gate-layer__q"><b>Czy kod jest poprawnie zbudowany?</b><span>kompilator i analyzer</span></span><span class="gate-layer__status"></span></div>
+				<div class="gate-layer" data-layer="style"><span class="gate-layer__n">2</span><span class="gate-layer__q"><b>Czy jest napisany po naszemu?</b><span>reguły lintera i formatter</span></span><span class="gate-layer__status"></span></div>
+				<div class="gate-layer" data-layer="arch"><span class="gate-layer__n">3</span><span class="gate-layer__q"><b>Czy pasuje do architektury?</b><span>testy architektury, import-linter</span></span><span class="gate-layer__status"></span></div>
+				<div class="gate-layer" data-layer="secrets"><span class="gate-layer__n">4</span><span class="gate-layer__q"><b>Czy można go bezpiecznie udostępnić?</b><span>secret scan</span></span><span class="gate-layer__status"></span></div>
+				<div class="gate-layer" data-layer="deps"><span class="gate-layer__n">5</span><span class="gate-layer__q"><b>Czy możemy ufać jego zależnościom?</b><span>skan podatności, test rejestru SOUP</span></span><span class="gate-layer__status"></span></div>
+				<div class="gate-layer" data-layer="golden"><span class="gate-layer__n">6</span><span class="gate-layer__q"><b>Czy wygląda tak, jak zatwierdzono?</b><span>golden testy</span></span><span class="gate-layer__status"></span></div>
+			</div>
+			<div class="gate-group gate-group--after">
+				<p class="gate-group__label">To już nie gate: tu potrzebne są twoje kryteria i twój osąd</p>
+				<div class="gate-layer" data-layer="tests"><span class="gate-layer__n">7</span><span class="gate-layer__q"><b>Czy robi to, o co prosiliśmy?</b><span>testy sprawdzające kryteria (etap 7)</span></span><span class="gate-layer__status"></span></div>
+				<div class="gate-layer" data-layer="human"><span class="gate-layer__n">10</span><span class="gate-layer__q"><b>Czy to w ogóle właściwa rzecz?</b><span>twoje uruchomienie, review, klient (etapy 7 i 10)</span></span><span class="gate-layer__status"></span></div>
+			</div>
+		</div>
+	</div>
+	<div class="gate-lab__result" aria-live="polite"><p>Wybierz defekt powyżej.</p></div>
+	<div class="gate-lab__data">
+		<div data-defect="analyze"><b>Złapany przez warstwę 1, analyzer:</b> <code>Undefined name 'AboutScreen'</code>. Kilka sekund po zmianie, zanim ktokolwiek przeczyta kod, a agent sam go poprawia.</div>
+		<div data-defect="style"><b>Złapany przez warstwę 2, formatter i reguły lintera.</b> Nikt nie musi tego podnosić w review i nikt nie musi się o to kłócić.</div>
+		<div data-defect="arch"><b>Złapany przez warstwę 3, regułę architektury:</b> mały test, który nie przechodzi, gdy plik w <code>lib/screens/</code> albo <code>lib/widgets/</code> importuje <code>http</code>, <code>sqflite</code> albo secure storage. Na serwerze to samo robi <code>lint-imports</code> dla warstw z <code>.importlinter</code>. Bez takich reguł warstwy rozmywają się, jeden wiarygodnie wyglądający wyjątek po drugim.</div>
+		<div data-defect="secrets"><b>Złapany przez warstwę 4, secret scan,</b> zanim klucz trafi do historii Gita, skąd trudno go usunąć i trzeba uznać, że wyciekł: każdy, kto go ma, może podpisywać ważne tokeny logowania.</div>
+		<div data-defect="deps"><b>Złapany przez warstwę 5, dependency scan,</b> który porównuje <code>pubspec.lock</code> i <code>requirements.txt</code> z bazą znanych podatności. Nowy pakiet bez wiersza w <code>docs/soup.csv</code> też zostaje tu zatrzymany, przez test rejestru SOUP.</div>
+		<div data-defect="golden"><b>Złapany przez warstwę 6, golden test:</b> wyrenderowana karta nastroju nie zgadza się już z zatwierdzonym obrazem. W review zmiana o 8 px jest prawie niewidoczna.</div>
+		<div data-defect="tests"><b>Przechodzi przez każdy gate.</b> Kod jest poprawnie zbudowany, schludny, w dobrej warstwie i wygląda dobrze, gdy serwer działa. Łapie go dopiero <b>test dla AC-4</b>, który czeka 5 s na serwer, który nigdy nie odpowiada. Gate'y sprawdzają właściwości kodu, a nie twoje intencje.</div>
+		<div data-defect="human"><b>Przechodzi każde sprawdzenie, łącznie z testami.</b> Agent wpisał to zdanie także do <code>docs/product.md</code>, a test AC-5 sprawdza tylko, czy tekst na ekranie zgadza się z tym plikiem. Dopiero człowiek, który porówna go z <code>docs/client-log.md</code>, zauważy, że klient nigdy tego nie powiedział. Przeznaczenie w stylu „pomaga pacjentom radzić sobie z depresją” to twierdzenie medyczne: może zrobić z aplikacji regulowany wyrób medyczny.</div>
+	</div>
+</div>
+
+<script>
+	import '../../scripts/sdlc.js';
+</script>

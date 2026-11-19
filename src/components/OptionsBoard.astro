@@ -27,14 +27,17 @@ interface Props {
 	options: Option[];
 }
 const { need, limits, budgetKey, budget, options } = Astro.props;
+import { t, fill } from '../i18n/ui';
+const T = t(Astro);
+const i18n = JSON.stringify({ boardStart: T.boardStart, boardNone: T.boardNone, boardSome: T.boardSome });
 const e = (o: Option) => Math.round(((o.o + 4 * o.m + o.p) / 6) * 10) / 10;
 ---
 
-<div class="biz-widget optboard not-content" data-budget-key={budgetKey} data-budget={budget}>
-	<p class="biz-kicker">Options board</p>
+<div class="biz-widget optboard not-content" data-budget-key={budgetKey} data-budget={budget} data-i18n={i18n}>
+	<p class="biz-kicker">{T.optionsBoard}</p>
 	<p class="biz-title" set:html={need} />
 	<div class="optboard__limits" role="group" aria-label="Hard limits">
-		<span class="sdlc-legend__hint">Hard limits from the client:</span>
+		<span class="sdlc-legend__hint">{T.hardLimits}</span>
 		{limits.map((l) => <label><input type="checkbox" data-limit={l.key} /> <span set:html={l.label} /></label>)}
 	</div>
 	<div class="optboard__grid">
@@ -51,16 +54,16 @@ const e = (o: Option) => Math.round(((o.o + 4 * o.m + o.p) / 6) * 10) / 10;
 					<dl>
 						<dt>O / M / P</dt>
 						<dd>{o.o} / {o.m} / {o.p} h</dd>
-						<dt>Stays with the client</dt>
+						<dt>{T.staysWithClient}</dt>
 						<dd set:html={o.duties} />
-						<dt>Main risk</dt>
+						<dt>{T.mainRisk}</dt>
 						<dd set:html={o.risk} />
 					</dl>
 					<ul class="optboard__why">
 						{(o.breaks ?? []).map((b) => (
 							<li data-limit={b.limit} set:html={b.why} />
 						))}
-						{budgetKey && <li data-limit={budgetKey}>Expected effort ({e(o)} h) is over the budget.</li>}
+						{budgetKey && <li data-limit={budgetKey}>{fill(T.overBudget, { e: e(o) })}</li>}
 					</ul>
 				</article>
 			))
@@ -76,6 +79,7 @@ const e = (o: Option) => Math.round(((o.o + 4 * o.m + o.p) / 6) * 10) / 10;
 		const out = board.querySelector<HTMLElement>('.optboard__out')!;
 		const budgetKey = board.dataset.budgetKey;
 		const budget = Number(board.dataset.budget);
+		const L = JSON.parse(board.dataset.i18n || '{}');
 		const render = () => {
 			const on = boxes.filter((b) => b.checked).map((b) => b.dataset.limit!);
 			let alive = 0;
@@ -87,10 +91,10 @@ const e = (o: Option) => Math.round(((o.o + 4 * o.m + o.p) / 6) * 10) / 10;
 				if (!broken.size) alive++;
 			});
 			out.innerHTML = !on.length
-				? 'Switch on the client\'s hard limits. An option that breaks one is out, however cheap it is.'
+				? L.boardStart
 				: alive === 0
-					? '<b>No option survives.</b> Tell the client which limit to relax, or recommend doing nothing for now. "No" is a valid result.'
-					: `<b>${alive} of ${opts.length} options survive.</b> Compare those on the client's other criteria, not on cost alone.`;
+					? L.boardNone
+					: String(L.boardSome).replace('{n}', String(alive)).replace('{total}', String(opts.length));
 		};
 		boxes.forEach((b) => b.addEventListener('change', render));
 		render();

@@ -1,0 +1,10 @@
+---
+/** "At work": how this shows up in a job, in one or two sentences. */
+import { t } from '../i18n/ui';
+const T = t(Astro);
+---
+
+<aside class="atwork not-content">
+	<span class="atwork__label">💼 {T.atWork}</span>
+	<div class="atwork__body"><slot /></div>
+</aside>

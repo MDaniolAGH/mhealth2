@@ -7,6 +7,11 @@ import HarnessLab from '../../../components/HarnessLab.astro';
 import Race from '../../../components/Race.astro';
 import Quiz from '../../../components/Quiz.astro';
 import Predict from '../../../components/Predict.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={6} items={["Agent = model + harness: tools, a loop, instructions, rules.", "Poor output? Fix the harness before you switch the model.", "Every tool is also a way in. Know the lethal trifecta."]} />
 
 A language model on its own does one thing: given a prompt, it produces text. In a chat window that is the whole loop: **model → prompt → output**. You copy code in, copy the answer out, and you are the one who runs it, tests it and notices what is wrong.
 
@@ -115,6 +120,10 @@ W5 covers the attacks in detail (OWASP Top 10 for LLM applications and for agent
 	explain="Without a way to send data out, a leaked secret stays on your machine. Approving outgoing actions costs you a click; the other two legs cost you the task itself. In a real setup you would also run the task in a sandbox without the secrets."
 />
 
+<AtWork>Teams now set up agents for the whole repository. Showing that you can tune a harness (instructions, tools, permissions) with a concrete example is something you can put on a CV.</AtWork>
+
 :::tip[Do this in your project]
 Ask your agent, in a fresh session: *"Which tools can you use here, which instruction files did you read, and which commands may you run without asking me?"* Compare the answer with your `AGENTS.md` and your tool's settings. Fix the first gap you find, and switch off automatic approval of commands if it is on.
 :::
+
+<Done />

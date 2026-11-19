@@ -6,6 +6,12 @@ description: Ask only questions whose answers change your recommendation, and re
 import StageFacts from '../../../components/StageFacts.astro';
 import Sorter from '../../../components/Sorter.astro';
 import Quiz from '../../../components/Quiz.astro';
+import Scene from '../../../components/Scene.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={6} items={["Ask only what changes your recommendation.", "Observation ≠ interpretation ≠ implication.", "Write down what the client said, with a date."]} />
 
 <StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> drafts and searches · <span class="sdlc-chip is-you">You</span> choose and reproduce'} input="The assumption log, the code, the running app with synthetic data" output="<code>docs/questions.md</code> (3–5 ranked questions), observations with evidence" />
 
@@ -50,6 +56,37 @@ A good question is **open, neutral and specific**. It does not suggest the answe
 :::note[Discovery synthesis with an agent]
 After interviews, an agent can cluster your notes into themes in minutes. Insist that **every theme cites a quote**, and check that each quote exists and says what the theme claims. Interview notes are personal data, often health data: use anonymised notes, keep them out of consumer AI tools, and in this course use synthetic material only.
 :::
+
+<span id="meeting" class="stage-anchor"></span>
+
+## The client meeting
+
+You have three questions, each with "if A → X, if B → Y". The meeting is where assumptions turn into facts, or into new questions.
+
+<Scene
+	title="Tuesday, 10:00: the meeting at the clinic"
+	messages={[
+		{ who: 'you', name: 'You', text: 'Does the committee need the purpose stated inside the app, or is the consent form enough?' },
+		{ who: 'client', name: 'Anna', text: 'Inside the app. They were very clear.' },
+		{ who: 'you', name: 'You', text: 'Who should participants contact with questions?' },
+		{ who: 'client', name: 'Anna', text: 'Good question… we have not decided. I will ask the head of the clinic.' },
+		{ who: 'client', name: 'Anna', text: 'Oh, and we may need to change the wording during the study, without waiting for a new version of the app.' },
+		{ who: 'other', name: 'Tomek', text: 'And please make the version easy to read out over the phone.' },
+		{ who: 'you', name: 'You', text: 'Noted, with today\'s date. I will send you the notes to check.' },
+	]}
+/>
+
+Write down what the client **said**, not what you hoped, with the date and who said it. Then send it back for a check. Those lines are now the only source of client facts:
+
+```text title="docs/client-log.md (excerpt, illustrative)"
+2026-11-13  Meeting with Anna (coordinator) and Tomek (support)
+- The committee requires the purpose to be stated in the app itself. (Anna)
+- Contact for participants: not decided; Anna asks the head of the clinic.
+- Wording may have to change during the study, without a new app release. (Anna)
+- The version must be easy to read out over the phone. (Tomek)
+```
+
+Notice the third line. It will matter on the [options page](../options-and-recommendation/#options).
 
 <span id="observation" class="stage-anchor"></span>
 
@@ -97,6 +134,10 @@ Do not start from "find the bug". The word *bug* is only right when the expected
 	explain="Rewrite it: <em>Observation</em>: no About screen exists (evidence: the search). <em>Implication</em>: support cannot see the version. Whether that is a problem is the client's call."
 />
 
+<AtWork>Good discovery questions save weeks of building the wrong thing. It is one of the skills senior people are hired for.</AtWork>
+
 :::tip[Do this in your project]
 Run `/ba-questions` and keep only the questions that pass the "if A → X, if B → Y" test, at most five. Then pick your client's main concern and run `/ba-app-observation` on it. Reproduce the agent's evidence yourself before anything goes into your dossier.
 :::
+
+<Done />

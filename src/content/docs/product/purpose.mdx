@@ -7,8 +7,14 @@ import StageFacts from '../../../components/StageFacts.astro';
 import Sorter from '../../../components/Sorter.astro';
 import Quiz from '../../../components/Quiz.astro';
 import Predict from '../../../components/Predict.astro';
+import Scene from '../../../components/Scene.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
 
-<StageFacts tone="you" who={'The <span class="sdlc-chip is-knowledge">client</span> states it · <span class="sdlc-chip is-you">You</span> check what it implies · an expert confirms'} input="The decision, the client log, the features you are considering" output="The intended purpose in four lines, in <code>docs/product.md</code>, quoted from the client" />
+<Tldr minutes={5} items={["One sentence can turn a diary into a medical device.", "Only the client states the purpose.", "Agents write medical claims without being asked: catch them."]} />
+
+<StageFacts tone="you" who={'The <span class="sdlc-chip is-client">client</span> states it · <span class="sdlc-chip is-you">You</span> check what it implies · an expert confirms'} input="The decision, the client log, the features you are considering" output="The intended purpose in four lines, in <code>docs/product.md</code>, quoted from the client" />
 
 The **intended purpose** says what a product is for. Under the EU Medical Device Regulation (MDR), software intended for a medical purpose, such as diagnosis, prevention, monitoring, prediction, treatment or alleviation of a disease, is a **medical device**. A device needs a quality management system, risk management, a software life-cycle process (IEC 62304), clinical evaluation and a CE mark. That changes the cost of every later decision by an order of magnitude.
 
@@ -19,6 +25,16 @@ What counts is the **purpose the manufacturer states and the functions the softw
 Possibly everything. "Manage depression" states a purpose of treating or alleviating a disease. With that sentence, the same code may be medical-device software, with all the obligations that follow. The purpose is the product's legal identity, which is why only the client may state it, and why an agent must never write it.
 
 </Predict>
+
+<Scene
+	title="Tuesday, 15:40: a store description"
+	messages={[
+		{ who: 'you', name: 'You', text: '@Copilot draft a short store description for the Mood Tracker.' },
+		{ who: 'agent', name: 'Copilot', text: '“Mood Tracker helps patients manage their mental health and spot early signs of depression.”' },
+		{ who: 'you', name: 'You', text: 'Stop. That is a medical claim. Use only the intended purpose in <code>docs/product.md</code>, word for word.' },
+		{ who: 'client', name: 'Anna', text: 'Please, nothing medical. If we promise diagnosis or treatment, the committee stops the study.' },
+	]}
+/>
 
 ## Four lines
 
@@ -77,6 +93,10 @@ Ask an agent for a store description, a README or onboarding text, and it will o
 	explain="Advising an action based on what someone entered moves the app from recording towards recommending: the step the MDR looks at. Stop, write the four lines for the change, and ask before building it."
 />
 
+<AtWork>Medtech employers value people who spot a regulatory problem in a single sentence, before it costs months.</AtWork>
+
 :::tip[Do this in your project]
 Write your client's intended purpose in four lines, quoted from your client log. Then ask the agent: *"List every sentence in the app, the README and the store text that claims more than this purpose."* Check each hit yourself, and bring the list to your client.
 :::
+
+<Done />

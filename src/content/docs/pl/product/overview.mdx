@@ -1,0 +1,112 @@
+---
+title: Tworzenie produktu z agentami
+description: Jak przejść od briefu klienta do user stories i rekomendacji z agentem u boku – i co możecie zrobić tylko ty i klient.
+---
+
+import ProductMap from '../../../../components/pl/ProductMap.astro';
+import Sorter from '../../../../components/Sorter.astro';
+import Checklist from '../../../../components/Checklist.astro';
+import Predict from '../../../../components/Predict.astro';
+import Scene from '../../../../components/Scene.astro';
+import Tldr from '../../../../components/Tldr.astro';
+import AtWork from '../../../../components/AtWork.astro';
+import Done from '../../../../components/Done.astro';
+
+<Tldr minutes={6} items={["Pisanie kodu tanieje. Decyzja, co zbudować – nie.", "Agent pisze szkic, ty sprawdzasz, klient decyduje.", "Prześledź prośbę Anny na mapie."]} />
+
+Agent w kilka minut napisze gładką analizę, dwadzieścia user stories i tabelę kosztów – i napisze je równie gładko, kiedy są błędne. Wartość przesuwa się do osoby, która potrafi odróżnić jedno od drugiego.
+
+Ta część to biznesowa strona AI SDLC: wszystko, co dzieje się **przed** etapem 1, od wiadomości klienta do prośby, która staje się issue #7.
+
+## Poznaj bohaterów
+
+Ta sama historia ciągnie się przez wszystkie strony.
+
+| | Kto | W tej historii |
+|---|---|---|
+| 🩺 | **Anna**, koordynatorka badania w klinice rehabilitacyjnej | klientka. Jej klinika prowadzi sześciomiesięczne badanie z Mood Trackerem |
+| 🎧 | **Tomek**, wsparcie techniczne w klinice | odbiera telefony od uczestników; musi wiedzieć, której wersji używają |
+| ⚖️ | **Komisja bioetyczna** | zatwierdza badanie; nigdy nie siedzi przy stole, ale zawsze jest w wymaganiach |
+| 🧑‍💻 | **Ty i twoja para** | para, która przejęła Mood Trackera |
+| 🤖 | **Copilot** w agent mode | szybki, niezmordowany, pewny siebie; wie tylko to, co mu dasz |
+
+<Scene
+	title="Poniedziałek, 9:12: przychodzi e-mail"
+	messages={[
+		{ who: 'client', name: 'Anna', text: 'Cześć! Uczestnicy ciągle pytają, którą wersję aplikacji mają, a nasza komisja bioetyczna chce, żeby aplikacja mówiła, do czego służy. Dałoby się dodać stronę About? 🙏' },
+		{ who: 'you', name: 'Ty', text: 'Dzięki, Anno! Zanim cokolwiek zbudujemy: możemy pogadać, co właściwie trzeba zdecydować? Jutro o 10?' },
+		{ who: 'agent', name: 'Copilot', text: 'Mogę od razu dodać ekran About z <code>package_info_plus</code>. Zaczynam?' },
+		{ who: 'you', name: 'Ty', text: 'Jeszcze nie. Najpierw ustalmy, czego Anna naprawdę potrzebuje.' },
+	]}
+/>
+
+Ta ostatnia linijka to cała ta część w jednym zdaniu.
+
+<Checklist
+	id="product-outcomes"
+	title="Po tej części potrafisz"
+	items={[
+		"Zamienić brief klienta w <b>jednostronicową notatkę decyzyjną</b>: rekomendację, rejestr założeń ze źródłami i dwa pytania, których odpowiedzi mogłyby ją zmienić",
+		'Odróżnić <b>fakty</b> agenta od jego <b>zgadywania</b> i nie wpuszczać do dokumentów zmyślonych faktów o kliencie, liczb ani twierdzeń medycznych',
+		'Pisać <b>user stories z testowalnymi kryteriami</b>, które agent może zaimplementować w AI SDLC – każdą powiązaną z tym, co powiedział klient',
+		'Porównywać opcje, także te bez oprogramowania, pod kątem <b>całkowitego kosztu i twardych ograniczeń</b>, z uczciwymi estymacjami trzypunktowymi',
+		"Sprawdzić, czy <b>intended purpose</b> produktu nie zrobi z niego wyrobu medycznego – zanim ktokolwiek go zbuduje",
+	]}
+/>
+
+## Mapa
+
+Trzy tory: **klient**, **ty**, **agent**. Po lewej **dowody**, na których może się opierać twoja rekomendacja. Z boku szyna **śledzalności**: każdy etap zostawia dokument, który wskazuje swoje źródła.
+
+**Spróbuj.** Kliknij **Przejdź krok po kroku**, żeby prześledzić prośbę Anny od e-maila do decyzji – łącznie z momentem, w którym żadna opcja nie pasuje. Przyciskiem **Pokaż** dodasz pętle zwrotne, przepływy dowodów albo ślad w dokumentach. Kliknij etap albo któryś z dowodów. Strzałkami na klawiaturze przechodzisz przez kolejne kroki.
+
+<ProductMap />
+
+Mapa korzysta z kursowych skilli do analizy biznesowej (`/ba-*` w Copilocie) i jednego skilla mHealth (`/mh-intended-purpose`). Każdy etap linkuje do strony, która go wyjaśnia.
+
+## Kto co robi?
+
+<Predict id="sort-before" question="Zanim zaczniesz sortować: jak myślisz, kto z tej czwórki robi <b>najmniej</b> w pracy nad produktem z agentami – agent, ty, klient czy „jeszcze nikt”?">
+
+Nie ma jednej dobrej odpowiedzi, ale większość ludzi nie docenia **„jeszcze nikt”**. W prawdziwych projektach wiele decyzji na początku nie ma właściciela: kto odpowiada na pytania uczestników, kto zatwierdza treść. Zapisanie ich jako otwartych pytań to część twojej pracy. Agent nigdy nie zrobi tego sam z siebie: wypełni lukę odpowiedzią, która tylko brzmi wiarygodnie.
+
+</Predict>
+
+<Sorter
+	title="Kto powinien to zrobić: agent, ty, klient czy jeszcze nikt (zapisz to jako pytanie)?"
+	intro="Każde zadanie wynika z prośby Anny. Przypisz je, a potem przeczytaj dlaczego. Pod koniec tej części posortujesz tę samą listę jeszcze raz."
+	bins={[
+		{ key: 'agent', label: 'Agent', tone: 'agent' },
+		{ key: 'you', label: 'Ty', tone: 'you' },
+		{ key: 'client', label: 'Klient', tone: 'client' },
+		{ key: 'nobody', label: 'Jeszcze nikt', tone: 'neutral' },
+	]}
+	items={[
+		{ text: 'Naszkicować dwadzieścia możliwych pytań do Anny', bin: 'agent', why: 'Szkicowanie jest tanie, a agenci dobrze ogarniają szeroki przegląd. Wybieranie tanie nie jest – to następne zadanie.' },
+		{ text: 'Wybrać trzy pytania, które naprawdę zadasz Annie', bin: 'you', why: 'Czas klienta jest cenny. Tylko ty wiesz, które odpowiedzi zmieniłyby twoją rekomendację.' },
+		{ text: 'Powiedzieć, czy komisja bioetyczna wymaga podania celu w samej aplikacji, czy wystarczy formularz zgody', bin: 'client', why: 'To fakt ze świata klienta. Agent może go tylko zgadywać, a zgadywanie w tym miejscu zmienia całą rekomendację.' },
+		{ text: 'Znaleźć miejsce, w którym aplikacja ustawia numer wersji – z plikiem i linią', bin: 'agent', why: 'Dobre zadanie dla agenta: przeszukać kod i podać <code>file:line</code>. Zanim się na tym oprzesz, i tak musisz to odtworzyć.' },
+		{ text: 'Napisać zdanie, które mówi, do czego służy aplikacja', bin: 'client', why: 'Intended purpose to deklaracja klienta, z konsekwencjami regulacyjnymi. Agent nigdy nie może jej pisać; ty możesz przygotować warianty, z których klient wybierze.' },
+		{ text: 'Zdecydować, kto odpowiada na pytania uczestników po zakończeniu badania', bin: 'nobody', why: 'Nikt jeszcze za to nie odpowiada. Zapisz to jako pytanie do Anny; nie pozwól nikomu – ani człowiekowi, ani agentowi – wpisać tu odpowiedzi.' },
+		{ text: 'Sprawdzić, czy każda user story wskazuje linijkę w dzienniku klienta', bin: 'you', why: 'Agent może wypisać źródła, ale sprawdzenie, czy istnieją i mówią to, co twierdzi story, to twoja robota.' },
+		{ text: 'Ułożyć stories według priorytetów: Must, Should, Could albo Won\'t', bin: 'client', why: 'Priorytet to decyzja klienta. Ty możesz zaproponować kolejność i wyjaśnić kompromisy.' },
+	]}
+/>
+
+## Gdzie to wykorzystasz na kursie
+
+| Kiedy | Etap produktu | Co robisz |
+|---|---|---|
+| **W2** | Zrozum i wybierz: prototyp, który przejęliście | due diligence w trzech wymiarach (techniczny, regulacyjny, biznesowy); propozycja wartości; opcje, w tym nierobienie niczego; estymacje trzypunktowe |
+| **W3** | Od intended purpose do wymagań | intended purpose i jego koszt; wymagania i priorytety; prototyp do wyrzucenia, żeby przetestować potrzebę |
+| **W4** | Budowanie i sprawdzanie | ograniczony wkład inżynierski: zmiana, dowody, koszt |
+| **W5** | Przekazanie projektu i droga na rynek | regulacje, jeśli to wyrób medyczny, ochrona danych, jeśli nie; koszty działania i utrzymania |
+| **W6** | Business case | całkowity koszt posiadania (TCO), pilotaż z kryteriami sukcesu uzgodnionymi z góry; „nie” jako pełnoprawny wynik |
+
+<AtWork>Product managerowie i analitycy codziennie używają agentów do pierwszych wersji dokumentów. Rzadką umiejętnością jest osąd: wiedzieć, która linijka szkicu to dowód, a która zgadywanie.</AtWork>
+
+:::tip[Zrób to w swoim projekcie]
+Uruchom w Copilocie `/ba-analyst` na swoim briefie. Potem rozłóż wynik do czterech kategorii z ćwiczenia wyżej: co agent może zostawić, co musisz sprawdzić, na co odpowie tylko twój klient i czego jeszcze nikt nie ma. Pozycje „jeszcze nikt” wpisz na samą górę listy pytań na następne spotkanie z klientem.
+:::
+
+<Done />

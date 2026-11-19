@@ -1,0 +1,89 @@
+---
+title: 'Aplikacje Mobilne w Medycynie - Od Pomysłu do Wprowadzenia na Rynek'
+description: 'Aplikacje mobilne w medycynie, od pomysłu do rynku: jak budować oprogramowanie z agentami kodującymi, od briefu klienta do zmergowanego pull requesta.'
+template: splash
+hero:
+  title: 'Aplikacje Mobilne w Medycynie'
+  image:
+    file: ../../../assets/hero-pl.svg
+  tagline: '<b>Od Pomysłu do Wprowadzenia na Rynek</b> · Agent kodujący napisze ekran we Flutterze w kilka minut. Ten przewodnik jest o całej reszcie: jak zdecydować, co budować i po co, jak dać agentowi to, czego potrzebuje, jak sprawdzić, co zrobił, i jak wytłumaczyć to kilka miesięcy później.'
+  actions:
+    - text: Zacznij od mapy
+      link: ai-sdlc/overview/
+      icon: right-arrow
+    - text: Przejdź do szablonów
+      link: ai-sdlc/templates/
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import Progress from '../../../components/Progress.astro';
+
+## Część 1 · AI SDLC: od pomysłu do merge'a
+
+Przewodnik śledzi **jedną funkcję** – ekran About w Mood Trackerze, który teraz rozwijasz – od szkicu do zmergowanego pull requesta. Na każdym etapie pokazuje, kto wykonuje pracę, co wchodzi, co wychodzi i co to sprawdza. Na każdej stronie jest coś do wypróbowania, kilka pytań do samosprawdzenia i zadanie do twojego projektu.
+
+<CardGrid>
+	<LinkCard title="Pipeline w pigułce" description="Cały proces na jednej interaktywnej mapie. Zacznij tutaj. (5 min)" href="ai-sdlc/overview/" />
+	<LinkCard title="1. Od promptu do agenta" description="Model, harness, tools i to, dlaczego każde narzędzie jest też furtką. (6 min)" href="ai-sdlc/agents/" />
+	<LinkCard title="2. Kontekst" description="Co agent wie i ile to kosztuje. Zbuduj kontekst. (5 min)" href="ai-sdlc/context/" />
+	<LinkCard title="3. Wiedza o projekcie" description="Na czym opiera się plan: architektura, decyzje, notatki, słowa klienta. (5 min)" href="ai-sdlc/knowledge/" />
+	<LinkCard title="4. AGENTS.md" description="Zasady projektu dla agentów: od prośby do egzekwowania. (4 min)" href="ai-sdlc/agents-md/" />
+	<LinkCard title="5. Etap po etapie" description="Przykład w trzech częściach: od pomysłu do planu, kod i quality gate, od testów do merge'a. (20 min)" href="ai-sdlc/idea-to-plan/" />
+	<LinkCard title="6. Audytowalność" description="Przejdź od linijki kodu z powrotem do celu. Przerwij jedno ogniwo i zobacz, co tracisz. (4 min)" href="ai-sdlc/auditability/" />
+	<LinkCard title="7. Szablony" description="AGENTS.md, ARCHITECTURE.md, ADR, NOTES.md, spec, commit, pull request: gotowe do skopiowania." href="ai-sdlc/templates/" />
+</CardGrid>
+
+## Część 2 · Rozwój produktu z agentami
+
+Biznesowa strona projektu: od wiadomości klienta do user stories i rekomendacji na jedną stronę. Agent pisze wersje robocze, a decydujesz ty. Poznaj Annę, koordynatorkę badania, i prześledź jej prośbę na interaktywnej mapie: właśnie stąd bierze się issue #7.
+
+<CardGrid>
+	<LinkCard title="Od briefu do backlogu" description="Mapa produktu: prześledź prośbę Anny od maila do decyzji. (6 min)" href="product/overview/" />
+	<LinkCard title="1. Decyzja, fakty, ludzie" description="Najpierw decyzja, potem rozwiązanie; fakty, założenia, syntetyczni użytkownicy; interesariusze. (7 min)" href="product/decision-and-facts/" />
+	<LinkCard title="2. Intended purpose" description="Dziennik czy wyrób medyczny? Decyduje jedno zdanie. (5 min)" href="product/purpose/" />
+	<LinkCard title="3. Pytania i obserwacje" description="Pytania, które zmieniają odpowiedź; co aplikacja naprawdę robi. (5 min)" href="product/questions-and-observation/" />
+	<LinkCard title="4. User stories" description="Od potrzeby do user story, każda ze źródłem. Popraw story napisaną przez agenta. (5 min)" href="product/user-stories/" />
+	<LinkCard title="5. Testowalne, z priorytetem, podzielone" description="Given/When/Then, INVEST, MoSCoW, dzielenie stories, słowa o jednym znaczeniu. (6 min)" href="product/testable-stories/" />
+	<LinkCard title="6. Opcje i rekomendacja" description="Twarde ograniczenia, całkowity koszt, estymacje trzypunktowe, jedna strona. (8 min)" href="product/options-and-recommendation/" />
+</CardGrid>
+
+<Progress parts={[
+	{ title: 'Część 1 · AI SDLC', pages: [
+		{ slug: 'ai-sdlc/overview/', label: 'Pipeline w pigułce' },
+		{ slug: 'ai-sdlc/agents/', label: '1. Od promptu do agenta' },
+		{ slug: 'ai-sdlc/context/', label: '2. Kontekst' },
+		{ slug: 'ai-sdlc/knowledge/', label: '3. Wiedza o projekcie' },
+		{ slug: 'ai-sdlc/agents-md/', label: '4. AGENTS.md' },
+		{ slug: 'ai-sdlc/idea-to-plan/', label: '5a. Od pomysłu do planu' },
+		{ slug: 'ai-sdlc/code-and-gate/', label: '5b. Kod i quality gate' },
+		{ slug: 'ai-sdlc/tests-to-merge/', label: '5c. Od testów do merge' },
+		{ slug: 'ai-sdlc/auditability/', label: '6. Audytowalność' },
+	] },
+	{ title: 'Część 2 · Rozwój produktu z agentami', pages: [
+		{ slug: 'product/overview/', label: 'Od briefu do backlogu' },
+		{ slug: 'product/decision-and-facts/', label: '1. Decyzja, fakty, ludzie' },
+		{ slug: 'product/purpose/', label: '2. Intended purpose' },
+		{ slug: 'product/questions-and-observation/', label: '3. Pytania i obserwacje' },
+		{ slug: 'product/user-stories/', label: '4. User stories' },
+		{ slug: 'product/testable-stories/', label: '5. Testowalne, z priorytetem, podzielone' },
+		{ slug: 'product/options-and-recommendation/', label: '6. Opcje i rekomendacja' },
+	] },
+]} />
+
+## Jak korzystać z tego przewodnika
+
+<CardGrid>
+	<Card title="Przed W3" icon="open-book">
+		Przeczytaj mapę i rozdziały 1–4 z części 1. Opierają się na W2: jak działa model, czym jest kontekst i `AGENTS.md` twojej pary.
+	</Card>
+	<Card title="Na laboratoriach" icon="laptop">
+		Miej rozdział 5 otwarty, kiedy pracujesz nad briefem klienta. Przy każdym etapie jest napisane, co ma po sobie zostawić.
+	</Card>
+	<Card title="Najpierw przewidź, potem sprawdź" icon="pencil">
+		Ramki oznaczone **Najpierw przewidź** proszą o twoją odpowiedź, zanim zobaczysz naszą. Twoje odpowiedzi zostają tylko w twojej przeglądarce.
+	</Card>
+	<Card title="Tylko dane syntetyczne" icon="warning">
+		Wszystko tutaj korzysta z syntetycznych danych Mood Trackera. Nigdy nie wpisuj prawdziwych danych osobowych ani zdrowotnych do aplikacji ani do kontekstu agenta.
+	</Card>
+</CardGrid>

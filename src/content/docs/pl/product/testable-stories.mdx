@@ -1,0 +1,123 @@
+---
+title: '5. Testowalne, uszeregowane, podzielone'
+description: Acceptance criteria w formacie Given/When/Then, lekki test INVEST, priorytety MoSCoW, dzielenie stories i słowa, które znaczą jedno.
+---
+
+import StageFacts from '../../../../components/StageFacts.astro';
+import Quiz from '../../../../components/Quiz.astro';
+import Predict from '../../../../components/Predict.astro';
+import Scene from '../../../../components/Scene.astro';
+import Tldr from '../../../../components/Tldr.astro';
+import AtWork from '../../../../components/AtWork.astro';
+import Done from '../../../../components/Done.astro';
+
+<Tldr minutes={6} items={["Dzięki Given/When/Then story da się sprawdzić.", "Priorytety ustala klient: Must, Should, Could, Won't.", "Dziel według wartości, nie według warstw technicznych."]} />
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> szkicuje kryteria i przypadki brzegowe · <span class="sdlc-chip is-you">Ty</span> je doprecyzowujesz · <span class="sdlc-chip is-client">klient</span> ustala priorytety i definiuje pojęcia'} input="<code>docs/stories.md</code>" output="Stories z kryteriami Given/When/Then i priorytetem; słownik pojęć" />
+
+## Given, When, Then
+
+Story staje się testowalna, kiedy ma **acceptance criteria**: konkretne sytuacje z wynikiem, który da się zaobserwować.
+
+> **Given** *[kontekst]*, **when** *[działanie albo zdarzenie]*, **then** *[obserwowalny wynik]*.
+
+Story S2 z poprzedniej strony, z jej najbardziej ryzykownym kryterium:
+
+```text title="S2: acceptance criteria (fragment)"
+Given the server does not answer,
+When the participant opens the About screen and waits 5 seconds,
+Then the screen shows "Server: unavailable",
+ and the purpose and the contact are still shown.
+
+Given the client has not confirmed a contact yet,
+When the participant opens the About screen,
+Then the contact line shows "not yet confirmed".
+```
+
+To są AC-4 i AC-5 z [przykładu AI SDLC](../../ai-sdlc/idea-to-plan/#stage-requirements). Kryteria story *są* specyfikacją, na podstawie której agent będzie planował; zapis EARS w tamtym miejscu mówi to samo jednym zdaniem. Agenci dobrze proponują przypadki brzegowe (brak sieci, brak kontaktu, bardzo długi tekst, duża czcionka). Ty decydujesz, które z nich są ważne dla tego klienta.
+
+## Lekki test INVEST
+
+| Litera | Story jest… | Szybkie sprawdzenie |
+|---|---|---|
+| **I**ndependent | niezależna: da się ją zbudować bez czekania na inną story | Czy można ją wydać osobno? |
+| **N**egotiable | negocjowalna: to potrzeba, a nie umowa na jedno rozwiązanie | Czy wymienia paczkę, przycisk, dostawcę? |
+| **V**aluable | wartościowa: jest coś warta dla konkretnej osoby | Kto zauważy, że jej brakuje? |
+| **E**stimable | estymowalna: na tyle jasna, że da się ją oszacować | Czy dasz radę podać estymację trzypunktową? |
+| **S**mall | mała: gotowa i sprawdzona w kilka dni | Czy dałoby się ją podzielić, gdyby trzeba było? |
+| **T**estable | testowalna: test albo uruchomienie rozstrzyga, czy jest spełniona | Czy ma co najmniej jedno Given/When/Then? |
+
+<Quiz
+	question="„Jako klinika chcę, żeby aplikacja była zgodna z przepisami.” Których liter INVEST ta story najwyraźniej nie spełnia?"
+	options={[
+		'Independent i Valuable',
+		'Negotiable i Estimable',
+		'Small i Testable',
+		'Spełnia wszystkie sześć liter',
+	]}
+	answer={2}
+	why={[
+		'Może być jak najbardziej wartościowa. Problem w tym, że nikt nie powie, kiedy jest gotowa.',
+		'Jest otwarta co do rozwiązania i to akurat dobrze. Trudno ją oszacować, bo jest za duża i za mglista: a to S i T.',
+		'',
+		'Zgodna z czym, sprawdzana jak, do kiedy? To nie jest testowalne i to nie jest jedna story.',
+	]}
+	explain="„Zgodna z przepisami” ukrywa cały projekt. Podziel to według regulacji i obowiązków (sprawdzenie intended purpose, inwentaryzacja danych, rejestr SOUP), a potem napisz kryteria dla każdej części."
+/>
+
+## Priorytety: Must, Should, Could, Won't
+
+Priorytety **MoSCoW** to decyzja klienta; ty proponujesz i wyjaśniasz kompromisy. *Won't (tym razem)* to przydatna odpowiedź: zapisuje, że coś rozważono i świadomie pominięto.
+
+<Scene
+	title="Środa, 14:00: szybki telefon w sprawie priorytetów"
+	messages={[
+		{ who: 'you', name: 'Ty', text: 'Anno, jeśli w tym sprincie zdążymy tylko z jednym: cel i kontakt czy wersja?' },
+		{ who: 'client', name: 'Anna', text: 'Cel i kontakt. Bez nich komisja nie zatwierdzi kolejnej grupy uczestników.' },
+		{ who: 'other', name: 'Tomek', text: 'To potem wersja. Do tego czasu mogę prowadzić ludzi przez ustawienia telefonu.' },
+	]}
+/>
+
+| Priorytet | Stories dla ekranu About (przykład) | Dlaczego |
+|---|---|---|
+| **Must** | cel i kontakt (S2) | prośba komisji bioetycznej |
+| **Should** | wersja aplikacji (S1) | wsparcie o nią prosiło; ustawienia telefonu to obejście |
+| **Could** | wersja serwera | przydatna dla wsparcia, ale nikt o nią nie prosił |
+| **Won't** | strona z licencjami; changelog | poza zakresem tego badania |
+
+## Dzielenie stories
+
+Kiedy story jest za duża, podziel ją tak, żeby **każda część nadal sama dawała wartość**. Agenci dobrze proponują podziały; sprawdź, czy każdy kawałek to coś, co ktoś by zauważył.
+
+- **Według reguły albo przypadku brzegowego**: serwer odpowiada / nie odpowiada.
+- **Według danych**: tekst o celu / numery wersji.
+- **Według użytkownika**: uczestnik / osoba ze wsparcia.
+- **Najpierw prosty przypadek**: ekran ze stałym tekstem, potem wersja serwera.
+
+Dzielenie według warstw technicznych („serwis”, „ekran”, „testy”) to nie jest podział: żaden kawałek nie jest przydatny sam w sobie.
+
+<span id="terms" class="stage-anchor"></span>
+
+## Jedno słowo, jedno znaczenie
+
+Wiele sporów nie dotyczy danych, tylko słów. Pojęcie jest zdefiniowane, kiedy dwie osoby, mając przed sobą ten sam przypadek, zaklasyfikują go tak samo. Znaczenie ustala klient; ty znajdujesz przypadki, które trzeba rozstrzygnąć.
+
+| Pojęcie | Proponowana definicja | Przypadki brzegowe i reguła | Właściciel |
+|---|---|---|---|
+| **Wersja aplikacji** | wersja i numer buildu zainstalowanej aplikacji, np. `1.3.0 (12)` | build debug: pokaż „dev”; aktualizacja w trakcie badania: pokaż nową wersję, bez historii | koordynatorka: *do potwierdzenia* |
+| **Wersja serwera** | wersja, którą serwer podaje pod `GET /version` | serwer nie działa: „unavailable”; starszy serwer bez `/version`: „unknown” | twoja para |
+| **Kontakt** | osoba i kanał, które klinika wskazała do pytań uczestników | jeszcze niewskazany: „not yet confirmed”; poza godzinami pracy: *do decyzji klienta* | koordynatorka |
+
+<Predict id="term-version" question="Wsparcie pyta uczestniczkę: „Jaką ma pani wersję?” Uczestniczka odczytuje z ekranu About „1.3.0 (12)”, a w ustawieniach telefonu widzi „1.3.0”. Czy to problem?">
+
+Tylko jeśli nikt nie zdefiniował tego pojęcia. Z definicją powyżej wsparcie wie, że liczba w nawiasie to numer buildu i że dwa buildy mogą mieć tę samą wersję 1.3.0. Bez niej wsparcie i twoja para będą rozumieć „wersję” inaczej, a zgłoszenie błędu wskaże zły build. Definicje są tanie przed wydaniem i drogie po nim.
+
+</Predict>
+
+<AtWork>Given/When/Then rozumieją testerzy, programiści i agenci: jeden format, trzech odbiorców.</AtWork>
+
+:::tip[Zrób to w swoim projekcie]
+Dodaj kryteria Given/When/Then do swoich trzech najważniejszych stories, z jednym przypadkiem brzegowym w każdej. Poproś klienta, żeby nadał im priorytety metodą MoSCoW. Wypisz ze swojego briefu dwa słowa, które ludzie rozumieją różnie, i wpisz je do słownika razem z przypadkami brzegowymi (`/ba-define-terms`).
+:::
+
+<Done />

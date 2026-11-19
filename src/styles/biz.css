@@ -23,7 +23,6 @@
 .biz-intro { margin: 0 0 0.875rem; color: var(--sdlc-muted); }
 .biz-intro > :last-child { margin-bottom: 0; }
 
-.is-client { --chip: var(--sdlc-kb); --chip-tint: var(--sdlc-kb-tint); }
 .is-neutral { --chip: var(--sdlc-muted); --chip-tint: transparent; }
 
 /* ---------- Sorter ---------- */
@@ -232,7 +231,7 @@
 .dmap__panel dt { font-weight: 700; color: var(--sdlc-muted); }
 .dmap__panel dt.is-agent { color: var(--sdlc-agent); }
 .dmap__panel dt.is-you { color: var(--sdlc-you); }
-.dmap__panel dt.is-client { color: var(--sdlc-kb); }
+.dmap__panel dt.is-client { color: var(--sdlc-client); }
 .dmap__panel dd { margin: 0; }
 .dmap__panel p { margin: 0.75rem 0 0; }
 @media screen and (max-width: 44em) {

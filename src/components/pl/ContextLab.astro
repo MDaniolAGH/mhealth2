@@ -1,0 +1,63 @@
+---
+/** Section 2 (Polish): build a context for the About-screen task and watch the meters. */
+
+const i18n = JSON.stringify({
+	used: 'wykorzystane: około {k}',
+	over: ' (nie mieści się)',
+	belowLean: 'poniżej minimum',
+	xLean: '≈ {x}× minimum',
+	relevant: '{p}% istotnych',
+	nOf: '{n} z {total}',
+	none: 'brak',
+	stop: '<b>Stop.</b> Ten kontekst zawiera {what}. Wszystko, co jest w kontekście, trafia do dostawcy modelu. Sekrety i prawdziwe dane o zdrowiu nigdy tam nie trafiają, bez względu na zadanie.',
+	and: ' i ',
+	notFit: '<b>To się nie mieści.</b> Harness będzie musiał coś wyrzucić albo streścić, a ty nie decydujesz, co. Mogą wypaść akurat te fakty, które się liczą.',
+	missing: '<b>Brakujące fakty:</b> {what}. Agent się nie zatrzyma; wypełni te luki wiarygodnie brzmiącymi domysłami.',
+	noise: '<b>Kompletny, ale to głównie szum.</b> Każdy fakt tu jest, tylko zakopany w {k} tokenów niezwiązanego tekstu, za które płacisz od nowa na każdym kroku pętli.',
+	lean: '<b>Minimalny i kompletny.</b> Wszystko, czego potrzebuje to zadanie, i niewiele więcej: tanio na każdym kroku i nic, co agent musiałby zgadywać.',
+	segTitle: ': około {k} tokenów',
+});
+---
+
+<div class="ctx-lab not-content" data-i18n={i18n}>
+	<div class="ctx-lab__presets">
+		<span class="sdlc-legend__hint">Spróbuj:</span>
+		<button type="button" class="sdlc-btn" data-preset="lean">Minimalny i kompletny</button>
+		<button type="button" class="sdlc-btn" data-preset="all">Wszystko, na wszelki wypadek</button>
+		<button type="button" class="sdlc-btn" data-preset="bare">Sam prompt</button>
+	</div>
+	<div class="ctx-lab__items">
+		<label class="ctx-item" data-kind="rules"><input type="checkbox" data-tokens="1500" data-need="zasady projektu" /> <code>AGENTS.md</code></label>
+		<label class="ctx-item" data-kind="rules"><input type="checkbox" data-tokens="1200" data-need="kryteria" data-bare /> zadanie i <code>docs/spec-about.md</code></label>
+		<label class="ctx-item" data-kind="knowledge"><input type="checkbox" data-tokens="4000" data-need="architektura i decyzje" /> <code>ARCHITECTURE.md</code> i zapisy decyzji</label>
+		<label class="ctx-item" data-kind="knowledge"><input type="checkbox" data-tokens="800" data-need="słowa klienta (intended purpose, kontakt)" /> <code>docs/product.md</code></label>
+		<label class="ctx-item" data-kind="knowledge"><input type="checkbox" data-tokens="1500" data-need="znane pułapki (obrazy golden)" /> ostatnie wpisy w <code>NOTES.md</code></label>
+		<label class="ctx-item" data-kind="code"><input type="checkbox" data-tokens="12000" data-need="kod, który agent zmieni" /> 3 pliki, których dotyczy zmiana</label>
+		<label class="ctx-item" data-kind="noise"><input type="checkbox" data-tokens="70000" /> całe foldery <code>lib/</code> i <code>test/</code></label>
+		<label class="ctx-item" data-kind="stale"><input type="checkbox" data-tokens="45000" /> wczorajsza sesja czatu</label>
+		<label class="ctx-item" data-kind="stale"><input type="checkbox" data-tokens="25000" /> pełny log testów z zeszłego tygodnia</label>
+		<label class="ctx-item" data-kind="noise"><input type="checkbox" data-tokens="380000" /> cała dokumentacja Fluttera</label>
+		<label class="ctx-item" data-kind="danger"><input type="checkbox" data-tokens="200" data-danger="sekret" /> <code>.env</code> z tajnym kluczem JWT serwera</label>
+		<label class="ctx-item" data-kind="danger"><input type="checkbox" data-tokens="30000" data-danger="prawdziwe dane o zdrowiu" /> eksport prawdziwych wpisów nastroju uczestników</label>
+	</div>
+	<div class="ctx-lab__bar" role="img" aria-label="Zapełnienie context window"></div>
+	<div class="ctx__scale"><span>0</span><span class="ctx-lab__used"></span><span>okno: 200k tokenów (poglądowo)</span></div>
+	<p class="ctx-lab__legend" aria-hidden="true">
+		<span class="ctx-key" data-kind="rules">zasady</span>
+		<span class="ctx-key" data-kind="knowledge">wiedza o projekcie</span>
+		<span class="ctx-key" data-kind="code">kod</span>
+		<span class="ctx-key" data-kind="noise">szum</span>
+		<span class="ctx-key" data-kind="stale">nieaktualne</span>
+		<span class="ctx-key" data-kind="danger">nigdy</span>
+	</p>
+	<div class="ctx-lab__meters">
+		<div class="meter" data-meter="cost"><span class="meter__label">Koszt na krok</span><span class="meter__value"></span><span class="meter__bar"><i></i></span></div>
+		<div class="meter" data-meter="focus"><span class="meter__label">Skupienie</span><span class="meter__value"></span><span class="meter__bar"><i></i></span></div>
+		<div class="meter" data-meter="gaps"><span class="meter__label">Brakujące fakty</span><span class="meter__value"></span><span class="meter__bar"><i></i></span></div>
+	</div>
+	<div class="ctx-lab__verdict" aria-live="polite"></div>
+</div>
+
+<script>
+	import '../../scripts/sdlc.js';
+</script>

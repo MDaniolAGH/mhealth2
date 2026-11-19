@@ -6,6 +6,11 @@ description: The documents an agent reads before it plans, and why they are the 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 import Quiz from '../../../components/Quiz.astro';
 import Predict from '../../../components/Predict.astro';
+import Tldr from '../../../components/Tldr.astro';
+import AtWork from '../../../components/AtWork.astro';
+import Done from '../../../components/Done.astro';
+
+<Tldr minutes={5} items={["Agents forget your project after every session.", "Write the architecture, decisions, notes and the client's words into the repo.", "Make the plan cite them, and flag contradictions."]} />
 
 :::danger[The most important input to the plan]
 A coding agent has **no memory of your project** between sessions. Everything it learned yesterday, it has forgotten. If the architecture, the decisions, the client's words and the traps are not written down in the repository, the agent will guess them again in every session, and each guess can be different. The documents on this page are the project's long-term memory, for agents and for people.
@@ -191,6 +196,10 @@ Out of date. With no document, the agent at least has to read the code. With a w
 	explain="A client fact needs a source that outlives the meeting and the chat. Until it is in the client log, it is an assumption, and the screen shows “not yet confirmed”."
 />
 
+<AtWork>An <code>ARCHITECTURE.md</code> and a few ADRs make your project reviewable in minutes, by a teammate, a client or a future employer.</AtWork>
+
 :::tip[Do this in your project]
 Run the planning prompt above on your repository, with the line *"Do not change any file."* Fix one contradiction it finds between your documents and your code, in a pull request.
 :::
+
+<Done />

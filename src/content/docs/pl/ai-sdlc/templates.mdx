@@ -1,0 +1,202 @@
+---
+title: 7. Szablony
+description: Gotowe do skopiowania szablony AGENTS.md, ARCHITECTURE.md, zapisów decyzji, NOTES.md, specyfikacji, commitów i pull requestów.
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Skopiuj je do repozytorium twojej pary i dopasuj do projektu. Trzymają się konwencji z przejętego Mood Trackera i z tego kursu. Każdy blok kodu ma przycisk kopiowania w prawym górnym rogu.
+
+<Tabs>
+<TabItem label="AGENTS.md">
+
+```markdown title="AGENTS.md"
+# AGENTS.md: <app> (<client brief, e.g. C03>)
+
+<One paragraph: what the app does, for whom, who reads the code.>
+Synthetic data only. Never enter real personal or health data.
+
+## How we work with agents
+The human decides; you propose. For every change:
+1. Restate the task: goal, files in scope and out of scope, acceptance
+   criterion. If any is missing, ask before doing anything else.
+2. Plan before editing. Wait for the human to approve the plan.
+3. Make the smallest change that meets the criterion.
+4. Verify: run the checks below and show their actual output.
+5. Report in the format below.
+6. Stop and ask before: adding a dependency; changing authentication, data
+   models or the database schema; changing an existing test's expectation.
+
+## Project knowledge (read before planning)
+- Architecture: ARCHITECTURE.md
+- Decisions: docs/adr/ (one ADR per decision; never contradict an accepted one)
+- Notes and work log: NOTES.md (read the latest entries)
+- Product card: docs/product.md. What the client said: docs/client-log.md,
+  the only source of client facts.
+
+## Commands
+cd mood_tracker && flutter analyze     # must report "No issues found!"
+cd mood_tracker && flutter test        # every test must pass
+cd mood-tracker-api && venv/bin/lint-imports && venv/bin/python -m pytest -q
+
+## Architecture rules
+- Checked by a tool: <rule> (<test or tool>)
+- Convention, not checked yet: <rule>
+
+## Specifications
+- New behaviour starts with docs/spec-<feature>.md; no code before it is accepted.
+- One test per acceptance criterion; the criterion ID (AC-1) in the test name.
+- Never invent client facts: use a visible <TODO: client> and list it.
+- A new dependency is a SOUP item: stop and ask (name, version, licence, why).
+
+## Boundaries
+- Do not weaken, skip or delete tests; do not regenerate goldens to pass.
+- No secrets in code, commits or logs.
+- Do not commit, push or open pull requests unless asked.
+
+## Reporting
+Label every claim FACT (file:line or command), HYPOTHESIS or UNKNOWN.
+End with what you did not check, the files you changed, and one line for
+the agent log (task, tool, verification, decision).
+```
+
+</TabItem>
+<TabItem label="ARCHITECTURE.md">
+
+```markdown title="ARCHITECTURE.md"
+# <App>: architecture
+
+## Purpose
+<Two sentences: what the app does and for whom. Quote the intended purpose
+from docs/product.md; do not paraphrase it.>
+
+## Containers
+<App> → <protocol> → <server> → <database>. On the phone: <local storage>.
+
+## App layers (lib/; dependencies point down only)
+| Layer | Folder | Contains | May import |
+|---|---|---|---|
+| Screens | lib/screens/ | screens | widgets, providers, models |
+| Widgets | lib/widgets/ | reusable UI | models |
+| Providers | lib/providers/ | state (Riverpod) | services, data, models |
+| Services | lib/services/ | HTTP, secure storage | models |
+| Data | lib/data/ | local database | models |
+| Models | lib/models/ | pure Dart data | nothing from Flutter |
+
+## Server layers (checked by import-linter)
+main → routers → auth → models | schemas → database → config
+
+## Data flow
+<Where data comes from, who owns it, how it reaches the screen.>
+
+## Rules
+- <Rule> (see ADR-<n>; checked by <test>, or "not checked yet")
+
+## Not yet built
+<Parts that are planned but do not exist, so nobody assumes they do.>
+```
+
+</TabItem>
+<TabItem label="Zapis decyzji">
+
+```markdown title="docs/adr/NNNN-<decision-in-a-few-words>.md"
+# ADR-<n>: <decision in a few words>
+
+Status: proposed | accepted | superseded by ADR-<m>   (<date>, <GOAL-ID>)
+
+## Context
+<The situation and the forces at play. What made a decision necessary?>
+
+## Decision
+<What we decided, in one or two sentences.>
+
+## Consequences
+<What becomes easier, what becomes harder, when to revisit.>
+```
+
+</TabItem>
+<TabItem label="NOTES.md">
+
+```markdown title="NOTES.md"
+# Notes
+
+## <date>: <task> (<GOAL-ID>, PR #<n>)
+- Done: <what now works>
+- In progress / not done: <what is left>
+- Not verified: <what was not checked, and why>
+- Traps: <what surprised you, so the next session avoids it>
+```
+
+</TabItem>
+<TabItem label="Specyfikacja">
+
+```markdown title="docs/spec-<feature>.md"
+# <Feature>: acceptance criteria (<GOAL-ID>)
+
+Client facts used: <docs/client-log.md entries, with dates>
+
+AC-1  <What the user sees or can do, in observable terms.>
+AC-2  <The main behaviour, with a concrete example value.>
+AC-3  <An edge case: no network, a value not yet provided, a boundary.>
+AC-4  <What must NOT change.>
+
+Out of scope: <what this change will not do>.
+
+Open questions
+- (client)    <question> → <TODO: client>
+- (technical) <question>
+```
+
+</TabItem>
+<TabItem label="Opis commita">
+
+```text title="Opis commita (docs/commits.md)"
+<type>(<scope>): <imperative summary, max 72 characters>
+
+<Why: 1–3 sentences describing the problem, not the code.>
+
+Verified: <command> → <result>
+Not verified: <what and why>
+Refs: <GOAL-ID or ISSUE-ID>
+ADR: <ADR-ID>
+AI-assisted: <tool (agent)> / <model>
+Decision: <accepted|revised>
+Time: <minutes> min
+Cost: <AI credits|unknown>
+```
+
+Typy: `feat`, `fix`, `test`, `docs`, `refactor`, `chore`, `ci`, `security`. Zakresy (scope): `api`, `app`, `db`, `docs`, `ci`. Pomiń linijki, które nie pasują; nigdy nie pozwól agentowi wypełniać pól *Decision*, *Time* ani *Cost*.
+
+</TabItem>
+<TabItem label="Pull request">
+
+```markdown title="Opis pull requesta"
+## What and why
+<One or two sentences; link the goal, the criteria and the issue.>
+
+## How to review
+- <Where to start reading.>
+- <The risky part and the test that covers it.>
+
+## Evidence
+- [ ] `flutter analyze`: <real result>
+- [ ] `flutter test`: <real summary line>
+- [ ] Ran on <device>: <screenshot>
+- Not verified: <what and why>
+
+## Documentation
+- <ARCHITECTURE.md / ADR / NOTES.md / AGENTS.md changes, or "none needed, because…">
+
+## Open questions for the client
+- <question, or "none">
+
+## AI assistance
+<Agent and model. What it did, and what you changed or rewrote.>
+Agent log: <row added to dossier/agent_log.csv>
+
+## Standards
+AGENTS.md rev. <date> · docs/commits.md
+```
+
+</TabItem>
+</Tabs>

@@ -14,7 +14,8 @@
   --sdlc-tool: #34D399;
   --sdlc-kb: #A78BFA;
   --sdlc-audit: #FB923C;
-  --sdlc-loop: #22D3EE;
+  --sdlc-loop: #FBBF24;
+  --sdlc-client: #2DD4BF;
   --sdlc-fail: #F87171;
   --sdlc-work: #FBBF24;
   --sdlc-predict: #FBBF24;
@@ -36,7 +37,8 @@
   --sdlc-tool: #059669;
   --sdlc-kb: #7C3AED;
   --sdlc-audit: #EA580C;
-  --sdlc-loop: #0891B2;
+  --sdlc-loop: #D97706;
+  --sdlc-client: #0D9488;
   --sdlc-fail: #DC2626;
   --sdlc-work: var(--sdlc-work);
   --sdlc-predict: #B45309;
@@ -59,6 +61,7 @@
   --sdlc-kb-tint: color-mix(in srgb, var(--sdlc-kb) var(--sdlc-tint), transparent);
   --sdlc-audit-tint: color-mix(in srgb, var(--sdlc-audit) var(--sdlc-tint), transparent);
   --sdlc-fail-tint: color-mix(in srgb, var(--sdlc-fail) var(--sdlc-tint), transparent);
+  --sdlc-client-tint: color-mix(in srgb, var(--sdlc-client) var(--sdlc-tint), transparent);
   --w-radius: 0.875rem;
   --w-radius-sm: 0.625rem;
   --w-pad: 1.25rem;
@@ -103,6 +106,7 @@
 /* Data the script reads; never shown directly. */
 .sdlc-details,
 .sdlc-kb-details,
+.sdlc-layer-info,
 .sdlc-audits,
 ol.sdlc-walk { display: none; }
 
@@ -200,6 +204,7 @@ button.sdlc-chip[aria-pressed="true"]::before { background: var(--sdlc-card); }
 .is-knowledge { --chip: var(--sdlc-kb);    --chip-tint: var(--sdlc-kb-tint); }
 .is-audit     { --chip: var(--sdlc-audit); --chip-tint: var(--sdlc-audit-tint); }
 .is-loop      { --chip: var(--sdlc-loop);  --chip-tint: transparent; }
+.is-client    { --chip: var(--sdlc-client); --chip-tint: var(--sdlc-client-tint); }
 
 /* ---------- Pipeline map ---------- */
 
@@ -367,6 +372,11 @@ a.sdlc-stage.is-agent-tool {
   --chip: var(--sdlc-tool);
   border-color: var(--sdlc-agent) var(--sdlc-tool) var(--sdlc-tool) var(--sdlc-agent);
   background: linear-gradient(90deg, var(--sdlc-agent-tint), var(--sdlc-tool-tint)), var(--sdlc-card);
+}
+a.sdlc-stage.is-client-you {
+  --chip: var(--sdlc-you);
+  border-color: var(--sdlc-client) var(--sdlc-you) var(--sdlc-you) var(--sdlc-client);
+  background: linear-gradient(90deg, var(--sdlc-client-tint), var(--sdlc-you-tint)), var(--sdlc-card);
 }
 /* The plan reads the project knowledge: an indigo edge. */
 a.sdlc-stage.is-kb-reader { box-shadow: inset 4px 0 0 var(--sdlc-kb), var(--w-shadow); }

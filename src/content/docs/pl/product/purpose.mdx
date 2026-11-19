@@ -1,0 +1,102 @@
+---
+title: '2. Intended purpose: dziennik czy wyrób medyczny?'
+description: Ta sama aplikacja może być dziennikiem albo regulowanym wyrobem medycznym – zależy od jednego zdania. Sprawdź to, zanim napiszesz stories albo oszacujesz koszty.
+---
+
+import StageFacts from '../../../../components/StageFacts.astro';
+import Sorter from '../../../../components/Sorter.astro';
+import Quiz from '../../../../components/Quiz.astro';
+import Predict from '../../../../components/Predict.astro';
+import Scene from '../../../../components/Scene.astro';
+import Tldr from '../../../../components/Tldr.astro';
+import AtWork from '../../../../components/AtWork.astro';
+import Done from '../../../../components/Done.astro';
+
+<Tldr minutes={5} items={["Jedno zdanie może zmienić dziennik w wyrób medyczny.", "Cel produktu podaje tylko klient.", "Agenci dopisują twierdzenia medyczne, choć nikt ich o to nie prosi: wyłapuj je."]} />
+
+<StageFacts tone="you" who={'<span class="sdlc-chip is-client">Klient</span> go formułuje · <span class="sdlc-chip is-you">Ty</span> sprawdzasz, co z niego wynika · ekspert potwierdza'} input="Decyzja, dziennik klienta, funkcje, które rozważasz" output="Intended purpose w czterech linijkach, w <code>docs/product.md</code>, zacytowany za klientem" />
+
+**Intended purpose** mówi, do czego służy produkt. Według unijnego rozporządzenia w sprawie wyrobów medycznych (MDR) oprogramowanie przeznaczone do celu medycznego – takiego jak diagnoza, zapobieganie, monitorowanie, prognozowanie, leczenie albo łagodzenie choroby – jest **wyrobem medycznym**. Wyrób wymaga systemu zarządzania jakością, zarządzania ryzykiem, procesu cyklu życia oprogramowania (IEC 62304), oceny klinicznej i oznakowania CE. To podnosi koszt każdej kolejnej decyzji o rząd wielkości.
+
+Liczy się **cel deklarowany przez producenta i funkcje, które ma oprogramowanie**, a nie etykieta w stylu „do celów badawczych” czy „wyłącznie w celach informacyjnych”. Przechowywanie i wyświetlanie tego, co wpisał użytkownik, zwykle nie robi z oprogramowania wyrobu. Interpretowanie danych, ich ocenianie, alarmowanie na ich podstawie albo zalecanie działań – już może.
+
+<Predict id="purpose-flip" question="Mood Tracker zostaje dokładnie taki sam: ten sam kod, te same ekrany. Zmienia się tylko zdanie w sklepie z aplikacjami – z „dziennik nastroju dla uczestników badania” na „pomaga pacjentom radzić sobie z depresją”. Czy coś się zmienia?">
+
+Być może wszystko. „Radzić sobie z depresją” oznacza cel leczenia albo łagodzenia choroby. Z takim zdaniem ten sam kod może być oprogramowaniem wyrobu medycznego, ze wszystkimi obowiązkami, które z tego wynikają. Cel to prawna tożsamość produktu – dlatego może go sformułować tylko klient i dlatego agent nigdy nie może go pisać.
+
+</Predict>
+
+<Scene
+	title="Wtorek, 15:40: opis do sklepu"
+	messages={[
+		{ who: 'you', name: 'Ty', text: '@Copilot napisz krótki opis Mood Trackera do sklepu.' },
+		{ who: 'agent', name: 'Copilot', text: '„Mood Tracker pomaga pacjentom dbać o zdrowie psychiczne i wychwytywać wczesne objawy depresji.”' },
+		{ who: 'you', name: 'Ty', text: 'Stop. To jest twierdzenie medyczne. Użyj tylko intended purpose z <code>docs/product.md</code>, słowo w słowo.' },
+		{ who: 'client', name: 'Anna', text: 'Proszę, nic medycznego. Jak obiecamy diagnozę albo leczenie, komisja wstrzyma badanie.' },
+	]}
+/>
+
+## Cztery linijki
+
+Zapisz cel w czterech linijkach, tak jak każe kursowy skill `mh-intended-purpose`:
+
+```text title="docs/product.md: intended purpose (przykład)"
+Dla kogo      dorośli uczestnicy sześciomiesięcznego badania kliniki
+Sytuacja      w domu, raz dziennie, na własnym telefonie
+Działanie     zapisują, jak się czują, i przeglądają własne wpisy
+Konsekwencja  żadna dla opieki nad nimi: wpisy nie służą do diagnozy ani
+              leczenia; zespół badawczy czyta je wyłącznie do celów naukowych
+Cytat         „Dziennik nastroju prowadzony samodzielnie przez uczestników
+              badania kliniki. Nie służy do diagnozy ani leczenia.”
+              (dziennik klienta, 2026-11-12)
+```
+
+Potem dla każdej funkcji albo tekstu, który chcesz dodać, napisz te same cztery linijki i porównaj. Jeśli **działanie** albo **konsekwencja** przesuwa się w stronę diagnozy lub leczenia – zatrzymaj się i zapytaj.
+
+<Sorter
+	title="Raczej dziennik, raczej wyrób medyczny czy pytanie do eksperta od regulacji?"
+	intro="To ćwiczenie dydaktyczne, nie porada prawna. Prawdziwa kwalifikacja opiera się na MDR (art. 2 i reguła 11) oraz wytycznych MDCG 2019-11 i wymaga eksperta."
+	bins={[
+		{ key: 'no', label: 'Raczej nie wyrób', tone: 'tool' },
+		{ key: 'ask', label: 'Zapytaj eksperta', tone: 'audit' },
+		{ key: 'yes', label: 'Raczej wyrób', tone: 'you' },
+	]}
+	items={[
+		{ text: '„Dziennik nastroju prowadzony samodzielnie przez uczestników badania kliniki. Nie służy do diagnozy ani leczenia.”', bin: 'no', why: 'Zapisuje i pokazuje to, co ludzie wpisali, i wyklucza zastosowanie medyczne – o ile funkcje aplikacji zgadzają się z tym zdaniem.' },
+		{ text: '„Pomaga pacjentom radzić sobie z depresją.”', bin: 'yes', why: 'Radzenie sobie z chorobą to leczenie albo łagodzenie objawów, czyli cel medyczny. Agenci piszą takie zdania bez proszenia, w tekstach do sklepu i w README.' },
+		{ text: '„Wspiera lekarzy w decyzji, kiedy zmienić pacjentowi leczenie.”', bin: 'yes', why: 'Informacje, na podstawie których podejmuje się decyzje o leczeniu, to dokładnie to, co klasyfikuje reguła 11 MDR – często powyżej najniższej klasy.' },
+		{ text: '„Pokazuje uczestnikom ich własne wpisy, dokładnie tak, jak je wpisali.”', bin: 'no', why: 'Samo przechowywanie i wyświetlanie bez interpretacji zwykle nie wystarcza, żeby oprogramowanie było wyrobem.' },
+		{ text: '„Pomaga uczestnikom zauważyć, jak się czują, żeby mogli porozmawiać o tym z terapeutą.”', bin: 'ask', why: 'To blisko leczenia: czy aplikacja jest częścią terapii, czy prywatnym dziennikiem? Odpowiedź zależy od szczegółów i deklaracji. To właśnie takie zdanie, które musi przeczytać ekspert.' },
+		{ text: '„Przesiewowo bada użytkowników pod kątem objawów depresji.”', bin: 'yes', why: 'Badanie przesiewowe w kierunku choroby to cel diagnostyczny.' },
+	]}
+/>
+
+:::danger[Agenci dopisują twierdzenia medyczne, choć nikt o to nie prosi]
+Poproś agenta o opis do sklepu, README albo tekst onboardingu, a często dorzuci korzyści: „pomaga panować nad nastrojem”, „wspiera twoje zdrowie psychiczne”. Każde takie zdanie to deklaracja dotycząca celu. `AGENTS.md` Mood Trackera ma regułę, której potrzebujesz: *„Flag any change that could make the intended purpose in `docs/product.md` untrue, before writing code.”* Stosuj ją do tekstu tak samo jak do kodu.
+:::
+
+<Quiz
+	question="Która zmiana w Mood Trackerze najbardziej wymaga ponownego przyjrzenia się intended purpose?"
+	options={[
+		'Tryb ciemny dla wszystkich ekranów aplikacji',
+		'Ekran About, który pokazuje wersję aplikacji',
+		'Szybsze logowanie odciskiem palca na telefonie',
+		'Komunikat, który radzi uczestnikom iść do lekarza',
+	]}
+	answer={3}
+	why={[
+		'Wygląd nie zmienia tego, do czego służy aplikacja.',
+		'Wersja to informacja o oprogramowaniu, nie o zdrowiu.',
+		'Bezpieczeństwo i wygoda; nic o diagnozie ani leczeniu.',
+		'',
+	]}
+	explain="Doradzanie działania na podstawie tego, co ktoś wpisał, przesuwa aplikację od zapisywania w stronę zalecania – a właśnie na ten krok patrzy MDR. Zatrzymaj się, napisz cztery linijki dla tej zmiany i zapytaj, zanim ją zbudujesz."
+/>
+
+<AtWork>Pracodawcy z branży medtech cenią ludzi, którzy wyłapią problem regulacyjny w jednym zdaniu, zanim będzie kosztował miesiące.</AtWork>
+
+:::tip[Zrób to w swoim projekcie]
+Zapisz intended purpose swojego klienta w czterech linijkach, cytując dziennik klienta. Potem poproś agenta: *„Wypisz każde zdanie w aplikacji, w README i w tekście do sklepu, które obiecuje więcej niż ten cel.”* Każde trafienie sprawdź samodzielnie i przynieś listę klientowi.
+:::
+
+<Done />

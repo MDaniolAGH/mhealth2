@@ -1,0 +1,161 @@
+---
+/**
+ * The product-development map: ten stages from the client's brief to a
+ * decision, in three lanes (client, you, agent), with the evidence on the left
+ * and the traceability rail. Same engine as the AI SDLC map (src/scripts/sdlc.js).
+ */
+import { link } from '../lib/url';
+
+const s = {
+	brief: link('product/decision-and-facts/'),
+	decision: link('product/decision-and-facts/#decision'),
+	assumptions: link('product/decision-and-facts/#assumptions'),
+	purpose: link('product/purpose/'),
+	questions: link('product/questions-and-observation/'),
+	meeting: link('product/questions-and-observation/#meeting'),
+	stories: link('product/user-stories/'),
+	criteria: link('product/testable-stories/'),
+	options: link('product/options-and-recommendation/#options'),
+	recommendation: link('product/options-and-recommendation/#recommendation'),
+	evidence: link('product/decision-and-facts/#assumptions'),
+};
+
+const flows = {
+	loops: [
+		{ from: 'options', to: 'meeting', label: 'no option fits → ask', kind: 'fail', layer: 'base', lane: 0.3, dy: 8 },
+		{ from: 'meeting', to: 'decision', label: 'answers change the decision', kind: 'loop', layer: 'loops', lane: 0.62, dy: 4, labelDy: 0, wideOnly: true },
+		{ from: 'purpose', to: 'decision', label: 'device? → rethink', kind: 'loop', layer: 'loops', lane: 0.9, dy: -6, labelAt: 'from' },
+		{ from: 'recommendation', to: 'options', kind: 'loop', layer: 'loops', lane: 'near' },
+	],
+	kb: [
+		{ to: 'assumptions', layer: 'base' },
+		{ from: 'meeting', layer: 'base' },
+		{ to: 'questions', layer: 'knowledge' },
+		{ to: 'stories', layer: 'knowledge' },
+		{ to: 'options', layer: 'knowledge' },
+		{ from: 'recommendation', layer: 'knowledge', label: 'decided' },
+		{ to: 'brief', layer: 'knowledge', label: 'next request' },
+	],
+};
+---
+
+<div class="sdlc pmap not-content">
+	<div class="sdlc-toolbar">
+		<div class="sdlc-toolbar__group" role="group" aria-label="Walk through the map">
+			<button type="button" class="sdlc-btn" data-action="prev" aria-label="Previous step">◀</button>
+			<button type="button" class="sdlc-btn sdlc-btn--primary" data-action="play">▶ Walk through</button>
+			<button type="button" class="sdlc-btn" data-action="next" aria-label="Next step">▶</button>
+			<span class="sdlc-toolbar__status" aria-live="polite"></span>
+		</div>
+		<div class="sdlc-toolbar__group" role="group" aria-label="Layers">
+			<span class="sdlc-legend__hint">Show:</span>
+			<button type="button" class="sdlc-chip is-loop" data-layer="loops" aria-pressed="false">Feedback loops</button>
+			<button type="button" class="sdlc-chip is-knowledge" data-layer="knowledge" aria-pressed="false">Evidence flows</button>
+			<button type="button" class="sdlc-chip is-audit" data-layer="audit" aria-pressed="false">Paper trail</button>
+		</div>
+	</div>
+
+	<div class="sdlc-legend">
+		<span class="sdlc-legend__hint">Who:</span>
+		<button type="button" class="sdlc-chip is-client" data-actor="client" aria-pressed="false">Client</button>
+		<button type="button" class="sdlc-chip is-you" data-actor="you" aria-pressed="false">You and your pair</button>
+		<button type="button" class="sdlc-chip is-agent" data-actor="agent" aria-pressed="false">Agent</button>
+	</div>
+
+	<div class="sdlc-map" role="group" aria-label="Product development map: ten stages from the client's brief to a decision, with the evidence on the left" data-flows={JSON.stringify(flows)}>
+		<div class="sdlc-lane is-client" style="grid-column:4" aria-hidden="true"></div>
+		<div class="sdlc-lane is-you" style="grid-column:5" aria-hidden="true"></div>
+		<div class="sdlc-lane is-agent" style="grid-column:6" aria-hidden="true"></div>
+		<div class="sdlc-lane-title is-knowledge" style="grid-column:2">Evidence</div>
+		<div class="sdlc-lane-title is-client" style="grid-column:4">Client</div>
+		<div class="sdlc-lane-title is-you" style="grid-column:5">You</div>
+		<div class="sdlc-lane-title is-agent" style="grid-column:6">Agent</div>
+		<div class="sdlc-rail" aria-hidden="true"><span>Traceability</span><i class="sdlc-rail__fill"></i></div>
+
+		<div class="sdlc-kb is-knowledge" style="grid-row:3 / 11">
+			<a class="sdlc-kb__title" href={s.evidence}>Evi&shy;dence</a>
+			<a class="sdlc-kb__doc" href={s.evidence} data-doc="brief" data-feeds="decision assumptions">Brief</a>
+			<a class="sdlc-kb__doc" href={s.evidence} data-doc="log" data-feeds="decision assumptions purpose stories criteria recommendation">Client log</a>
+			<a class="sdlc-kb__doc" href={s.purpose} data-doc="product" data-feeds="purpose stories options">Product card</a>
+			<a class="sdlc-kb__doc" href={s.questions} data-doc="app" data-feeds="assumptions questions options">App &amp; code</a>
+			<a class="sdlc-kb__doc" href={s.questions} data-doc="notes" data-feeds="questions stories">Interview notes</a>
+			<a class="sdlc-kb__doc" href={s.options} data-doc="sources" data-feeds="options recommendation">Dated sources</a>
+		</div>
+
+		<a class="sdlc-stage is-client" href={s.brief} data-stage="brief" data-order="1" data-actors="client" style="--row:2;--col:4"><span class="sdlc-stage__n">1</span><span class="sdlc-stage__t">Brief</span><span class="sdlc-stage__s">the client's request</span><span class="sdlc-stage__rec">brief.md</span></a>
+		<a class="sdlc-stage is-client-you" href={s.decision} data-stage="decision" data-order="2" data-actors="client you" style="--row:3;--col:4 / 6"><span class="sdlc-stage__n">2</span><span class="sdlc-stage__t">Decision</span><span class="sdlc-stage__s">what must be decided, not built</span><span class="sdlc-stage__rec">decision.md</span></a>
+		<a class="sdlc-stage is-you-agent is-kb-reader" href={s.assumptions} data-stage="assumptions" data-order="3" data-actors="you agent" style="--row:4;--col:5 / 7"><span class="sdlc-stage__n">3</span><span class="sdlc-stage__t">Facts and assumptions</span><span class="sdlc-stage__s">agent drafts · you check sources</span><span class="sdlc-stage__rec">assumptions.md</span></a>
+		<a class="sdlc-stage is-client-you" href={s.purpose} data-stage="purpose" data-order="4" data-actors="client you" style="--row:5;--col:4 / 6"><span class="sdlc-stage__n">4</span><span class="sdlc-stage__t">Intended purpose</span><span class="sdlc-stage__s">diary or medical device?</span><span class="sdlc-stage__rec">product.md</span></a>
+		<a class="sdlc-stage is-you-agent" href={s.questions} data-stage="questions" data-order="5" data-actors="you agent" style="--row:6;--col:5 / 7"><span class="sdlc-stage__n">5</span><span class="sdlc-stage__t">Questions and observations</span><span class="sdlc-stage__s">only what changes the answer</span><span class="sdlc-stage__rec">questions.md</span></a>
+		<a class="sdlc-stage is-client" href={s.meeting} data-stage="meeting" data-order="6" data-actors="client" style="--row:7;--col:4"><span class="sdlc-stage__n">6</span><span class="sdlc-stage__t">Client meeting</span><span class="sdlc-stage__s">answers, dated</span><span class="sdlc-stage__rec">client log</span></a>
+		<a class="sdlc-stage is-you-agent is-kb-reader" href={s.stories} data-stage="stories" data-order="7" data-actors="you agent" style="--row:8;--col:5 / 7"><span class="sdlc-stage__n">7</span><span class="sdlc-stage__t">User stories</span><span class="sdlc-stage__s">need first, a source for each</span><span class="sdlc-stage__rec">stories.md</span></a>
+		<a class="sdlc-stage is-client-you" href={s.criteria} data-stage="criteria" data-order="8" data-actors="client you" style="--row:9;--col:4 / 6"><span class="sdlc-stage__n">8</span><span class="sdlc-stage__t">Criteria and priorities</span><span class="sdlc-stage__s">Given/When/Then · MoSCoW</span><span class="sdlc-stage__rec">AC + MoSCoW</span></a>
+		<a class="sdlc-stage is-you-agent" href={s.options} data-stage="options" data-order="9" data-actors="you agent" style="--row:10;--col:5 / 7"><span class="sdlc-stage__n">9</span><span class="sdlc-stage__t">Options and estimates</span><span class="sdlc-stage__s">hard limits, ranges</span><span class="sdlc-stage__rec">options table</span></a>
+		<a class="sdlc-stage is-client-you" href={s.recommendation} data-stage="recommendation" data-order="10" data-actors="client you" style="--row:11;--col:4 / 6"><span class="sdlc-stage__n">10</span><span class="sdlc-stage__t">Recommendation</span><span class="sdlc-stage__s">one page · the client decides</span><span class="sdlc-stage__rec">recommendation.md</span></a>
+	</div>
+
+	<div class="sdlc-panel" aria-live="polite"><p class="sdlc-panel__empty">Click a stage or a piece of evidence, or press <b>Walk through</b> to follow Anna's request.</p></div>
+
+	<div class="sdlc-layer-info">
+		<div data-layer-info="audit"><h4>Paper trail</h4><p>Every stage leaves a document that points back to its sources. Click a stage to see its record and trace it back along the rail to the brief.</p></div>
+		<div data-layer-info="loops"><h4>Feedback loops</h4><dl><dt>No option fits</dt><dd>The client's hard limits rule out every option: go back and ask which limit can move.</dd><dt>Answers change the decision</dt><dd>A client answer shows the decision was framed wrongly: rewrite it.</dd><dt>Device? Rethink</dt><dd>The purpose would make the app a medical device: rethink the scope before anything else.</dd><dt>Client says no</dt><dd>The recommendation is rejected: back to the options, with the reason.</dd></dl><p>Discovery is drawn top to bottom, but real projects loop. A loop here costs an email; the same loop after the code is written costs weeks.</p></div>
+		<div data-layer-info="knowledge"><h4>Evidence flows</h4><p>The evidence feeds the assumptions, the questions, the stories and the options. Every client meeting adds dated entries to the client log, and the decision is written down at the end, so the next request starts from it. Click a piece of evidence to see which stages read it.</p></div>
+	</div>
+
+	<div class="sdlc-details">
+		<div data-detail="brief"><h4>1. Brief</h4><dl><dt>Who</dt><dd>The client: Anna, the study coordinator</dd><dt>In</dt><dd>A problem in the client's own words</dd><dt>Out</dt><dd>The brief and a first, dated client-log entry</dd><dt>Check</dt><dd>Is this the client's wording, not yours?</dd></dl></div>
+		<div data-detail="decision"><h4>2. Decision</h4><dl><dt>Who</dt><dd>You write it; the client confirms it</dd><dt>In</dt><dd>The brief, the client log</dd><dt>Out</dt><dd>One sentence: who decides, between which options, by when, within which limits</dd><dt>Check</dt><dd>No feature or technology names; at least one option that is not software</dd></dl></div>
+		<div data-detail="assumptions"><h4>3. Facts and assumptions</h4><dl><dt>Who</dt><dd>The agent drafts; you check every source</dd><dt>In</dt><dd>The <b>evidence</b>: brief, client log, the app and its code</dd><dt>Out</dt><dd>An assumption log, ranked by the damage if wrong; a stakeholder table</dd><dt>Check</dt><dd>Every FACT has a source you have opened; synthetic users are never facts</dd></dl></div>
+		<div data-detail="purpose"><h4>4. Intended purpose</h4><dl><dt>Who</dt><dd>The client states it; you check what it implies</dd><dt>In</dt><dd>The client log, the product card, the features under discussion</dd><dt>Out</dt><dd>The purpose in four lines, quoted from the client</dd><dt>Check</dt><dd>Does anything move it towards diagnosis or treatment? Then stop and ask an expert</dd></dl></div>
+		<div data-detail="questions"><h4>5. Questions and observations</h4><dl><dt>Who</dt><dd>The agent drafts and searches the code; you choose and reproduce</dd><dt>In</dt><dd>The assumption log, the app, interview notes</dd><dt>Out</dt><dd>3–5 questions with "if A → X, if B → Y"; observations with evidence</dd><dt>Check</dt><dd>Would any answer change your recommendation? If not, drop the question</dd></dl></div>
+		<div data-detail="meeting"><h4>6. Client meeting</h4><dl><dt>Who</dt><dd>The client answers; you listen and write it down</dd><dt>In</dt><dd>Your 3–5 questions</dd><dt>Out</dt><dd>Dated client-log entries: facts, with a source</dd><dt>Check</dt><dd>Did you write down what the client said, not what you hoped?</dd></dl></div>
+		<div data-detail="stories"><h4>7. User stories</h4><dl><dt>Who</dt><dd>The agent drafts and critiques; you cut and trace</dd><dt>In</dt><dd>The client log, the decision, the purpose</dd><dt>Out</dt><dd>Stories with a source, and a separate list of ideas</dd><dt>Check</dt><dd>Every story points to a line in the client log that says what the story claims</dd></dl></div>
+		<div data-detail="criteria"><h4>8. Criteria and priorities</h4><dl><dt>Who</dt><dd>You write the criteria; the client ranks</dd><dt>In</dt><dd>The stories</dd><dt>Out</dt><dd>Given/When/Then criteria with edge cases; Must, Should, Could, Won't</dd><dt>Check</dt><dd>Each criterion can be shown true or false; the client, not you, set the priorities</dd></dl></div>
+		<div data-detail="options"><h4>9. Options and estimates</h4><dl><dt>Who</dt><dd>The agent drafts tables and argues against you; you check</dd><dt>In</dt><dd>Ranked stories, the client's hard limits, <b>dated sources</b></dd><dt>Out</dt><dd>An options table with total costs and three-point estimates</dd><dt>Check</dt><dd>At least one option without software; every number sourced or marked as an estimate</dd></dl></div>
+		<div data-detail="recommendation"><h4>10. Recommendation</h4><dl><dt>Who</dt><dd>You write one page; the client decides</dd><dt>In</dt><dd>Everything above</dd><dt>Out</dt><dd><code>docs/recommendation.md</code>, then <b>issue #7</b>, which enters the AI SDLC</dd><dt>Check</dt><dd>Answer first; every reason points to evidence; a kill criterion</dd></dl></div>
+		<div data-detail="kb"><h4>Evidence</h4><dl><dt>What</dt><dd>Everything your recommendation may rely on, each with a source and a date</dd><dt>Why</dt><dd>An agent writes fluent analysis whether or not it has evidence. These documents are the difference between a fact and a plausible guess.</dd><dt>Try</dt><dd>Click one piece of evidence to see which stages read it.</dd></dl></div>
+	</div>
+
+	<div class="sdlc-kb-details">
+		<div data-kb="brief"><h4>Brief: <code>docs/brief.md</code></h4><dl><dt>Records</dt><dd>The client's request, in their words, and what they worry about</dd><dt>Read by</dt><dd>Decision, assumptions</dd></dl></div>
+		<div data-kb="log"><h4>Client log: <code>docs/client-log.md</code></h4><dl><dt>Records</dt><dd>Everything the client said, dated: answers, decisions, wording</dd><dt>Read by</dt><dd>Almost every stage. It is the <b>only</b> source of client facts</dd></dl></div>
+		<div data-kb="product"><h4>Product card: <code>docs/product.md</code></h4><dl><dt>Records</dt><dd>Client, users, intended purpose (quoted), constraints, scope</dd><dt>Read by</dt><dd>Purpose, stories, options</dd></dl></div>
+		<div data-kb="app"><h4>The app and its code</h4><dl><dt>Records</dt><dd>What the prototype you took over really does, checked with synthetic data</dd><dt>Read by</dt><dd>Assumptions, questions, options</dd></dl></div>
+		<div data-kb="notes"><h4>Interview notes</h4><dl><dt>Records</dt><dd>Anonymised notes from talks with users and staff</dd><dt>Read by</dt><dd>Questions, stories</dd><dt>Rule</dt><dd>Personal data: anonymise, and keep them out of consumer AI tools</dd></dl></div>
+		<div data-kb="sources"><h4>Dated sources</h4><dl><dt>Records</dt><dd>Prices, regulations, market facts, each with a link and a date</dd><dt>Read by</dt><dd>Options, recommendation</dd><dt>Rule</dt><dd>No source, no number: mark it [UNVERIFIED]</dd></dl></div>
+	</div>
+
+	<div class="sdlc-audits">
+		<div data-audit="brief"><h4>Record: the brief</h4><dl><dt>Record</dt><dd><code>docs/brief.md</code> and the first client-log entry</dd><dt>Points back to</dt><dd>Anna's email</dd></dl></div>
+		<div data-audit="decision"><h4>Record: the decision</h4><dl><dt>Record</dt><dd><code>docs/decision.md</code>, confirmed by the client</dd><dt>Points back to</dt><dd>The brief</dd></dl></div>
+		<div data-audit="assumptions"><h4>Record: the assumption log</h4><dl><dt>Record</dt><dd><code>docs/assumptions.md</code>: statement, type, source, impact</dd><dt>Points back to</dt><dd>Client-log lines, <code>file:line</code> in the app</dd></dl></div>
+		<div data-audit="purpose"><h4>Record: the intended purpose</h4><dl><dt>Record</dt><dd>Four lines in <code>docs/product.md</code></dd><dt>Points back to</dt><dd>Client log, 2026-11-12</dd></dl></div>
+		<div data-audit="questions"><h4>Record: questions and observations</h4><dl><dt>Record</dt><dd><code>docs/questions.md</code>; observations with evidence</dd><dt>Points back to</dt><dd>The assumptions they test</dd></dl></div>
+		<div data-audit="meeting"><h4>Record: the client log</h4><dl><dt>Record</dt><dd>Dated answers from the meeting</dd><dt>Points back to</dt><dd>The questions asked</dd></dl></div>
+		<div data-audit="stories"><h4>Record: the stories</h4><dl><dt>Record</dt><dd><code>docs/stories.md</code>, a source for each story</dd><dt>Points back to</dt><dd>Client-log lines</dd></dl></div>
+		<div data-audit="criteria"><h4>Record: criteria and priorities</h4><dl><dt>Record</dt><dd>Criteria with IDs; the client's MoSCoW ranking, dated</dd><dt>Points back to</dt><dd>The stories</dd></dl></div>
+		<div data-audit="options"><h4>Record: the options table</h4><dl><dt>Record</dt><dd>Options, hard limits, estimates, dated sources</dd><dt>Points back to</dt><dd>The decision, the ranked stories</dd></dl></div>
+		<div data-audit="recommendation"><h4>Record: the recommendation</h4><dl><dt>Record</dt><dd><code>docs/recommendation.md</code> and the client's decision; then issue #7</dd><dt>Points back to</dt><dd>Everything above, and on to GOAL-1 in the AI SDLC</dd></dl></div>
+	</div>
+
+	<ol class="sdlc-walk">
+		<li data-stage="brief">Monday, 9:12. Anna, the study coordinator at the rehabilitation clinic, emails: <em>"Participants keep asking which version they have, and our ethics committee wants the app to say what it is for. Can you add an About page?"</em> You save it as the brief and a first client-log entry.</li>
+		<li data-stage="decision">Before anyone mentions a screen, you write the <b>decision</b>: how participants learn what the app is for and whom to contact, and how support learns the version: in the app, on paper, or both. Anna replies: <em>"Yes, that's exactly it."</em></li>
+		<li data-stage="kb">Copilot reads the <b>evidence</b>: the brief, the client log and the app's code. It knows nothing else about this client.</li>
+		<li data-stage="assumptions">Copilot drafts the assumption log in a minute. One line says <em>"FACT: participants prefer in-app information"</em>, with no source. You relabel it as an assumption. That one label is the difference between analysis and fiction.</li>
+		<li data-stage="purpose">Copilot's draft store text says the app <em>"helps patients manage their mental health"</em>. You stop: that is a medical claim. The client's real purpose: <em>"a self-report mood diary, not used for diagnosis or treatment"</em>. Diary, not device.</li>
+		<li data-stage="questions">Copilot drafts twenty questions; you keep three, each with "if A → X, if B → Y". It also finds that the app has no About screen (<code>home_screen.dart</code>). You reproduce that yourself.</li>
+		<li data-stage="meeting">Tuesday. Anna answers: the committee wants the purpose <b>in the app</b>; the contact is not decided yet; and the wording <b>must change without an app release</b>. Every answer goes into the client log, dated.</li>
+		<li data-stage="kb">The client log now holds Anna's answers. From here on, they are facts with a source, not your guesses.</li>
+		<li data-stage="stories">Copilot drafts fifteen user stories. Nine have no source in the client log. You keep two (support needs the version; participants need the purpose and a contact) and move the rest to <em>Ideas</em>.</li>
+		<li data-stage="criteria">You add Given/When/Then criteria, including "the server does not answer". Anna ranks them: the purpose and contact are <b>Must</b>, the version is <b>Should</b>.</li>
+		<li data-stage="options" data-result="fail">The options board: with Anna's two hard limits (in the app, and wording changeable without a release) <b>no option survives</b>. The honest move is not to pick the least bad one quietly.</li>
+		<li data-stage="meeting">Back to Anna: <em>"Which limit can move?"</em> She checks with the committee: wording changes are rare, so a release is fine. A new, dated entry in the client log.</li>
+		<li data-stage="options" data-result="pass">Now the About screen survives. Three-point estimate: about <b>11 hours</b>, likely 6 to 16. Copilot argues for the paper option; you keep its best point, a sentence on the consent form.</li>
+		<li data-stage="recommendation">One page: the About screen plus one sentence on the consent form, the estimate, the risks and a kill criterion. Anna decides: <b>yes</b>. It becomes <b>issue #7</b>, and enters the AI SDLC at stage 1.</li>
+	</ol>
+</div>
+
+<script>
+	import '../scripts/sdlc.js';
+</script>

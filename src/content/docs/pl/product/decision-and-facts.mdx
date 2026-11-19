@@ -1,0 +1,168 @@
+---
+title: '1. Decyzja, fakty i ludzie'
+description: Nazwij decyzję klienta, zanim pojawi się jakiekolwiek rozwiązanie, oddziel fakty od założeń i ustal, kto dostarcza informacje, kto je widzi, a kto decyduje.
+---
+
+import StageFacts from '../../../../components/StageFacts.astro';
+import Sorter from '../../../../components/Sorter.astro';
+import Quiz from '../../../../components/Quiz.astro';
+import Predict from '../../../../components/Predict.astro';
+import Scene from '../../../../components/Scene.astro';
+import Tldr from '../../../../components/Tldr.astro';
+import AtWork from '../../../../components/AtWork.astro';
+import Done from '../../../../components/Done.astro';
+
+<Tldr minutes={7} items={["Nazwij decyzję, zanim pojawi się rozwiązanie.", "Fakt = źródło, które sprawdzisz na własne oczy. Wszystko inne to założenie.", "Syntetyczni użytkownicy to hipotezy, nie dowody."]} />
+
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> szkicuje · <span class="sdlc-chip is-you">Ty</span> sprawdzasz · <span class="sdlc-chip is-client">klient</span> potwierdza'} input="Brief, <code>docs/client-log.md</code>" output="<code>docs/decision.md</code>, <code>docs/assumptions.md</code>, tabela interesariuszy" />
+
+<span id="decision" class="stage-anchor"></span>
+
+## Decyzja przed rozwiązaniem
+
+Klient rzadko potrzebuje „aplikacji”. Potrzebuje **podjąć decyzję**. Nazwij ją, zanim cokolwiek zaproponujesz – inaczej agent nazwie za ciebie rozwiązanie i każdy kolejny dokument będzie właśnie o nim.
+
+<Scene
+	title="Poniedziałek, 11:00: prosimy Copilota o decyzję"
+	messages={[
+		{ who: 'client', name: 'Anna', text: 'Szczerze? Potrzebujemy po prostu strony About.' },
+		{ who: 'you', name: 'Ty', text: '@Copilot napisz, jaką decyzję musi podjąć Anna. Korzystaj tylko z briefu i dziennika klienta.' },
+		{ who: 'agent', name: 'Copilot', text: 'Decyzja: zaimplementować ekran About z użyciem <code>package_info_plus</code>, który pokazuje wersję aplikacji i kontakt do wsparcia.' },
+		{ who: 'you', name: 'Ty', text: 'To jest rozwiązanie, i to z paczką w środku. Przepisz to jako decyzję: bez nazw technologii i z co najmniej jedną opcją bez oprogramowania.' },
+		{ who: 'agent', name: 'Copilot', text: 'Anna musi zdecydować, jak uczestnicy dowiedzą się, do czego służy aplikacja i z kim się kontaktować, oraz jak Tomek sprawdzi, której wersji używają: w aplikacji, na papierze czy na oba sposoby.' },
+		{ who: 'client', name: 'Anna', text: 'Tak! Dokładnie to muszę zdecydować. 👍' },
+	]}
+/>
+
+> *[Kto] musi zdecydować, czy [opcja A], [opcja B] czy [opcja C], tak aby [cel], w ramach [kluczowe ograniczenia].*
+
+Dla kliniki:
+
+```text title="docs/decision.md (przykład)"
+Decyzja   Koordynatorka badania musi zdecydować, jak uczestnicy dowiedzą się,
+          do czego służy aplikacja i z kim się kontaktować, oraz jak wsparcie
+          sprawdzi, której wersji używa uczestnik: w aplikacji, w dokumentach
+          zgody czy w obu miejscach, tak aby spełnić prośbę komisji
+          bioetycznej, zanim zacznie się kolejna grupa uczestników, bez nowych
+          usług chmurowych.
+Opcje     bez zmian | formularz zgody + wydrukowana kartka | ekran w aplikacji |
+          strona internetowa badania
+Źródła    dziennik klienta 2026-11-12 (koordynatorka; prośba komisji bioetycznej)
+```
+
+Bez nazw technologii i z co najmniej jedną opcją, która nie jest oprogramowaniem. „Zbuduj ekran About” to rozwiązanie; pojawia się później, jako jedna z opcji.
+
+<Sorter
+	title="Decyzja czy rozwiązanie?"
+	bins={[
+		{ key: 'decision', label: 'Decyzja', tone: 'client' },
+		{ key: 'solution', label: 'Rozwiązanie', tone: 'neutral' },
+	]}
+	items={[
+		{ text: 'Zbudować ekran About w Mood Trackerze', bin: 'solution', why: 'Mówi, co zbudować. Może to i dobra odpowiedź, ale to nie jest pytanie.' },
+		{ text: 'Zdecydować, jak uczestnicy dowiedzą się, do czego służy aplikacja i z kim się kontaktować', bin: 'decision', why: 'Nazywa to, co musi wybrać klient, i zostawia otwarte opcje – także papier.' },
+		{ text: 'Dodać paczkę <code>package_info_plus</code>, żeby pokazać wersję', bin: 'solution', why: 'Wybór technologii, dwa poziomy poniżej decyzji. Agenci wskakują tu w pierwszej kolejności.' },
+		{ text: 'Zdecydować, czy wsparcie potrzebuje wersji serwera, czy tylko wersji aplikacji', bin: 'decision', why: 'Prawdziwy wybór dla klienta – i zmienia zakres każdej opcji.' },
+		{ text: 'Wydrukować na formularzu zgody kod QR z kontaktem', bin: 'solution', why: 'Konkretne rozwiązanie. Trzymaj je na liście opcji, nie w decyzji.' },
+	]}
+/>
+
+```text title="Prompt (Copilot, ze skillem ba-decision-statement)"
+/ba-decision-statement docs/brief.md
+Korzystaj tylko z briefu i docs/client-log.md. Uwzględnij co najmniej jedną
+opcję, która nie jest oprogramowaniem. Usuń każdą nazwę funkcji albo
+technologii, której klient nie wybrał. Oznacz każdy element jako FACT
+(z linijką z dziennika), ASSUMPTION albo UNKNOWN.
+```
+
+<span id="assumptions" class="stage-anchor"></span>
+
+## Fakty, założenia i niewiadome
+
+Każda rekomendacja opiera się na założeniach. Wyciągnij je na wierzch, żeby dało się je sprawdzić, zanim zaczną dużo kosztować.
+
+- **Fakt**: podany w briefie albo przez klienta lub widoczny w kodzie czy w aplikacji – **ze źródłem**.
+- **Założenie**: coś, co uznajesz za prawdę bez potwierdzenia. Przydaje się tylko wtedy, gdy jest na tyle konkretne, że może się okazać fałszywe.
+- **Niewiadoma**: coś, o czym wiesz, że tego nie wiesz. Zamienia się w pytanie.
+
+Szereguj założenia według **szkody, jaką wyrządzą, jeśli są błędne**, a nie według tego, jak prawdopodobne ci się wydają. I zapisuj, skąd pochodzi każde z nich: *zweryfikowane*, *klient powiedział (data)*, *wygenerowane przez agenta* albo *nieznane*. Stwierdzenie wygenerowane przez agenta nigdy nie jest faktem, nawet jeśli brzmi bardzo pewnie.
+
+<Scene
+	title="Poniedziałek, 11:20: jedna linijka w rejestrze założeń"
+	messages={[
+		{ who: 'agent', name: 'Copilot', text: 'FACT: uczestnicy wolą informacje w aplikacji.' },
+		{ who: 'you', name: 'Ty', text: 'Źródło?' },
+		{ who: 'agent', name: 'Copilot', text: 'To częsty wniosek w projektowaniu aplikacji mobilnych.' },
+		{ who: 'you', name: 'Ty', text: 'Czyli to ASSUMPTION, nie fakt. Wpływ, jeśli nieprawda: wysoki. Jak sprawdzić: zapytać trzech uczestników albo pokazać im makietę.' },
+	]}
+/>
+
+<Sorter
+	title="Fakt, założenie czy niewiadoma?"
+	intro="Każde stwierdzenie dotyczy prośby o ekran About."
+	bins={[
+		{ key: 'fact', label: 'Fakt', tone: 'tool' },
+		{ key: 'assumption', label: 'Założenie', tone: 'audit' },
+		{ key: 'unknown', label: 'Niewiadoma', tone: 'neutral' },
+	]}
+	items={[
+		{ text: 'Komisja bioetyczna chce, żeby aplikacja podawała swój cel.', bin: 'fact', why: 'Źródło: dziennik klienta, 2026-11-12 – koordynatorka cytuje komisję. Mimo to warto dopytać, <em>gdzie</em> dokładnie cel ma być podany (strona 3).' },
+		{ text: 'Uczestnicy otworzą ekran About, kiedy będą mieli pytanie.', bin: 'assumption', why: 'Brzmi rozsądnie, nikt tego nie sprawdził, a wpływ jest duży: jeśli to nieprawda, ekran niczego nie rozwiązuje. Najtańsze sprawdzenie: prototyp do wyrzucenia pokazany trzem–pięciu osobom.' },
+		{ text: 'Kto odpowiada na pytania uczestników?', bin: 'unknown', why: 'Nikt tego nie powiedział. Zapisz to jako pytanie do klienta, nie jako odpowiedź.' },
+		{ text: 'Persona AI, „Anna, 67 lat”, mówi, że potrzebuje większej czcionki.', bin: 'assumption', why: 'Syntetyczny użytkownik to hipoteza, nie dana. Odbija dane treningowe modelu i twój prompt. Sprawdź to na prawdziwych ludziach; nigdy nie wpisuj tego do dziennika klienta.' },
+		{ text: 'Aplikacja nie ma dziś ekranu About.', bin: 'fact', why: 'Dowód: w <code>lib/screens/</code> jest sześć ekranów i żaden z nich nie jest ekranem About; pasek aplikacji na ekranie głównym ma jeden przycisk (<code>home_screen.dart</code>, linie 30–39).' },
+		{ text: 'Większość uczestników ma telefony z Androidem.', bin: 'assumption', why: 'To decyduje, na jakich urządzeniach testujesz. Zapytaj koordynatorkę; nie pozwól agentowi wymyślić liczby.' },
+	]}
+/>
+
+:::caution[Syntetyczni użytkownicy to nie użytkownicy]
+Agent w kilka sekund odegra pacjenta, pielęgniarkę albo koordynatora. Tacy **syntetyczni użytkownicy** nie dają żadnej nowej informacji: odbijają dane treningowe modelu i twój prompt, a do tego zwykle się z tobą zgadzają. Używaj ich, żeby przygotować scenariusz wywiadu albo znaleźć pytania, które ci umknęły. Nigdy nie traktuj ich jako dowodów i nigdy nie wpisuj tego, co „powiedzieli”, do dziennika klienta.
+:::
+
+<span id="stakeholders" class="stage-anchor"></span>
+
+## Interesariusze i przepływy danych
+
+Wymagania biorą się od ludzi, a konflikty między ludźmi często są tymi prawdziwymi wymaganiami. Uwzględnij też tych, których sprawa dotyczy, choć nie płacą.
+
+| Interesariusz | Cel | Obawa | Wpływ |
+|---|---|---|---|
+| Koordynatorka badania (klient) | zgoda komisji bioetycznej; mniej telefonów do wsparcia | błędny albo niezatwierdzony tekst w aplikacji | decyduje |
+| Komisja bioetyczna | uczestnicy wiedzą, do czego służy aplikacja | cel, który obiecuje za dużo | może wstrzymać badanie |
+| Uczestnicy | wiedzieć, do czego służy aplikacja i kogo pytać | zamieszanie; prośby o więcej danych | używają albo przestają |
+| Osoba ze wsparcia w klinice | wiedzieć, której wersji używa uczestnik | czas tracony na rozmowy bez kontekstu | formalnie żaden; w praktyce duży |
+| Twoja para (maintainerzy) | zmiana, którą da się zbudować, przetestować i wyjaśnić | tekst, który zmienia się co tydzień | proponuje |
+
+| Dane | Skąd | Dokąd | Cel | Uzgodnione? |
+|---|---|---|---|---|
+| Wersja aplikacji | build | ekran, potem wsparcie (uczestnik ją odczytuje) | sprawdzić, czy zgłoszony problem jest już naprawiony | tak |
+| Wersja serwera | `GET /version` | ekran | to samo, dla serwera | do potwierdzenia |
+| Zdanie o celu, kontakt | dziennik klienta, przez `docs/product.md` | ekran | uczestnicy znają cel i wiedzą, kogo pytać | kontakt: **jeszcze nie** |
+
+Ekran About nie pokazuje żadnych danych o uczestniku. Niech tak zostanie: dodanie ID uczestnika „żeby pomóc wsparciu” oznaczałoby nowy przepływ danych osobowych, na który nikt się nie zgodził.
+
+<Quiz
+	question="W rejestrze założeń od agenta jest wpis: „Uczestnicy wolą krótkie teksty (FACT)”. Nie ma źródła. Co robisz?"
+	options={[
+		'Zostawiasz jako fakt: to powszechna wiedza w projektowaniu aplikacji',
+		'Usuwasz, bo agent w ogóle nie powinien był tego pisać',
+		'Zmieniasz etykietę na założenie, oceniasz wpływ i planujesz sprawdzenie',
+		'Dopytujesz agenta tak długo, aż poda ci źródło tego twierdzenia',
+	]}
+	answer={2}
+	why={[
+		'„Powszechna wiedza” to nie źródło, a w tej grupie uczestników wcale nie musi się sprawdzać.',
+		'To może być przydatne założenie. Problemem jest etykieta, nie sam pomysł.',
+		'',
+		'Agenci potrafią zmyślać także źródła. Źródło, do którego nie zajrzysz, nie jest źródłem.',
+	]}
+	explain="Fakt wymaga źródła, które sprawdzisz na własne oczy. Wszystko inne to założenie – i to jest w porządku, o ile jest oznaczone, uszeregowane i da się je sprawdzić."
+/>
+
+<AtWork>Decyzja zapisana w jednym zdaniu to najszybszy sposób, żeby zgrać się z klientem na spotkaniu – i klasyczny ruch na rozmowach rekrutacyjnych typu case interview w firmach consultingowych.</AtWork>
+
+:::tip[Zrób to w swoim projekcie]
+Napisz `docs/decision.md` i `docs/assumptions.md` dla swojego briefu, korzystając z kursowych skilli `/ba-decision-statement` i `/ba-assumptions`. Potem przejdź przez wynik agenta linijka po linijce: każdy FACT potrzebuje źródła, które samodzielnie otworzysz; wszystko inne dostaje nową etykietę. Dodaj jednego interesariusza, którego sprawa dotyczy, choć nie płaci.
+:::
+
+<Done />

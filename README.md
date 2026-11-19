@@ -1,8 +1,8 @@
-# AI SDLC: From Idea to Merge
+# Aplikacje Mobilne w Medycynie - Od Pomysłu do Wprowadzenia na Rynek
 
 Course website for the Digital Health Engineering Studio (AGH University of Krakow): an interactive guide to building software with coding agents. Part 1 (AI SDLC) follows one feature of the Mood Tracker from a sketch to a merged pull request; Part 2 (product development with agents) covers the business side, from a client's brief to user stories and a recommendation.
 
-**Live site:** <https://mdaniolagh.github.io/mhealth2/>
+**Live site:** <https://mdaniolagh.github.io/mhealth2/> (English) · <https://mdaniolagh.github.io/mhealth2/pl/> (Polski)
 
 Built with [Astro Starlight](https://starlight.astro.build). Ported from the *Agentic SDLC* guide of the Multiplatform Mobile Software Engineering course and adapted to this course (GitHub Copilot, the Mood Tracker handover, workshops W2–W6).
 
@@ -52,3 +52,11 @@ Our answer, shown after the student writes theirs.
 Predictions and checklist ticks are kept only in the student's browser (`localStorage`); nothing is sent anywhere.
 
 Keep quiz options about the same length, and spread the correct answers over A–D.
+
+## Two languages
+
+English pages live in `src/content/docs/`, Polish pages in `src/content/docs/pl/` with the same file names; the sidebar labels have a `translations.pl` entry in `astro.config.mjs`. The big widgets have Polish copies in `src/components/pl/` (the text the scripts write comes from their `data-i18n` attribute). Generic components take their interface text from `src/i18n/ui.ts`. When you change an English page, change its Polish twin too. `TRANSLATION_GUIDE.md` lists the terms that stay in English.
+
+## Teaching patterns used on every page
+
+`Tldr` (three points and the reading time) at the top, `Scene` (a short chat with the cast: Anna the coordinator, Tomek from support, you, Copilot) where the example needs a face, `Predict` before reveals, `Quiz` with feedback per option, `AtWork` (how it shows up in a job), a "Do this in your project" tip, and `Done` at the bottom, which feeds the progress tracker on the home page.
