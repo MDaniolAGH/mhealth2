@@ -31,7 +31,7 @@ The context of a running agent holds:
 Context windows in current models are large: hundreds of thousands of tokens, and up to about a million for some. Filling them is still a bad idea:
 
 - **Cost.** Every step of the loop sends the context again, and you pay for it in time and money (in Copilot, in premium requests). Less context means lower cost.
-- **Focus.** Irrelevant files and stale tool output compete with what matters. A long session slowly fills with old logs, and in W2 you saw a long session break a rule a fresh one followed.
+- **Focus.** Irrelevant files and stale tool output compete with what matters. A long session slowly fills with old logs, and can start to drift from rules that a fresh session follows.
 - **Sub-agents** help. A large task can be split so that each part starts with a fresh, small context:
 
 <Subagents />
