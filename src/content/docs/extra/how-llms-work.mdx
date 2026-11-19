@@ -39,11 +39,11 @@ The model will absorb the patterns of this text, including its facts, its style 
 
 ## 2. Tokens: what the model actually reads
 
-A model does not read letters or words. Text is cut into **tokens**: frequent pieces of text, from single characters to whole words. The vocabulary is built from the data with an algorithm called byte-pair encoding: start from bytes, and keep merging the pairs that appear most often. GPT-4's tokenizer has about 100,000 tokens; GPT-4o's has about 200,000.
+A model does not read letters or words. Text is cut into **tokens**: frequent pieces of text, from single characters to whole words. The vocabulary is built from the data with an algorithm called byte-pair encoding: start from bytes, and keep merging the pairs that appear most often. GPT-2's tokenizer (2019) had about 50,000 tokens, GPT-4's about 100,000, GPT-4o's about 200,000.
 
 <Predict id="strawberry" question="How many tokens is the word &quot;strawberry&quot;? And will a Polish sentence need more tokens than the same sentence in English, fewer, or the same?">
 
-"strawberry" is **3 tokens** in both tokenizers below. Polish usually needs **more** tokens than English for the same meaning: the tokenizers learned mostly from English text, so English words are often single tokens while Polish words are split into pieces. Try the two clinical sentences in the playground: the same meaning, very different counts. More tokens means more cost and a fuller context window.
+"strawberry" is **3 tokens** in all three tokenizers below. Polish usually needs **more** tokens than English for the same meaning: the tokenizers learned mostly from English text, so English words are often single tokens while Polish words are split into pieces. Try the two clinical sentences in the playground: the same meaning, very different counts. More tokens means more cost and a fuller context window.
 
 </Predict>
 
@@ -54,7 +54,12 @@ A model does not read letters or words. Text is cut into **tokens**: frequent pi
 	{ label: '9.11 vs 9.9', text: 'Which is bigger: 9.11 or 9.9?' },
 	{ label: 'Code', text: 'final appVersion = String.fromEnvironment(\'APP_VERSION\');' },
 	{ label: 'Emoji', text: 'Feeling great today 😊🎉' },
+	{ label: 'Polish diacritics', text: 'Zażółć gęślą jaźń' },
+	{ label: 'Russian', text: 'Пациент сообщает о плохом настроении.' },
+	{ label: 'Chinese', text: '研究参与者' },
 ]} />
+
+Compare the rows. A bigger vocabulary, trained on more languages, cuts the same text into fewer, longer pieces: the Polish sentence goes from 19 tokens in GPT-2 to 13 in GPT-4o, the Russian one from 41 to 10, the Chinese word from 11 to 3. English barely changes: it was already cheap. The reference rows show the extremes: a model reading UTF-8 bytes would need a token for every byte, which is why Polish letters with diacritics (two bytes each) were so expensive for GPT-2.
 
 The dots (·) stand for spaces: a space is usually part of the next token. Notice what the model can and cannot "see": it sees `straw` and `berry`, not ten letters. Keep that in mind for section 6.
 

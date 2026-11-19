@@ -1,8 +1,10 @@
 ---
 /**
- * Live tokenizer: the real GPT-4o (o200k_base) and GPT-4 (cl100k_base)
- * encodings, run in the browser (gpt-tokenizer). The encoding tables are
- * loaded only on the page that uses this component.
+ * Tokenizer comparison: the same text cut by three generations of real
+ * OpenAI tokenizers (GPT-2 r50k_base, GPT-4 cl100k_base, GPT-4o o200k_base),
+ * run in the browser with gpt-tokenizer, next to three reference counts
+ * (words, characters, UTF-8 bytes). The encoding tables are loaded only on
+ * the page that uses this component.
  */
 import { t } from '../i18n/ui';
 interface Props {
@@ -10,82 +12,163 @@ interface Props {
 }
 const { presets } = Astro.props;
 const T = t(Astro);
+const models = [
+	{ key: 'r50k', name: 'GPT-2', meta: '2019 · r50k_base', vocab: '50k' },
+	{ key: 'cl100k', name: 'GPT-4', meta: '2023 · cl100k_base', vocab: '100k' },
+	{ key: 'o200k', name: 'GPT-4o', meta: '2024 · o200k_base', vocab: '200k' },
+];
+const baselines = [
+	{ key: 'words', name: T.tokWords },
+	{ key: 'chars', name: T.tokCharsRow },
+	{ key: 'bytes', name: T.tokBytes },
+];
 ---
 
-<div class="biz-widget tok not-content" data-loading={T.tokLoading}>
+<div class="biz-widget tok not-content" data-loading={T.tokLoading} data-fewest={T.tokFewest} data-piece={T.tokPiece}>
 	<div class="biz-head">
 		<p class="biz-kicker">{T.tokKicker}</p>
-		<label class="tok__enc">
-			{T.tokEncoding}
-			<select>
-				<option value="o200k">GPT-4o · o200k_base</option>
-				<option value="cl100k">GPT-4 · cl100k_base</option>
-			</select>
-		</label>
+		<label class="tok__idsw"><input type="checkbox" /> {T.tokIds}</label>
 	</div>
 	<div class="tok__presets">
 		{presets.map((p) => <button type="button" class="tok__preset" data-text={p.text}>{p.label}</button>)}
 	</div>
-	<textarea class="tok__input" rows="3" placeholder={T.tokPlaceholder} aria-label={T.tokPlaceholder}>{presets[0]?.text}</textarea>
-	<div class="tok__stats">
-		<span><b data-s="tokens">–</b> {T.tokTokens}</span>
-		<span><b data-s="chars">–</b> {T.tokChars}</span>
-		<span><b data-s="ratio">–</b> {T.tokPerToken}</span>
-		<label class="tok__idsw"><input type="checkbox" /> {T.tokIds}</label>
+	<textarea class="tok__input" rows="2" placeholder={T.tokPlaceholder} aria-label={T.tokPlaceholder}>{presets[0]?.text}</textarea>
+
+	<p class="tok__title">{T.tokCompare}</p>
+	<div class="tok__rows">
+		{
+			models.map((m) => (
+				<div class="tok__row" data-model={m.key}>
+					<div class="tok__label">
+						<b>{m.name}</b>
+						<span>{m.meta} · {T.tokVocab} {m.vocab}</span>
+					</div>
+					<div class="tok__meter"><i></i><b class="tok__count">–</b></div>
+					<div class="tok__out" aria-live="polite"></div>
+				</div>
+			))
+		}
+		{
+			baselines.map((b) => (
+				<div class="tok__row is-base" data-base={b.key}>
+					<div class="tok__label">
+						<b>{b.name}</b>
+						<span>{T.tokBaseline}</span>
+					</div>
+					<div class="tok__meter"><i></i><b class="tok__count">–</b></div>
+				</div>
+			))
+		}
 	</div>
-	<div class="tok__out" aria-live="polite"></div>
 </div>
 
 <script>
 	type Enc = { encode: (s: string) => number[]; decode: (t: number[]) => string };
+	const loaders: Record<string, () => Promise<Enc>> = {
+		r50k: () => import('gpt-tokenizer/encoding/r50k_base') as Promise<Enc>,
+		cl100k: () => import('gpt-tokenizer/encoding/cl100k_base') as Promise<Enc>,
+		o200k: () => import('gpt-tokenizer/encoding/o200k_base') as Promise<Enc>,
+	};
 	const cache: Record<string, Promise<Enc>> = {};
-	const load = (name: string) =>
-		(cache[name] ??= (name === 'cl100k'
-			? import('gpt-tokenizer/encoding/cl100k_base')
-			: import('gpt-tokenizer/encoding/o200k_base')) as Promise<Enc>);
+	const load = (k: string) => (cache[k] ??= loaders[k]());
 
 	document.querySelectorAll<HTMLElement>('.tok').forEach((box) => {
 		const input = box.querySelector<HTMLTextAreaElement>('.tok__input')!;
-		const select = box.querySelector<HTMLSelectElement>('select')!;
-		const out = box.querySelector<HTMLElement>('.tok__out')!;
 		const ids = box.querySelector<HTMLInputElement>('.tok__idsw input')!;
-		const stat = (k: string, v: string) => (box.querySelector<HTMLElement>(`[data-s="${k}"]`)!.textContent = v);
+		const rows = Array.from(box.querySelectorAll<HTMLElement>('.tok__row'));
 		let seq = 0;
-		const render = async () => {
-			const my = ++seq;
-			out.textContent = box.dataset.loading || '…';
-			const enc = await load(select.value);
-			if (my !== seq) return;
-			const text = input.value;
-			const tokens = enc.encode(text);
+
+		// A token can be only part of a character (GPT-2 splits Cyrillic, Chinese,
+		// emoji and some Polish letters into UTF-8 bytes). Such pieces decode to
+		// U+FFFD on their own; group them until they form whole characters and
+		// label each chip "k/n" with the character it belongs to.
+		const chips = (out: HTMLElement, enc: Enc, tokens: number[]) => {
 			out.textContent = '';
-			tokens.forEach((id, i) => {
+			const add = (text: string, id: number, i: number, piece?: [number, number]) => {
 				const span = document.createElement('span');
-				span.className = `tok__t c${i % 6}`;
-				const piece = enc.decode([id]);
-				span.textContent = piece.replace(/ /g, '·').replace(/\n/g, '↵') || '∅';
-				span.title = `#${i + 1} · id ${id}`;
+				span.className = `tok__t c${i % 6}` + (piece ? ' is-piece' : '');
+				span.textContent = text.replace(/ /g, '·').replace(/\n/g, '↵') || '∅';
+				span.title = piece
+					? String(box.dataset.piece || '').replace('{k}', String(piece[0])).replace('{n}', String(piece[1])) + ` · id ${id}`
+					: `#${i + 1} · id ${id}`;
+				if (piece) {
+					const sup = document.createElement('sup');
+					sup.textContent = `${piece[0]}/${piece[1]}`;
+					span.appendChild(sup);
+				}
 				if (ids.checked) {
 					const small = document.createElement('small');
-					small.textContent = String(id);
+					small.textContent = `#${id}`;
 					span.appendChild(small);
 				}
 				out.appendChild(span);
-			});
-			const chars = [...text].length;
-			stat('tokens', String(tokens.length));
-			stat('chars', String(chars));
-			stat('ratio', tokens.length ? (chars / tokens.length).toFixed(1) : '–');
+			};
+			for (let i = 0; i < tokens.length; i++) {
+				const one = enc.decode([tokens[i]]);
+				if (!one.includes('\uFFFD')) {
+					add(one, tokens[i], i);
+					continue;
+				}
+				let j = i;
+				let text = one;
+				while (j + 1 < tokens.length && j - i < 6 && text.endsWith('\uFFFD')) {
+					j++;
+					text = enc.decode(tokens.slice(i, j + 1));
+				}
+				const n = j - i + 1;
+				const shown = text.replace(/\uFFFD/g, '').trim() || '?';
+				for (let k = i; k <= j; k++) add(shown, tokens[k], k, [k - i + 1, n]);
+				i = j;
+			}
 		};
+
+		const render = async () => {
+			const my = ++seq;
+			const text = input.value;
+			const counts: Record<string, number> = {
+				words: text.trim() ? text.trim().split(/\s+/).length : 0,
+				chars: [...text].length,
+				bytes: new TextEncoder().encode(text).length,
+			};
+			rows.forEach((r) => {
+				const out = r.querySelector<HTMLElement>('.tok__out');
+				if (out && !out.childElementCount) out.textContent = box.dataset.loading || '…';
+			});
+			const results = await Promise.all(
+				Object.keys(loaders).map(async (k) => {
+					const enc = await load(k);
+					return [k, enc, enc.encode(text)] as const;
+				}),
+			);
+			if (my !== seq) return;
+			results.forEach(([k, enc, tokens]) => {
+				counts[k] = tokens.length;
+				chips(box.querySelector<HTMLElement>(`[data-model="${k}"] .tok__out`)!, enc, tokens);
+			});
+			const max = Math.max(1, ...Object.values(counts));
+			const fewest = Math.min(...Object.keys(loaders).map((k) => counts[k]));
+			rows.forEach((r) => {
+				const k = r.dataset.model || r.dataset.base!;
+				const n = counts[k] ?? 0;
+				(r.querySelector('.tok__meter i') as HTMLElement).style.width = `${(n / max) * 100}%`;
+				const c = r.querySelector<HTMLElement>('.tok__count')!;
+				c.textContent = String(n);
+				const best = !!r.dataset.model && n === fewest && text.length > 0;
+				r.classList.toggle('is-best', best);
+				c.title = best ? box.dataset.fewest || '' : '';
+			});
+		};
+
 		input.addEventListener('input', render);
-		select.addEventListener('change', render);
 		ids.addEventListener('change', render);
 		box.querySelectorAll<HTMLButtonElement>('.tok__preset').forEach((b) =>
 			b.addEventListener('click', () => {
 				input.value = b.dataset.text || '';
+				box.querySelectorAll('.tok__preset').forEach((x) => x.classList.toggle('is-on', x === b));
 				render();
 			}),
 		);
+		box.querySelector('.tok__preset')?.classList.add('is-on');
 		render();
 	});
 </script>
