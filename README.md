@@ -1,5 +1,7 @@
 # Aplikacje Mobilne w Medycynie - Od Pomysłu do Wprowadzenia na Rynek
 
+*Mobile Apps in Medicine - From Idea to Market*
+
 Course website for the Digital Health Engineering Studio (AGH University of Krakow): an interactive guide to building software with coding agents. Part 1 (AI SDLC) follows one feature of the Mood Tracker from a sketch to a merged pull request; Part 2 (product development with agents) covers the business side, from a client's brief to user stories and a recommendation.
 
 **Live site:** <https://mdaniolagh.github.io/mhealth2/> (English) · <https://mdaniolagh.github.io/mhealth2/pl/> (Polski)

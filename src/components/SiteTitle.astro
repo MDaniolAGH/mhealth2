@@ -1,0 +1,60 @@
+---
+/**
+ * Header title on two lines: the course name, then its subtitle.
+ * The site title per language is set in astro.config.mjs as
+ * "<name> - <subtitle>"; this splits it at " - ".
+ */
+import logo from '../assets/logo.svg';
+const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
+const [name, ...rest] = siteTitle.split(' - ');
+const subtitle = rest.join(' - ');
+---
+
+<a href={siteTitleHref} class="site-title course-title">
+	<img src={logo.src} width={logo.width} height={logo.height} alt="" />
+	<span class="course-title__text" translate="no">
+		<span class="course-title__name">{name}</span>
+		{subtitle && <span class="course-title__sub">{subtitle}</span>}
+	</span>
+</a>
+
+<style>
+	.course-title {
+		display: flex;
+		align-items: center;
+		gap: var(--sl-nav-gap);
+		min-width: 0;
+		color: var(--sl-color-text-accent);
+		text-decoration: none;
+	}
+	.course-title img {
+		height: calc(var(--sl-nav-height) - 2 * var(--sl-nav-pad-y));
+		width: auto;
+		flex: none;
+	}
+	.course-title__text {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+		line-height: 1.15;
+	}
+	.course-title__name,
+	.course-title__sub {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.course-title__name {
+		font-size: var(--sl-text-xl);
+		font-weight: 700;
+	}
+	.course-title__sub {
+		font-size: var(--sl-text-sm);
+		font-weight: 500;
+		opacity: 0.85;
+	}
+	@media (max-width: 50rem) {
+		.course-title__name { font-size: var(--sl-text-base); }
+		.course-title__sub { font-size: var(--sl-text-xs); }
+	}
+</style>

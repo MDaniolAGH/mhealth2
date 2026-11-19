@@ -5,43 +5,75 @@
  * Starlight's dark scheme is the default (:root); light is [data-theme='light'].
  */
 
+/* Base palette in --c-* variables, mapped to Starlight's --sl-color-*.
+   The header overrides the --sl-color-* values for white-on-crimson text;
+   the search dialog, which Starlight renders inside the header, maps them
+   back to the base palette (see below). */
 :root {
-	--sl-color-accent-low: #4C0519;
-	--sl-color-accent: #E11D48;
-	--sl-color-accent-high: #FDA4AF;
+	--c-accent-low: #4C0519;
+	--c-accent: #E11D48;
+	--c-accent-high: #FDA4AF;
+	--c-text-accent: var(--c-accent-high);
 	--course-secondary: #93C5FD;
 
-	--sl-color-white: #FFFFFF;
-	--sl-color-gray-1: #E2E8F0;
-	--sl-color-gray-2: #CBD5E1;
-	--sl-color-gray-3: #94A3B8;
-	--sl-color-gray-4: #64748B;
-	--sl-color-gray-5: #334155;
-	--sl-color-gray-6: #1E293B;
-	--sl-color-black: #0F172A;
+	--c-white: #FFFFFF;
+	--c-gray-1: #E2E8F0;
+	--c-gray-2: #CBD5E1;
+	--c-gray-3: #94A3B8;
+	--c-gray-4: #64748B;
+	--c-gray-5: #334155;
+	--c-gray-6: #1E293B;
+	--c-gray-7: #1E293B;
+	--c-black: #0F172A;
 
 	--course-header-bg: #881337;
 	--course-header-edge: linear-gradient(90deg, #E11D48, #2563EB);
 }
 
 :root[data-theme='light'] {
-	--sl-color-accent-low: #FFE4E6;
-	--sl-color-accent: #9F1239;
-	--sl-color-accent-high: #4C0519;
+	--c-accent-low: #FFE4E6;
+	--c-accent: #9F1239;
+	--c-accent-high: #4C0519;
+	--c-text-accent: var(--c-accent);
 	--course-secondary: #1D4ED8;
 
-	--sl-color-white: #0F172A;
-	--sl-color-gray-1: #1E293B;
-	--sl-color-gray-2: #334155;
-	--sl-color-gray-3: #475569;
-	--sl-color-gray-4: #94A3B8;
-	--sl-color-gray-5: #CBD5E1;
-	--sl-color-gray-6: #F1F5F9;
-	--sl-color-gray-7: #F8FAFC;
-	--sl-color-black: #FFFFFF;
+	--c-white: #0F172A;
+	--c-gray-1: #1E293B;
+	--c-gray-2: #334155;
+	--c-gray-3: #475569;
+	--c-gray-4: #94A3B8;
+	--c-gray-5: #CBD5E1;
+	--c-gray-6: #F1F5F9;
+	--c-gray-7: #F8FAFC;
+	--c-black: #FFFFFF;
 
 	--course-header-bg: #9F1239;
 	--course-header-edge: linear-gradient(90deg, #9F1239, #2563EB);
+}
+
+:root,
+:root[data-theme='light'],
+header.header dialog {
+	--sl-color-accent-low: var(--c-accent-low);
+	--sl-color-accent: var(--c-accent);
+	--sl-color-accent-high: var(--c-accent-high);
+	--sl-color-white: var(--c-white);
+	--sl-color-gray-1: var(--c-gray-1);
+	--sl-color-gray-2: var(--c-gray-2);
+	--sl-color-gray-3: var(--c-gray-3);
+	--sl-color-gray-4: var(--c-gray-4);
+	--sl-color-gray-5: var(--c-gray-5);
+	--sl-color-gray-6: var(--c-gray-6);
+	--sl-color-gray-7: var(--c-gray-7);
+	--sl-color-black: var(--c-black);
+}
+:root[data-theme='light'] { --sl-color-gray-7: var(--c-gray-7); }
+
+/* The search dialog: normal page colours, not the header's. */
+header.header dialog {
+	--sl-color-text: var(--c-gray-2);
+	--sl-color-text-accent: var(--c-text-accent);
+	color: var(--sl-color-text);
 }
 
 /* Crimson header with light text in both schemes. */

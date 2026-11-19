@@ -11,7 +11,11 @@ export default defineConfig({
 	compressHTML: false,
 	integrations: [
 		starlight({
-			title: 'Aplikacje Mobilne w Medycynie - Od Pomysłu do Wprowadzenia na Rynek',
+			title: {
+				en: 'Mobile Apps in Medicine - From Idea to Market',
+				pl: 'Aplikacje Mobilne w Medycynie - Od Pomysłu do Wprowadzenia na Rynek',
+			},
+			components: { SiteTitle: './src/components/SiteTitle.astro' },
 			defaultLocale: 'root',
 			locales: {
 				root: { label: 'English', lang: 'en' },
