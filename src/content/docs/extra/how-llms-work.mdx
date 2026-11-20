@@ -1,6 +1,6 @@
 ---
 title: How LLMs work
-description: 'A visual tour of large language models, after Andrej Karpathy''s lecture Deep Dive into LLMs like ChatGPT: data, tokens, next-token prediction, base models and assistants, memory, hallucinations.'
+description: 'A visual tour of large language models, after Andrej Karpathy''s lecture Deep Dive into LLMs like ChatGPT: data, tokens, next-token prediction, base models and assistants, memory, hallucinations, and the model inside a harness.'
 ---
 
 import Banner from '../../../components/Banner.astro';
@@ -144,7 +144,7 @@ Try it: pick a question and look at the answer with an empty desk. Then put a fi
 
 <MemoryDesk />
 
-## 6. Hallucinations and the Swiss cheese
+## 6. Hallucinations and uneven abilities
 
 Models **hallucinate**: they produce fluent, confident text that is false. In training, confident answers were almost always the right style, so a model imitates confidence even when it does not know. Labs reduce this by training models to say "I don't know" and by giving them **tools** (search, running code), but it never goes away.
 

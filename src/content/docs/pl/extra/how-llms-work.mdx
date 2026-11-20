@@ -1,6 +1,6 @@
 ---
 title: Jak działają LLM-y
-description: 'Wizualny przegląd dużych modeli językowych na podstawie wykładu Andreja Karpathy''ego Deep Dive into LLMs like ChatGPT: dane, tokeny, przewidywanie następnego tokenu, modele bazowe i asystenci, pamięć, halucynacje.'
+description: 'Wizualny przegląd dużych modeli językowych na podstawie wykładu Andreja Karpathy''ego Deep Dive into LLMs like ChatGPT: dane, tokeny, przewidywanie następnego tokenu, modele bazowe i asystenci, pamięć, halucynacje i model w harnessie.'
 ---
 
 import Banner from '../../../../components/Banner.astro';
@@ -144,7 +144,7 @@ Spróbuj: wybierz pytanie i zobacz odpowiedź przy pustym biurku. Potem połóż
 
 <MemoryDesk />
 
-## 6. Halucynacje i Swiss cheese
+## 6. Halucynacje i nierówne umiejętności
 
 Modele **halucynują**: piszą płynny, pewny siebie tekst, który jest nieprawdziwy. W treningu pewne siebie odpowiedzi prawie zawsze miały właściwy styl, więc model naśladuje pewność, nawet kiedy nie wie. Laboratoria ograniczają ten problem: uczą modele mówić „nie wiem” i dają im **tools** (wyszukiwanie, uruchamianie kodu). Ale halucynacje nigdy nie znikają całkiem.
 

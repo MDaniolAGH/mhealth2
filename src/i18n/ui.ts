@@ -115,7 +115,7 @@ export const ui = {
 		correctFirst: 'Dobrze, za pierwszym razem.',
 		correctAfter: 'Dobrze, za {n}. razem.',
 		notThis: 'Nie ta. Dlaczego? Zastanów się i spróbuj jeszcze raz.',
-		predictFirst: 'Najpierw przewidź',
+		predictFirst: 'Jak myślisz?',
 		predictPlaceholder: 'Twoja odpowiedź, w jednym lub dwóch zdaniach',
 		reveal: 'Pokaż',
 		predictHint: 'Najpierw coś napisz: z odpowiedzi, na którą się zdecydujesz, nauczysz się więcej niż z pominiętej.',
