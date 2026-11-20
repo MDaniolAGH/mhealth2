@@ -16,9 +16,9 @@ import Done from '../../../components/Done.astro';
 
 ## Health data and the GDPR
 
-Self-reported mood is **health data**, a special category under Article 9 of the GDPR, whether or not the app is a medical device. Two roles matter:
+Self-reported mood is **health data** ("data concerning health"), one of the special categories of personal data under Article 9 of the GDPR, whether or not the app is a medical device. Two roles matter:
 
-- The **controller** (the clinic) decides why and how data is processed: the legal basis, whether a data protection impact assessment (**DPIA**, Article 35) is needed, how long data is kept.
+- The **controller** (the clinic) decides why and how personal data is processed: the legal basis, whether a data protection impact assessment (**DPIA**, Article 35) is needed, how long data is kept.
 - **You** build what makes compliance possible, or impossible. You do not decide the legal basis; you make sure the system can do what the controller promises.
 
 Start with a **data inventory**: every data item, where it lives, who can see it, how long it is kept, and **why** it exists. Data lives in more places than the database: the phone's storage, caches, logs, backups, crash reports, test fixtures, and anything you paste into an AI tool.
@@ -33,24 +33,24 @@ Start with a **data inventory**: every data item, where it lives, who can see it
 	]}
 	items={[
 		{ text: 'A mood score of 3 with the note &quot;bad night again&quot;', bin: 'health', why: 'Self-reported wellbeing about an identifiable person is health data.' },
-		{ text: 'A participant\'s e-mail address', bin: 'personal', why: 'It identifies a person. In a study app it also reveals that this person takes part in the study, which may itself say something about their health.' },
+		{ text: 'A participant\'s email address', bin: 'personal', why: 'It identifies a person. In a study app it also reveals that this person takes part in the study, which may itself say something about their health.' },
 		{ text: 'The app version <code>1.3.0 (12)</code>', bin: 'none', why: 'On its own it says nothing about a person. Next to a participant ID, it becomes part of their record.' },
 		{ text: 'A server log line with an IP address and a time', bin: 'personal', why: 'IP addresses can identify people. Logs are personal data, and often forgotten in the inventory.' },
 		{ text: 'A crash report that includes the screen content of an entry', bin: 'health', why: 'Crash and analytics tools can quietly copy health data to a third party. Check what they send.' },
 	]}
 />
 
-The rights of the participants have to work **technically**: access, rectification, erasure, restriction, portability. For each one, ask: can the system do it, and how long does it take? Write what only the controller can decide as **questions**, not answers. And never claim that a system "is GDPR compliant": compliance is not a property of code alone. In Poland, the data protection authority is UODO (*Urząd Ochrony Danych Osobowych*).
+The rights of the participants have to work **technically**: access, rectification, erasure, restriction, portability. For each one, ask: can the system do it, and how long does it take? Write what only the controller can decide as **questions**, not answers. And never claim that a system "is GDPR compliant": compliance is not a property of code alone. In Poland, the supervisory authority for data protection is UODO (*Urząd Ochrony Danych Osobowych*).
 
 :::caution[AI tools are processors too]
-Pasting participants' data into an AI tool sends it to another company. In this course, use synthetic data only. In a real project, any service that processes personal data on your behalf (hosting, crash reporting, an AI API) needs a contract and a place in the data inventory.
+Pasting participants' data into an AI tool sends it to another company. In this course, use synthetic data only. In a real project, any service that processes personal data on the controller's behalf (hosting, crash reporting, an AI API) needs a contract and a place in the data inventory.
 :::
 
 <span id="risk" class="stage-anchor"></span>
 
 ## Risk: harm first, then code
 
-Risk management for medical software (ISO 14971) asks first **what could go wrong for a person**, and only then what could go wrong in the code. It is good practice for any health app.
+Risk management for medical devices, including software (ISO 14971), asks first **what could go wrong for a person**, and only then what could go wrong in the code. It is good practice for any health app.
 
 - **Hazard**: a source of harm (wrong information shown).
 - **Sequence of events → hazardous situation**: how a person gets exposed.
@@ -101,7 +101,7 @@ For the API, check the way an attacker would, with requests and two synthetic us
 
 ## The evidence pack
 
-Everything from Part 2 becomes evidence here: goals, acceptance criteria, tests, pull requests, decision records. For medical software, IEC 62304 asks for this **traceability**: requirement → design → code → test, and for every risk control a test. It also asks for a **SOUP** list: every third-party library, with its version, why it is there, and its known problems. Its **safety class** (A, B or C) depends on the worst harm a software failure could contribute to, and decides how much process is required.
+Everything from Part 2 becomes evidence here: goals, acceptance criteria, tests, pull requests, decision records. For medical software, IEC 62304 asks for this **traceability**: requirement → design → code → test, and for every risk control a test. It also asks for a **SOUP** list: every third-party library, with its version, why it is there, and its known problems. The software's **safety class** (A, B or C) depends on the worst harm a software failure could contribute to, and decides how much process is required.
 
 Even for a diary, the same pack answers the questions a client, an auditor or the next team will ask.
 

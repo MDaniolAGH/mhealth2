@@ -19,12 +19,12 @@ const i18n = JSON.stringify({
 			<p class="race__title">Asystent w czacie</p>
 			<ol class="race__steps">
 				<li data-who="you" data-handoff="1">Wklejasz do czatu <code>home_screen.dart</code> i zadanie.</li>
-				<li data-who="model">Model odpowiada nowym <code>AppBar</code> z przyciskiem About.</li>
+				<li data-who="model">Model odpowiada kodem nowego <code>AppBar</code> z przyciskiem About.</li>
 				<li data-who="you" data-handoff="1">Kopiujesz to do pliku i uruchamiasz <code>flutter analyze</code>.</li>
 				<li data-who="tool">Analyzer: <code>Undefined name 'AboutScreen'</code>. Widzisz to tylko ty.</li>
 				<li data-who="you" data-handoff="1">Wklejasz błąd z powrotem do czatu.</li>
 				<li data-who="model">„Przepraszam! Oto brakujący import.”</li>
-				<li data-who="you" data-handoff="1">Wklejasz go i uruchamiasz <code>flutter test</code>. Przechodzi, a model nigdy nie widział tego uruchomienia.</li>
+				<li data-who="you" data-handoff="1">Wklejasz go i uruchamiasz <code>flutter test</code>. Testy przechodzą, ale model nigdy nie widział tego uruchomienia.</li>
 			</ol>
 			<p class="race__count">Ile razy kopiujesz i wklejasz: <b>4</b></p>
 		</div>
@@ -37,12 +37,12 @@ const i18n = JSON.stringify({
 				<li data-who="agent">Edytuje dwa pliki.</li>
 				<li data-who="tool">Uruchamia <code>flutter analyze</code>: <code>Undefined name 'AboutScreen'</code>. Agent widzi błąd.</li>
 				<li data-who="agent">Dodaje brakujący import i znowu uruchamia analyzer: <code>No issues found!</code></li>
-				<li data-who="agent">Uruchamia <code>flutter test</code> i raportuje prawdziwy wynik. Ty robisz review diffa.</li>
+				<li data-who="agent">Uruchamia <code>flutter test</code> i podaje prawdziwy wynik. Ty robisz review diffa.</li>
 			</ol>
 			<p class="race__count">Ile razy kopiujesz i wklejasz: <b>0</b></p>
 		</div>
 	</div>
-	<p class="race__moral">Różnica nie leży w modelu. Chodzi o to, kto pierwszy widzi błąd: ty, ręcznie, czy agent, dzięki swoim narzędziom i swojej pętli.</p>
+	<p class="race__moral">Różnica nie tkwi w modelu. Chodzi o to, kto pierwszy widzi błąd: ty, ręcznie, czy agent – dzięki swoim narzędziom i pętli.</p>
 </div>
 
 <script>

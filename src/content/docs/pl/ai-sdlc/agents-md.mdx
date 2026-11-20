@@ -11,13 +11,13 @@ import Done from '../../../../components/Done.astro';
 
 <Tldr minutes={4} items={["<code>AGENTS.md</code> = zasady agenta, czytane w każdym zadaniu.", "Pisz krótko i odsyłaj do innych dokumentów.", "Zasada, którą może sprawdzić narzędzie, należy do narzędzia."]} />
 
-`AGENTS.md` to plik Markdown w katalogu głównym repozytorium, napisany dla agentów kodujących, a nie dla ludzi. Wiele agentów czyta go automatycznie na początku każdego zadania, więc jest ich **punktem wejścia** do projektu. Pierwsza wersja twojej pary powstała na W2.
+`AGENTS.md` to plik Markdown w katalogu głównym repozytorium, napisany dla agentów kodujących, a nie dla ludzi. Wiele agentów czyta go automatycznie na początku każdego zadania, więc jest ich **punktem wejścia** do projektu. Pierwszą wersję w parze napisaliście na W2.
 
 Które narzędzia go czytają (stan na listopad 2026 r.):
 
-- **GitHub Copilot** czyta `AGENTS.md` w VS Code, w Copilot CLI i w Copilot cloud agent (dawniej „coding agent”). Ma też własne pliki: `.github/copilot-instructions.md` dla całego repozytorium i `.github/instructions/*.instructions.md` dla jego części.
-- **Claude Code** czyta swój własny `CLAUDE.md`. Nowsze wersje sięgają po `AGENTS.md`, jeśli nie ma `CLAUDE.md`; bezpieczny sposób, który działa w każdej wersji, to `CLAUDE.md` z linijką `@AGENTS.md`, która go importuje.
-- **Inne agenty**: ponad dwadzieścia narzędzi obsługuje format [agents.md](https://agents.md/). Wsparcie wciąż szybko się zmienia, więc sprawdzaj w praktyce: zapytaj agenta, które pliki z instrukcjami przeczytał.
+- **GitHub Copilot** czyta `AGENTS.md` w VS Code, w Copilot CLI i w usłudze Copilot cloud agent (dawniej „coding agent”). Ma też własne pliki: `.github/copilot-instructions.md` dla całego repozytorium i `.github/instructions/*.instructions.md` dla jego części.
+- **Claude Code** czyta swój własny `CLAUDE.md`. Nowsze wersje sięgają po `AGENTS.md`, jeśli nie ma `CLAUDE.md`. Bezpieczne rozwiązanie, które działa w każdej wersji, to `CLAUDE.md` z linijką `@AGENTS.md`, która go importuje.
+- **Inni agenci**: ponad dwadzieścia narzędzi obsługuje format [agents.md](https://agents.md/). Obsługa tego formatu wciąż szybko się zmienia, więc sprawdzaj w praktyce: zapytaj agenta, które pliki z instrukcjami przeczytał.
 
 Użyteczny `AGENTS.md` odpowiada na siedem pytań. Przykłady pochodzą z `AGENTS.md` Mood Trackera:
 
@@ -28,10 +28,10 @@ Użyteczny `AGENTS.md` odpowiada na siedem pytań. Przykłady pochodzą z `AGENT
 | **Architecture** | Co istnieje i co może zależeć od czego? | „Routers never import `app.config` directly.” (sprawdzane przez import-linter) |
 | **Specifications** | Co musi istnieć, zanim powstanie kod? | „One test per acceptance criterion; put the criterion ID (`AC-1`) in the test name.” |
 | **Commit standards** | Co musi zawierać commit? | „Commit messages and AI attribution follow `docs/commits.md`.” |
-| **Boundaries** | Czego nie wolno? | „Do not weaken, skip or delete tests to make them pass.” |
+| **Boundaries** | Czego agentowi nie wolno? | „Do not weaken, skip or delete tests to make them pass.” |
 | **Reporting** | Jak agent ma raportować? | „Label every claim: FACT (with `file:line`), HYPOTHESIS, UNKNOWN.” |
 
-<Predict id="agents-md-limits" question="Na W2 porównywaliście w parze, co agent twierdzi o kodzie bez <code>AGENTS.md</code> i z nim. Jakakolwiek była różnica: czego nawet bardzo dobry <code>AGENTS.md</code> <b>nie</b> naprawi?">
+<Predict id="agents-md-limits" question="Na W2 porównywaliście w parze, co agent twierdzi o kodzie bez <code>AGENTS.md</code> i z nim. Niezależnie od tego, jaka wyszła różnica: czego nawet bardzo dobry <code>AGENTS.md</code> <b>nie</b> naprawi?">
 
 Nie zastąpi sprawdzania i nie może zawierać wiedzy, której nikt nie zapisał. Agent, który przestrzega wszystkich zasad, nadal może się mylić co do faktów. Dlatego format raportu oddziela FACT od HYPOTHESIS i dlatego twierdzenia sprawdza się poleceniem, testem albo uruchomieniem aplikacji.
 
@@ -39,7 +39,7 @@ Nie zastąpi sprawdzania i nie może zawierać wiedzy, której nikt nie zapisał
 
 ## Od prośby do egzekwowania
 
-Zasada może mieszkać w trzech miejscach, od najsłabszego do najmocniejszego:
+Zasadę można zapisać w trzech miejscach, od najsłabszego do najmocniejszego:
 
 | Gdzie | Przykład | Co ją egzekwuje |
 |---|---|---|
@@ -47,7 +47,7 @@ Zasada może mieszkać w trzech miejscach, od najsłabszego do najmocniejszego:
 | **Hook**: skrypt, który harness uruchamia przed akcją agenta albo po niej | Skrypt, który blokuje każdą edycję w `test/`, chyba że ją zatwierdzisz | Harness, za każdym razem, cokolwiek zdecyduje model |
 | **Check** w quality gate | Test, który nie przechodzi, gdy ekran importuje `http` | Gate, przy każdej zmianie, niezależnie od autora (etap 6) |
 
-Każdą linijkę `AGENTS.md` agent czyta w każdym zadaniu, więc za każdym razem kosztuje ona kontekst. Jeśli zasadę może sprawdzić narzędzie (reguła lintera, formatter, test architektury, `import-linter`), przenieś ją do narzędzia, a w `AGENTS.md` podaj tylko polecenie. `AGENTS.md` Mood Trackera mówi, które zasady są sprawdzane, a które to tylko konwencje: ta linijka podpowiada, gdzie dodać następny test.
+Każdą linijkę `AGENTS.md` agent czyta w każdym zadaniu, więc za każdym razem kosztuje ona kontekst. Jeśli zasadę może sprawdzić narzędzie (reguła lintera, formatter, test architektury, `import-linter`), przenieś ją do narzędzia, a w `AGENTS.md` podaj tylko polecenie. `AGENTS.md` Mood Trackera mówi, które zasady są sprawdzane, a które to tylko konwencje. To rozróżnienie podpowiada, gdzie dodać następny test.
 
 Pełny szablon znajdziesz w rozdziale 7.
 
@@ -56,7 +56,7 @@ Pełny szablon znajdziesz w rozdziale 7.
 	options={[
 		'Po każdej zmianie uruchom <code>flutter test</code> i pokaż prawdziwy wynik',
 		'Aplikacja ma sześć warstw; providery łączą ekrany z serwisami',
-		'Nie dodawaj zależności bez wcześniejszego pytania i powiedz, po co jest potrzebna',
+		'Nie dodawaj zależności, zanim nie zapytasz, i wyjaśnij, po co jest potrzebna',
 		'W raporcie oznacz każde twierdzenie jako FACT, HYPOTHESIS albo UNKNOWN',
 	]}
 	answer={1}
@@ -69,10 +69,10 @@ Pełny szablon znajdziesz w rozdziale 7.
 	explain="<code>AGENTS.md</code> mówi, <b>jak pracować</b>, i agent czyta go w każdym zadaniu. <code>ARCHITECTURE.md</code> mówi, <b>czym jest system</b>, i agent czyta go wtedy, gdy zadanie tego wymaga. <code>AGENTS.md</code> do niego odsyła."
 />
 
-<AtWork>Wiele repozytoriów open source ma już <code>AGENTS.md</code>. Dodanie takiego pliku, z checkiem za każdą ważną zasadą, to mały, ale dobrze widoczny wkład w open source.</AtWork>
+<AtWork>Wiele repozytoriów open source ma już <code>AGENTS.md</code>. Dodanie takiego pliku, z checkiem dla każdej ważnej zasady, to mały, ale dobrze widoczny wkład w open source.</AtWork>
 
 :::tip[Zrób to w swoim projekcie]
-Wybierz jedną zasadę ze swojego `AGENTS.md`, która jest oznaczona jako „convention, not checked” albo którą musisz agentowi ciągle powtarzać. Zamień ją w test albo regułę lintera, uruchom i przenieś zasadę do „checked by `<test>`”.
+Wybierz jedną zasadę ze swojego `AGENTS.md`, która jest oznaczona jako „convention, not checked” albo którą musisz agentowi ciągle powtarzać. Zamień ją w test albo regułę lintera, uruchom go i przenieś zasadę do grupy „checked by `<test>`”.
 :::
 
 <Done />

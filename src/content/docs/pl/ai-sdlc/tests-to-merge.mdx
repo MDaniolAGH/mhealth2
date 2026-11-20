@@ -20,9 +20,9 @@ import Done from '../../../../components/Done.astro';
 
 ## 7. Testy
 
-<StageFacts tone="agent-tool" who={'<span class="sdlc-chip is-agent">Agent</span> pisze · <span class="sdlc-chip is-tool">Narzędzia</span> uruchamiają · <span class="sdlc-chip is-you">Ty</span> sprawdzasz, czy testują kryteria, i uruchamiasz aplikację'} input="<code>docs/spec-about.md</code> i kod" output="Testy z prawdziwymi wynikami oraz to, co widać na urządzeniu" />
+<StageFacts tone="agent-tool" who={'<span class="sdlc-chip is-agent">Agent</span> pisze · <span class="sdlc-chip is-tool">Narzędzia</span> uruchamiają · <span class="sdlc-chip is-you">Ty</span> sprawdzasz, czy testują kryteria, i uruchamiasz aplikację'} input="<code>docs/spec-about.md</code> i kod" output="Testy i ich prawdziwe wyniki oraz obserwacje z urządzenia" />
 
-Są trzy poziomy testów automatycznych, od szybkich i wąskich po wolne i szerokie, plus twoje własne uruchomienie aplikacji:
+Są trzy poziomy testów automatycznych, od szybkich i wąskich po wolne i szerokie, a do tego twoje własne uruchomienie aplikacji:
 
 | Poziom | We Flutterze | Gdzie działa | Dla ekranu About |
 |---|---|---|---|
@@ -31,7 +31,7 @@ Są trzy poziomy testów automatycznych, od szybkich i wąskich po wolne i szero
 | **End-to-end** | pakiet `integration_test` | urządzenie albo emulator | otwórz About przy działającym prawdziwym serwerze, a potem przy wyłączonym |
 | **Twoje uruchomienie** | sama aplikacja | telefon albo emulator | wyłączony serwer, bardzo duża czcionka, tryb ciemny, wąski ekran |
 
-Oto widget test dla najbardziej ryzykownego kryterium. Zwróć uwagę, że umożliwia go decyzja z planu: timeout przekazywany jako parametr i serwis, który test może podmienić. Widget testy działają na sztucznym zegarze, więc te 5 sekund nie zajmuje ani chwili:
+Oto widget test dla najbardziej ryzykownego kryterium. Zwróć uwagę, że jest możliwy dzięki decyzji z planu: timeout przekazywany jako parametr i serwis, który test może podmienić. Widget testy działają na sztucznym zegarze, więc te 5 sekund w rzeczywistości nie trwa ani chwili:
 
 ```dart title="test/screens/about_screen_test.dart (przykład)"
 testWidgets('AC-4: no answer within 5 s shows "Server: unavailable"',
@@ -53,11 +53,11 @@ testWidgets('AC-4: no answer within 5 s shows "Server: unavailable"',
 });
 ```
 
-`aboutScreenWith` to mały helper w tym samym pliku, który opakowuje ekran w `ProviderScope` z podmienionym serwisem. ID kryterium jest w nazwie testu, tak jak prosi `AGENTS.md`, więc padający test od razu wskazuje kryterium.
+`aboutScreenWith` to mała funkcja pomocnicza z tego samego pliku, która opakowuje ekran w `ProviderScope` z podmienionym serwisem. ID kryterium jest w nazwie testu, tak jak wymaga `AGENTS.md`, więc padający test od razu wskazuje, którego kryterium dotyczy.
 
 <Predict id="mutants" question="Czy ten test padnie przy każdym z tych błędów? (1) Timeout wynosi 10 s zamiast 5 s. (2) Timeout wynosi 3 s. (3) Spóźniona odpowiedź zastępuje „unavailable” tekstem „Server 1.0.0”.">
 
-(1) **Padnie**: po 5,1 s ekran wciąż pokazuje „checking…”. (2) **Padnie**: po 4,9 s pokazuje już „unavailable”. (3) **Przejdzie**: ostatni `pump` wpuszcza spóźnioną odpowiedź, ale potem nikt już nie sprawdza ekranu. Test, który przeżywa prawdziwy błąd, dowodzi mniej, niż się wydaje; do wyłapywania takich testów służy mutation testing z W4. Poprawka to dwie linijki więcej:
+(1) **Padnie**: po 5,1 s ekran wciąż pokazuje „checking…”. (2) **Padnie**: po 4,9 s pokazuje już „unavailable”. (3) **Przejdzie**: ostatni `pump` wpuszcza spóźnioną odpowiedź, ale potem nikt już nie sprawdza ekranu. Test, który przepuszcza prawdziwy błąd, dowodzi mniej, niż się wydaje. Do wyłapywania takich testów służy mutation testing z W4. Poprawka to dwie dodatkowe linijki:
 
 ```dart
   await tester.pump(const Duration(seconds: 1)); // the late reply arrives
@@ -69,35 +69,35 @@ testWidgets('AC-4: no answer within 5 s shows "Server: unavailable"',
 
 <Predict id="same-mistake" question="Agent napisał i ekran About, i jego testy, a wszystko przechodzi. Co nadal może być nie tak?">
 
-Agent może przyjąć to samo błędne założenie w kodzie i w teście. Jeśli uwierzył w zdanie o przeznaczeniu aplikacji, które sam wymyślił, test sprawdza właśnie to zdanie i przechodzi. Jeśli uznał, że „unavailable” ma się pojawić po 30 s, test czeka 30 s. Zielone testy pokazują, że kod i testy zgadzają się ze sobą, a nie że którekolwiek z nich zgadza się z twoimi kryteriami.
+Agent może przyjąć to samo błędne założenie w kodzie i w teście. Jeśli uwierzył w zdanie o przeznaczeniu aplikacji, które sam wymyślił, test sprawdza właśnie to zdanie i przechodzi. Jeśli uznał, że „unavailable” ma się pojawić po 30 s, test czeka 30 s. Zielone testy pokazują, że kod i testy zgadzają się ze sobą, a nie to, że którekolwiek z nich zgadza się z twoimi kryteriami.
 
 </Predict>
 
 :::tip[Kto pisze najważniejszy test?]
-Test dla najbardziej ryzykownego kryterium napisz własnoręcznie albo przynajmniej uważnie go przeczytaj, **zanim** powstanie implementacja. Potem zapytaj: *czy ten test padłby, gdyby funkcja była zepsuta?* Zepsuj kod celowo i uruchom test. Na W4 mutation testing zadaje to samo pytanie automatycznie, dla wielu drobnych, celowo wprowadzonych błędów.
+Test dla najbardziej ryzykownego kryterium napisz własnoręcznie albo przynajmniej uważnie go przeczytaj, **zanim** powstanie implementacja. Potem zapytaj: *czy ten test padłby, gdyby funkcja była zepsuta?* Celowo zepsuj kod i uruchom test. Mutation testing z W4 zadaje to samo pytanie automatycznie – dla wielu drobnych, celowo wprowadzonych błędów.
 :::
 
 <span id="stage-docs" class="stage-anchor"></span>
 
 ## 8. Dokumentacja: zaktualizuj to, co czyta następny plan
 
-<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> szkicuje · <span class="sdlc-chip is-you">Ty</span> porównujesz z kodem'} input="Zmiana, odpowiedzi i sprzeczności z planu, to, co poszło nie tak po drodze" output="Zaktualizowana wiedza o projekcie, w tym samym pull requeście co kod" />
+<StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> szkicuje · <span class="sdlc-chip is-you">Ty</span> porównujesz z kodem'} input="Zmiana, odpowiedzi i sprzeczności z planu oraz to, co poszło nie tak po drodze" output="Zaktualizowana wiedza o projekcie, w tym samym pull requeście co kod" />
 
-Ten etap zamyka pętlę, dzięki której następny plan będzie dobry. Wszystko, co ustaliliście albo czego się dowiedzieliście przy tej funkcji, trzeba zapisać teraz, póki jest świeże – inaczej następna sesja (twoja albo agenta) zacznie bez tej wiedzy.
+Ten etap zamyka pętlę, dzięki której następny plan będzie dobry. Wszystko, co ustaliliście albo czego się dowiedzieliście przy tej funkcji, zapisz teraz, póki pamiętasz. Inaczej następna sesja (twoja albo agenta) zacznie bez tej wiedzy.
 
-| Co się wydarzyło przy tej funkcji | Gdzie to trafia |
+| Co się wydarzyło przy tej funkcji | Gdzie to zapisać |
 |---|---|
 | Nowy ekran, serwis i provider | `ARCHITECTURE.md`: dopisz je do warstw |
 | W planie ustalono, że „wersja pochodzi z buildu, a nie z pakietu” | `docs/adr/0003-app-version-from-build.md` (ADR) |
-| `lib/repositories/` było wymienione, ale nie istnieje | `ARCHITECTURE.md`: usuń sprzeczność, którą znalazł plan |
-| iOS nie został zweryfikowany; buildy debug pokazują „dev” | `NOTES.md`: wpis z datą |
+| Folder `lib/repositories/` był wymieniony, ale nie istnieje | `ARCHITECTURE.md`: usuń sprzeczność, którą znalazł plan |
+| Nie sprawdzono na iOS; buildy debug pokazują „dev” | `NOTES.md`: wpis z datą |
 | Reguła „ekrany nigdy nie importują `http`” jest teraz sprawdzana testem | `AGENTS.md`: reguła przechodzi z „not checked” do „checked by `test/architecture_test.dart`” |
 | Klient jeszcze nie podał kontaktu | twoja lista pytań do klienta; `docs/client-log.md`, gdy odpowie |
 
-Agenty dobrze radzą sobie ze szkicowaniem takich aktualizacji na podstawie diffu i planu: poproś o nie wprost. Twoje zadanie to sprawdzić, czy dokumenty opisują kod **taki, jaki jest teraz**, a nie taki, jaki był w planie.
+Agenci dobrze radzą sobie ze szkicowaniem takich aktualizacji na podstawie diffu i planu – poproś o nie wprost. Twoje zadanie to sprawdzić, czy dokumenty opisują kod **taki, jaki jest teraz**, a nie taki, jaki był w planie.
 
 :::caution[Co tu najczęściej idzie nie tak]
-- „Udokumentujemy później”. Później nigdy nie nadchodzi, a dokumenty powoli przestają być prawdziwe.
+- „Udokumentujemy później”. Później nigdy nie nadchodzi, a dokumenty stopniowo przestają odpowiadać rzeczywistości.
 - Dokumentacja w osobnym pull requeście, któremu nikt nie robi review.
 - Agent opisuje to, co *zamierzał* zbudować. Porównuj dokumenty z diffem.
 :::
@@ -108,7 +108,7 @@ Agenty dobrze radzą sobie ze szkicowaniem takich aktualizacji na podstawie diff
 
 <StageFacts tone="you-agent" who={'<span class="sdlc-chip is-agent">Agent</span> szkicuje · <span class="sdlc-chip is-you">Ty</span> poprawiasz, bierzesz za niego odpowiedzialność i wysyłasz'} input="Commity, wyniki quality gate i testów, zmiany w dokumentacji" output="Pull request, który reviewer sprawdzi w kilka minut" />
 
-Pull request to prośba do drugiej osoby, żeby przyjęła twoją zmianę. Jego opis jest pisany dla reviewera. Mówi, co zostało zrobione i dlaczego, od czego zacząć, jakie są dowody, które dokumenty się zmieniły, jakie narzędzia AI pomagały i jakie standardy obowiązują. Zasady kursu dotyczące AI wymagają ujawnienia pomocy AI w trailerze commita albo właśnie tutaj.
+Pull request to prośba do drugiej osoby, żeby przyjęła twoją zmianę. Opis piszesz dla reviewera. Mówi on, co zrobiono i dlaczego, od czego zacząć przegląd, jakie są dowody, które dokumenty się zmieniły, z jakich narzędzi AI korzystano i jakie standardy obowiązują. Zasady kursu dotyczące AI wymagają, żeby ujawnić pomoc AI w trailerze commita albo właśnie tutaj.
 
 ```markdown title="Pull request #12 (przykład)"
 ## What and why
@@ -155,27 +155,27 @@ Agent potrafi napisać „all tests pass”, w ogóle ich nie uruchamiając. Wkl
 
 <StageFacts tone="you" who={'<span class="sdlc-chip is-you">Człowiek</span> – review robi osoba z twojej pary albo inna para; merge robi właściciel'} input="Pull request, <code>ARCHITECTURE.md</code>, zapisy decyzji, dziennik klienta" output="Zapis review (komentarze, zatwierdzenie) i zmergowana zmiana" />
 
-Reviewer sprawdza pull request według checklisty i zostawia ślad: komentarze, pytania, a na koniec zatwierdzenie albo prośbę o zmiany. Reviewer AI może dodać przydatne komentarze. Na W5 dodajecie Copilota jako reviewera w CI i widzicie, jak tekst podrzucony w issue potrafi nim sterować. Ale reviewer AI nie weźmie odpowiedzialności. Zatwierdza człowiek, a autor musi umieć wyjaśnić każdą linię. „AI to napisało” nie jest odpowiedzią na review.
+Reviewer sprawdza pull request według checklisty i zostawia ślad: komentarze, pytania, a na koniec zatwierdzenie albo prośbę o zmiany. Reviewer AI może dodać przydatne komentarze. Na W5 dodajecie Copilota jako reviewera w CI i sprawdzacie, jak tekst podrzucony w issue może nim sterować. Reviewer AI nie weźmie jednak odpowiedzialności. Zatwierdza człowiek, a autor musi umieć wyjaśnić każdą linię. „AI to napisało” to żadna odpowiedź na uwagi z review.
 
 <Checklist
 	id="review"
 	title="Checklista do review"
 	items={[
 		'Każde kryterium jest spełnione, a dowody są w pull requeście',
-		'Diff zgadza się z zatwierdzonym planem; nic niezwiązanego się nie zmieniło',
-		'Zmiana pasuje do <code>ARCHITECTURE.md</code> i zapisów decyzji',
+		'Diff zgadza się z zatwierdzonym planem; nie zmieniło się nic, co nie dotyczy zadania',
+		'Zmiana jest zgodna z <code>ARCHITECTURE.md</code> i zapisami decyzji',
 		'Testy padłyby, gdyby funkcja była zepsuta',
 		'Każdy fakt o kliencie (przeznaczenie, kontakt, sformułowania) jest w <code>docs/client-log.md</code>',
 		'Dokumentacja opisuje kod taki, jaki jest teraz',
-		'Żadnych sekretów ani prawdziwych danych osobowych czy zdrowotnych; żadnego nowego pakietu bez wiersza SOUP i zgody',
+		'Żadnych sekretów ani prawdziwych danych osobowych czy zdrowotnych; żadnego nowego pakietu bez wpisu w rejestrze SOUP i zgody',
 		'Żaden test nie został zmieniony ani usunięty, żeby zmiana przeszła (<code>git diff -- test/</code>)',
-		'Każdy nowy pakiet istnieje, jest tym, o który chodziło, i jest utrzymywany: agenty czasem wymyślają nazwy pakietów, a atakujący je rejestrują',
+		'Każdy nowy pakiet istnieje, jest tym, o który chodziło, i jest utrzymywany: agenci czasem wymyślają nazwy pakietów, a atakujący je rejestrują',
 		'Żadnego martwego kodu, zduplikowanych helperów ani „ulepszeń” spoza planu',
 		'Umiesz wyjaśnić każdą linię, jeśli ktoś zapyta',
 	]}
 />
 
-Po zmergowaniu pull requesta wiedza o projekcie opisuje już nową funkcję. Od tego miejsca startuje następny pomysł: pipeline to pętla, a nie linia prosta.
+Po zmergowaniu pull requesta wiedza o projekcie opisuje już nową funkcję. Od tego miejsca zaczyna się następny pomysł: pipeline to pętla, a nie linia prosta.
 
 <Quiz
 	question="Kiedy aktualizować <code>ARCHITECTURE.md</code>, zapisy decyzji i <code>NOTES.md</code> dla danej funkcji?"
@@ -190,9 +190,9 @@ Po zmergowaniu pull requesta wiedza o projekcie opisuje już nową funkcję. Od 
 		'',
 		'Osobny pull request przechodzi review bez diffu, który opisuje – o ile w ogóle ktoś go przejrzy.',
 		'Wtedy zapisujesz to, co pamiętasz, a nie to, co faktycznie powstało.',
-		'Następny plan czyta je jako pierwsze. Jeśli są nieaktualne, startuje z fałszywego założenia.',
+		'Następny plan czyta je jako pierwsze. Jeśli są nieaktualne, wychodzi z fałszywego założenia.',
 	]}
-	explain="W tym samym pull requeście reviewer porównuje dokumenty z diffem, a następny plan startuje z aktualnego stanu."
+	explain="Gdy wszystko jest w jednym pull requeście, reviewer porównuje dokumenty z diffem, a następny plan zaczyna od aktualnego stanu."
 />
 
 <Quiz
@@ -205,16 +205,16 @@ Po zmergowaniu pull requesta wiedza o projekcie opisuje już nową funkcję. Od 
 	]}
 	answer={2}
 	why={[
-		'Deklaracja to twierdzenie, a nie dowód. Agenty piszą „all tests pass”, nie uruchamiając testów.',
-		'Za długie na review, a do tego pokazuje, co zostało powiedziane, a nie co jest prawdą.',
+		'Deklaracja to twierdzenie, a nie dowód. Agenci piszą „all tests pass”, nie uruchamiając testów.',
+		'Jest za długi, żeby go przejrzeć, a do tego pokazuje, co zostało powiedziane, a nie co jest prawdą.',
 		'',
 		'CI je uruchomi, ale reviewer potrzebuje też twojego sprawdzenia na urządzeniu i uczciwej listy luk.',
 	]}
-	explain="Reviewer potrzebuje prawdziwych wyników i uczciwej listy tego, czego nie sprawdzono. Dzięki temu następnym razem twoje słowa też będą wiarygodne."
+	explain="Reviewer potrzebuje prawdziwych wyników i uczciwej listy tego, czego nie sprawdzono. Dzięki temu następnym razem łatwiej będzie ci uwierzyć."
 />
 
 <Quiz
-	question="Reviewer AI w CI zatwierdza pull request bez żadnych komentarzy. Możesz mergować?"
+	question="Reviewer AI w CI zatwierdza pull request bez żadnych komentarzy. Czy możesz mergować?"
 	options={[
 		'Tak: review AI i zielony gate to dwa niezależne sprawdzenia',
 		'Nie: review i zatwierdzenie musi zrobić człowiek, który umie wyjaśnić każdą linię',
@@ -223,18 +223,18 @@ Po zmergowaniu pull requesta wiedza o projekcie opisuje już nową funkcję. Od 
 	]}
 	answer={1}
 	why={[
-		'Dwa automatyczne sprawdzenia to wciąż nie człowiek, który bierze odpowiedzialność.',
+		'Dwa automatyczne sprawdzenia nie zastąpią człowieka, który bierze odpowiedzialność.',
 		'',
-		'Testy sprawdzają to, co zostało wyspecyfikowane, a nie to, czy była to właściwa rzecz.',
-		'To poczeka. Właśnie przez kod bez review do użytkowników trafia „intended purpose, którego nikt nie powiedział”.',
+		'Testy sprawdzają to, co zostało wyspecyfikowane, a nie to, czy w ogóle warto było to budować.',
+		'Wtedy merge musi poczekać. Właśnie przez kod bez review do użytkowników trafia „intended purpose, którego nikt nie podał”.',
 	]}
 	explain="Review AI to tylko jeszcze jeden głos. Nie weźmie odpowiedzialności, a tekst podrzucony w pull requeście potrafi nim sterować (W5)."
 />
 
-<AtWork>Review kodu napisanego przez AI – i wiedza, na co w nim patrzeć – to w wielu zespołach codzienna praca. Checklista z tej strony to dobry początek.</AtWork>
+<AtWork>Review kodu napisanego przez AI – i wiedza, na co w nim zwracać uwagę – to w wielu zespołach codzienna praca. Checklista z tej strony to dobry początek.</AtWork>
 
 :::tip[Zrób to w swoim projekcie]
-Dla swojego najbardziej ryzykownego kryterium przeczytaj test, zanim powstanie kod. Potem celowo zepsuj kod i zapisz w pull requeście, że test padł. Korzystaj z szablonu pull requesta i zostaw niezaznaczone pola przy sprawdzeniach, które nie zostały zrobione.
+Dla najbardziej ryzykownego kryterium przeczytaj test, zanim powstanie kod. Potem celowo zepsuj kod i zapisz w pull requeście, że test padł. Korzystaj z szablonu pull requesta i zostaw niezaznaczone pola przy sprawdzeniach, których nie wykonano.
 :::
 
 <Done />

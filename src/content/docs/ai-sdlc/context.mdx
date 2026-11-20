@@ -33,7 +33,7 @@ The context of a running agent holds:
 - **Work log**: its own earlier steps and every tool output, such as a long test run.
 - **Changes**: the diffs made so far.
 
-Context windows in current models are large: hundreds of thousands of tokens, a million for several models. The size a model advertises and the size it uses well are not the same thing. Filling the window is still a bad idea:
+Context windows in current models are large: hundreds of thousands of tokens, and a million for some models. The size a model advertises and the size it uses well are not the same thing. Filling the window is still a bad idea:
 
 - **Cost.** Every step of the loop processes the context again. Since June 2026 Copilot bills by tokens, in **GitHub AI Credits**, at each model's own rate; other providers bill by tokens too. A long session with a large context costs more on every step. Caching makes repeated context cheaper, not free.
 - **Focus.** Irrelevant files and stale tool output compete with what matters. A long session slowly fills with old logs, and the agent can stop following rules that a fresh session follows.
@@ -43,7 +43,7 @@ Context windows in current models are large: hundreds of thousands of tokens, a 
 
 The opposite failure is **missing information**. A model does not stop when it lacks a fact; it fills the gap with something plausible. For the About screen, the most dangerous gap is the client's own words: an agent that has not read `docs/product.md` will write an intended purpose and a contact address, and both will look exactly like real ones.
 
-That is why this pipeline does two things. It gives the agent the facts it needs: the goal, the criteria and, above all, the **project knowledge**. And it demands **evidence**: tests written against your criteria and checks that run without anyone's opinion. A test turns "looks right" into "checked".
+That is why this pipeline does two things. It gives the agent the facts it needs: the goal, the criteria and, above all, the **project knowledge**. And it demands **evidence**: tests written against your criteria and checks that do not depend on anyone's opinion. A test turns "looks right" into "checked".
 
 :::tip[What to put in the context, and what to leave out]
 - **Include**: the criteria, the files the change touches, the relevant project documents, the project rules.

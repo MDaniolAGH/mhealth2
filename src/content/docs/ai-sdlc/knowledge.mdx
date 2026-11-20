@@ -22,7 +22,7 @@ The context window (section 2) is short-term memory: it lasts for one task. **Pr
 |---|---|---|
 | `README.md` | What the app is; how to build, run and test it | run the right commands |
 | `ARCHITECTURE.md` | Containers, the app's and the server's layers, what may depend on what, how data flows | put the change in the right place, in the right shape |
-| `docs/adr/` | One architecture decision record (ADR) per decision: context, decision, consequences | respect decisions instead of re-making them |
+| `docs/adr/` | One architecture decision record (ADR) per decision: context, decision, consequences | respect decisions instead of remaking them |
 | `NOTES.md` | Work log: done, in progress, known problems, traps found | avoid repeating mistakes; continue where the last session stopped |
 | `docs/product.md` | The product card: client, users, intended purpose, constraints, scope | build what this client needs, in the client's words |
 | `docs/client-log.md` | What the client actually said, dated | tell a client fact from an assumption |
@@ -155,9 +155,9 @@ Out of date. With no document, the agent at least has to read the code. With a w
 - **Short and current beats long and complete.** One page of `ARCHITECTURE.md` that is true is worth more than ten that are out of date.
 - **Docs as code.** The documents live in the repository and change **in the same pull request** as the code they describe (stage 8). Reviewers check them like code.
 - **A wrong document is worse than none.** The agent trusts what it reads.
-- **Make `AGENTS.md` the index.** Agents read it first, so a line such as "Architecture: see `ARCHITECTURE.md`; decisions: `docs/adr/`" makes sure the rest is found.
+- **Make `AGENTS.md` the index.** Agents read it first, so a line such as "Architecture: see `ARCHITECTURE.md`; decisions: `docs/adr/`" makes sure the agent finds the rest.
 - **Client facts come from the client log only.** In the Mood Tracker's `AGENTS.md`: "This is the only source of client facts; anything else is an assumption."
-- In the handover, the *Architecture* section of `AGENTS.md` is a tiny architecture document. In your pair's repository, give the architecture, the decisions and the notes their own files from the first lab.
+- In the handover project, the *Architecture* section of `AGENTS.md` is a small architecture document. In your pair's repository, give the architecture, the decisions and the notes their own files from the first lab.
 :::
 
 <Quiz

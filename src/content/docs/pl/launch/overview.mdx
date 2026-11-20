@@ -1,5 +1,5 @@
 ---
-title: 'Wprowadź na rynek: od działającej aplikacji do produktu na rynku'
+title: 'Wprowadź na rynek: od działającej aplikacji do produktu'
 description: 'Co trzeba zrobić, żeby aplikacja zdrowotna trafiła do ludzi i została u nich na dłużej: regulacje, prywatność, bezpieczeństwo, release, business case i życie po wprowadzeniu na rynek.'
 ---
 
@@ -11,7 +11,7 @@ import Tldr from '../../../../components/Tldr.astro';
 import AtWork from '../../../../components/AtWork.astro';
 import Done from '../../../../components/Done.astro';
 
-<Tldr minutes={6} items={["Działająca aplikacja to jeszcze nie produkt: wprowadzenie na rynek to łańcuch decyzji i zapisów.", "Intended purpose wybiera drogę: wyrób medyczny albo nie.", "Nawet jeśli to nie wyrób: dane o zdrowiu, uczciwy opis w sklepie i plan na czas po starcie."]} />
+<Tldr minutes={6} items={["Działająca aplikacja to jeszcze nie produkt: wprowadzenie na rynek to łańcuch decyzji i zapisów.", "Od intended purpose zależy droga: wyrób medyczny albo nie.", "Nawet jeśli to nie wyrób, zostają dane o zdrowiu, uczciwy opis w sklepie i plan na czas po starcie."]} />
 
 Części 1 i 2 zaprowadziły cię od prośby klienta do przetestowanej zmiany po merge'u. Część 3 to wszystko, co dzieje się między „u mnie na telefonie działa” a „pięćdziesięciu uczestników bezpiecznie korzysta z aplikacji przez pół roku i ktoś potrafi to udowodnić”.
 
@@ -19,7 +19,7 @@ Części 1 i 2 zaprowadziły cię od prośby klienta do przetestowanej zmiany po
 	title="Czwartek, miesiąc później"
 	messages={[
 		{ who: 'client', name: 'Anna', text: 'Ekran About wygląda świetnie! Następna grupa startuje w styczniu: 50 uczestników, pół roku. Mogą korzystać z aplikacji?' },
-		{ who: 'you', name: 'Ty', text: 'Tak, aplikacja działa. Ale zanim trafi do 50 osób, trzeba ustalić kilka rzeczy: czy to wyrób medyczny, co dzieje się z ich danymi, jak ją zainstalują i kto będzie się nią zajmować do lipca.' },
+		{ who: 'you', name: 'Ty', text: 'Tak, aplikacja działa. Ale zanim trafi do 50 osób, trzeba ustalić kilka rzeczy: czy to wyrób medyczny, co dzieje się z ich danymi, jak ją zainstalują i kto będzie się nią zajmował do lipca.' },
 		{ who: 'client', name: 'Anna', text: 'Aha. Myślałam, że po prostu wrzucimy ją do sklepu. 😅' },
 		{ who: 'you', name: 'Ty', text: 'To ostatni krok. Przejdźmy przez to razem.' },
 	]}
@@ -27,7 +27,7 @@ Części 1 i 2 zaprowadziły cię od prośby klienta do przetestowanej zmiany po
 
 <Predict id="launch-steps" question="Zanim otworzysz mapę: wypisz wszystko, co według ciebie musi się wydarzyć między „aplikacja działa” a „50 uczestników korzysta z niej w styczniu”.">
 
-Większość ludzi wpisuje wrzucenie do sklepu i może politykę prywatności. Na mapie jest dziesięć etapów: intended purpose, pytanie o wyrób medyczny, klasa i ścieżka (jeśli to wyrób), dane i RODO, ryzyko i bezpieczeństwo, pakiet dowodów, release, pilotaż, decyzja go/no-go i życie po starcie. Policz, ile z twoich punktów tu jest, i zobacz, które etapy cię zaskoczyły.
+Większość osób wymienia publikację w sklepie i ewentualnie politykę prywatności. Na mapie jest dziesięć etapów: intended purpose, pytanie o wyrób medyczny, klasa i ścieżka (jeśli to wyrób), dane i RODO, ryzyko i bezpieczeństwo, pakiet dowodów, release, pilotaż, decyzja go/no-go i życie po starcie. Policz, ile z twoich punktów się tu znalazło i które etapy cię zaskoczyły.
 
 </Predict>
 
@@ -35,7 +35,7 @@ Większość ludzi wpisuje wrzucenie do sklepu i może politykę prywatności. N
 
 Trzy tory: **klient** (klinika, która wprowadza aplikację na rynek i za nią odpowiada), **ty** i **świat zewnętrzny** (regulatorzy, jednostki notyfikowane, sklepy z aplikacjami). Po lewej **dokumentacja techniczna**: zapisy, od których zależy wprowadzenie na rynek. Z boku **rozliczalność**: możliwość pokazania, co zrobiono i dlaczego.
 
-**Wypróbuj.** Naciśnij **Przejdź krok po kroku**, żeby zaprowadzić Mood Trackera do następnej grupy uczestników kliniki – razem z odrzuceniem w sklepie. Przyciskami **Pokaż** włączysz pętle zwrotne, przepływy dowodów i zapisy. Kliknij etap albo dokument.
+**Wypróbuj.** Naciśnij **Przejdź krok po kroku**, żeby przeprowadzić Mood Trackera aż do następnej grupy uczestników kliniki – łącznie z odrzuceniem w sklepie. Przyciskami **Pokaż** włączysz pętle zwrotne, przepływy dowodów i zapisy. Kliknij etap albo dokument.
 
 <LaunchMap />
 
@@ -48,12 +48,12 @@ Trzy tory: **klient** (klinika, która wprowadza aplikację na rynek i za nią o
 		{ key: 'device', label: 'Tylko wyrobu medycznego', tone: 'tool' },
 	]}
 	items={[
-		{ text: 'Traktuj wpisy o nastroju jako dane o zdrowiu w rozumieniu RODO', bin: 'always', why: 'Dane o zdrowiu to szczególna kategoria danych (RODO, art. 9), bez względu na to, czym jest aplikacja. Nastrój opisany przez samego uczestnika też się liczy.' },
-		{ text: 'Oddaj system jakości do oceny jednostce notyfikowanej', bin: 'device', why: 'Tylko dla wyrobów powyżej najniższej klasy. Większość oprogramowania wspierającego decyzje ma klasę IIa lub wyższą.' },
-		{ text: 'Pilnuj, żeby opis w sklepie nie wychodził poza intended purpose', bin: 'always', why: 'Twierdzenie medyczne w opisie może sprawić, że sklep poprosi o dokumenty regulacyjne, i może zmienić to, czym produkt jest w świetle prawa.' },
-		{ text: 'Umieść na aplikacji oznakowanie CE', bin: 'device', why: 'Oznakowanie CE według MDR jest dla wyrobów medycznych. Dziennik go nie ma.' },
-		{ text: 'Zgłoś naruszenie ochrony danych osobowych organowi ochrony danych w ciągu 72 godzin', bin: 'always', why: 'Obowiązek administratora danych z art. 33 RODO, w każdej aplikacji, która przetwarza dane osobowe.' },
-		{ text: 'Prowadź nadzór po wprowadzeniu do obrotu i zgłaszaj poważne incydenty według MDR', bin: 'device', why: 'Art. 83–87 MDR dotyczą wyrobów. Aplikacja, która nie jest wyrobem, też potrzebuje planu na incydenty i aktualizacje – po prostu nie jest to ten obowiązek prawny.' },
+		{ text: 'Traktuj wpisy o nastroju jako dane dotyczące zdrowia w rozumieniu RODO', bin: 'always', why: 'Dane dotyczące zdrowia należą do szczególnych kategorii danych (art. 9 RODO) bez względu na to, czym jest aplikacja. Nastrój opisany przez samego uczestnika też się do nich zalicza.' },
+		{ text: 'Poddaj system zarządzania jakością ocenie jednostki notyfikowanej', bin: 'device', why: 'Tylko dla wyrobów powyżej najniższej klasy. Większość oprogramowania wspomagającego decyzje należy do klasy IIa lub wyższej.' },
+		{ text: 'Pilnuj, żeby opis w sklepie nie wychodził poza intended purpose', bin: 'always', why: 'Twierdzenie medyczne w opisie może sprawić, że sklep zażąda dokumentów regulacyjnych, a nawet zmienić status prawny produktu.' },
+		{ text: 'Umieść na aplikacji oznakowanie CE', bin: 'device', why: 'Oznakowanie CE zgodnie z MDR dotyczy wyrobów medycznych. Zwykły dziennik go nie ma.' },
+		{ text: 'Zgłoś naruszenie ochrony danych osobowych organowi nadzorczemu w ciągu 72 godzin', bin: 'always', why: 'To obowiązek administratora (art. 33 RODO) w każdej aplikacji, która przetwarza dane osobowe.' },
+		{ text: 'Prowadź nadzór po wprowadzeniu do obrotu i zgłaszaj poważne incydenty zgodnie z MDR', bin: 'device', why: 'Art. 83–87 MDR dotyczą wyrobów. Aplikacja, która nie jest wyrobem, też potrzebuje planu na wypadek incydentów i aktualizacji – tyle że nie wymaga tego ten przepis.' },
 	]}
 />
 
@@ -64,8 +64,8 @@ Niczego nie oddajesz co tydzień. To, co ćwiczysz na kolejnych zajęciach, traf
 | Kiedy | Co | W twoim projekcie końcowym |
 |---|---|---|
 | **W3** | intended purpose i pierwsza kwalifikacja | cel w czterech linijkach, pierwsza kwalifikacja z uzasadnieniem |
-| **W5** | droga na rynek, prywatność, bezpieczeństwo, utrzymanie | ścieżka regulacyjna i wymagane dokumenty; koszty działania w porównaniu z limitem z briefu |
-| **W6** | business case, pilotaż, życie po starcie | business case z całkowitym kosztem; decyzja go/no-go, łącznie z „nie” |
+| **W5** | droga na rynek, prywatność, bezpieczeństwo, utrzymanie | ścieżka regulacyjna i wymagane dokumenty; koszty bieżące w porównaniu z limitem z briefu |
+| **W6** | business case, pilotaż, życie po starcie | business case z całkowitym kosztem; decyzja go/no-go – „nie” też jest dopuszczalne |
 
 <AtWork>Firmy z branży medtech i digital health zatrudniają programistów, którzy rozumieją, dlaczego release wymaga dokumentacji ryzyka i przeglądu prywatności. Jeśli umiesz rozmawiać o kwalifikacji, RODO i review w sklepie, wyróżniasz się na tle kandydatów, którzy mówią tylko o kodzie.</AtWork>
 

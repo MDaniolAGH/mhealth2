@@ -31,19 +31,19 @@ const copy = {
 	pl: {
 		kicker: 'Dlaczego zmyślone odpowiedzi brzmią pewnie',
 		sure: 'Jak pewny jest model?', sample: 'Wylosuj odpowiedź', idk: 'Wytrenowany, by mówić „nie wiem”',
-		note: 'Prawdopodobieństwa przykładowe, nie z prawdziwego modelu.',
+		note: 'Przykładowe prawdopodobieństwa, nie z prawdziwego modelu.',
 		idkTok: ' nie wiem',
-		idkLine: 'Nie wiem: nic, co dostałem, tego nie mówi. Zapytaj klinikę.',
-		kinds: { fact: 'fakt', guess: 'szczęśliwy traf', invented: 'zmyślone', honest: 'uczciwie' },
+		idkLine: 'Nie wiem: w niczym, co dostałem, nie ma tej informacji. Zapytaj klinikę.',
+		kinds: { fact: 'fakt', guess: 'szczęśliwy traf', invented: 'zmyślenie', honest: 'uczciwa odpowiedź' },
 		prompts: [
 			{ text: 'Stolicą Polski jest', truth: ' Warszawa', cands: [[' Warszawa', 0.93], [' Kraków', 0.03], [' miasto', 0.02], [' położona', 0.02]] },
 			{ text: 'Serwer Mood Trackera jest napisany w', truth: ' Pythonie', cands: [[' Pythonie', 0.26], [' Node', 0.22], [' Javie', 0.17], [' Go', 0.13], [' Darcie', 0.12], [' PHP', 0.10]] },
 			{ text: 'Osobą kontaktową kliniki dla uczestników jest dr', truth: '', cands: [[' Nowak', 0.13], [' Kowalska', 0.12], [' Wiśniewski', 0.11], [' Zielińska', 0.10], [' Lewandowski', 0.10], [' Mazur', 0.09], [' Kamińska', 0.09], [' Wójcik', 0.08]] },
 		],
 		read: [
-			'Model widział ten fakt niezliczoną ilość razy: prawdopodobieństwo skupia się na jednym tokenie.',
-			'Tego prywatnego projektu nigdy nie widział. Prawdopodobieństwo się rozlewa; każdy wybór to zgadywanie, czasem trafne.',
-			'Tego jeszcze nikt nie wie: klient nie zdecydował. Każde nazwisko jest zmyślone i każde brzmi równie prawdziwie.',
+			'Model widział ten fakt niezliczone razy: prawdopodobieństwo skupia się na jednym tokenie.',
+			'Tego prywatnego projektu nigdy nie widział. Prawdopodobieństwo się rozprasza; każdy wybór to zgadywanie, czasem trafne.',
+			'Tego jeszcze nikt nie wie: klient nie podjął decyzji. Każde nazwisko jest zmyślone i każde brzmi równie prawdziwie.',
 		],
 	},
 }[lang];

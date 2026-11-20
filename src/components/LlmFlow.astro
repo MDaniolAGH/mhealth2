@@ -68,15 +68,15 @@ const pl: typeof en = {
 	term: ['$ flutter test', '00:03 +12: …', '00:05 +33: All tests passed!'],
 	steps: [
 		'Wpisujesz pytanie: <b>„Czy testy przechodzą?”</b>',
-		'<b>Harness</b> buduje kontekst: swój system prompt, twój <code>AGENTS.md</code>, a potem twoją wiadomość. To jeden dokument i model nie zobaczy nic poza nim.',
+		'<b>Harness</b> składa kontekst: swój system prompt, twój <code>AGENTS.md</code>, a potem twoją wiadomość. To jeden dokument – model nie zobaczy nic poza nim.',
 		'Harness wysyła cały dokument do modelu. <b>Tokenizer</b> tnie go na ID tokenów: samo twoje pytanie to <code>174441 · 1746 · 88 · 24122 · 54474 · 21589 · 30</code>.',
 		'<b>Transformer</b> czyta wszystkie tokeny naraz, warstwa po warstwie, i liczy jedno: prawdopodobieństwo każdego możliwego następnego tokenu.',
 		'<b>Losowanie</b> wybiera jeden token: <code>Ur</code>. To cały wynik jednego przebiegu.',
-		'Token trafia na koniec i wszystko rusza od nowa po kolejny. <b>Jeden token na przebieg</b>: <i>Uruchomię testy.</i>',
+		'Token zostaje dopisany na końcu i cały przebieg powtarza się dla następnego. <b>Jeden token na przebieg</b>: <i>Uruchomię testy.</i>',
 		'Teraz model pisze specjalne <b>wywołanie narzędzia</b>, <code>run_command("flutter test")</code>, a tokeny wracają do harnessu. Model niczego nie uruchamia. Pisze tylko tekst, który o to prosi.',
 		'Harness rozpoznaje wywołanie i przekazuje je <b>wykonawcy narzędzi</b>, który sprawdza twoje uprawnienia.',
-		'Polecenie uruchamia się <b>na twoim komputerze</b>, w twoim terminalu.',
-		'Wynik wraca <b>do kontekstu</b>: <code>00:05 +33: All tests passed!</code> Prawdziwy dowód, a nie zgadywanie.',
+		'Polecenie wykonuje się <b>na twoim komputerze</b>, w twoim terminalu.',
+		'Wynik wraca <b>do kontekstu</b>: <code>00:05 +33: All tests passed!</code> Prawdziwy dowód, a nie domysł.',
 		'Cały dokument, już z wynikiem, znów trafia do modelu, a ten pisze odpowiedź token po tokenie.',
 		'<code>&lt;|im_end|&gt;</code> kończy turę. Harness pokazuje ci: <i>Tak: wszystkie 33 testy przechodzą (flutter test).</i>',
 	],
@@ -87,7 +87,7 @@ const pl: typeof en = {
 		'<b>Transformer</b> liczy prawdopodobieństwo każdego możliwego następnego tokenu.',
 		'<b>Losowanie</b> wybiera jeden token: <code>Tak</code>.',
 		'Token po tokenie model pisze najbardziej prawdopodobny ciąg dalszy: <i>Tak, wszystkie testy przechodzą.</i>',
-		'<b>Nic nie zostało uruchomione.</b> Nie było narzędzia do wywołania. Odpowiedź to po prostu najbardziej wiarygodne zdanie i brzmi dokładnie tak samo pewnie jak sprawdzona.',
+		'<b>Nic nie zostało uruchomione.</b> Nie było narzędzia do wywołania. Odpowiedź to po prostu najbardziej prawdopodobne zdanie, a brzmi równie pewnie jak sprawdzona.',
 	],
 };
 const c = lang === 'pl' ? pl : en;

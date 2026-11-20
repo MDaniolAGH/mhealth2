@@ -36,7 +36,7 @@
 	</div>
 	<div class="gate-lab__result" aria-live="polite"><p>Pick a defect above.</p></div>
 	<div class="gate-lab__data">
-		<div data-defect="analyze"><b>Caught by layer 1, the analyzer:</b> <code>Undefined name 'AboutScreen'</code>. Seconds after the edit, before anyone reads the code, and the agent fixes it itself.</div>
+		<div data-defect="analyze"><b>Caught by layer 1, the analyzer:</b> <code>Undefined name 'AboutScreen'</code>. This happens seconds after the edit, before anyone reads the code, and the agent fixes it itself.</div>
 		<div data-defect="style"><b>Caught by layer 2, the formatter and lint rules.</b> Nobody has to raise it in review, and nobody has to argue about it.</div>
 		<div data-defect="arch"><b>Caught by layer 3, an architecture rule:</b> a small test that fails when a file in <code>lib/screens/</code> or <code>lib/widgets/</code> imports <code>http</code>, <code>sqflite</code> or secure storage. On the server, <code>lint-imports</code> does the same for the layers in <code>.importlinter</code>. Without such rules, layers erode one plausible exception at a time.</div>
 		<div data-defect="secrets"><b>Caught by layer 4, the secret scan,</b> before the key enters Git history, where removing it is hard and it must be treated as leaked: anyone with it can sign valid login tokens.</div>

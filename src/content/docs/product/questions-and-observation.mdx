@@ -76,7 +76,7 @@ You have three questions, each with "if A → X, if B → Y". The meeting is whe
 	]}
 />
 
-Write down what the client **said**, not what you hoped, with the date and who said it. Then send it back for a check. Those lines are now the only source of client facts:
+Write down what the client **said**, not what you hoped, with the date and who said it. Then send it to the client to check. Those lines are now the only source of client facts:
 
 ```text title="docs/client-log.md (excerpt, illustrative)"
 2026-11-13  Meeting with Anna (coordinator) and Tomek (support)
@@ -134,7 +134,7 @@ Do not start from "find the bug". The word *bug* is only right when the expected
 	explain="Rewrite it: <em>Observation</em>: no About screen exists (evidence: the search). <em>Implication</em>: support cannot see the version. Whether that is a problem is the client's call."
 />
 
-<AtWork>Good discovery questions save weeks of building the wrong thing. It is one of the skills senior people are hired for.</AtWork>
+<AtWork>Good discovery questions save weeks of building the wrong thing. Asking them is one of the skills senior people are hired for.</AtWork>
 
 :::tip[Do this in your project]
 Run `/ba-questions` and keep only the questions that pass the "if A → X, if B → Y" test, at most five. Then pick your client's main concern and run `/ba-app-observation` on it. Reproduce the agent's evidence yourself before anything goes into your dossier.

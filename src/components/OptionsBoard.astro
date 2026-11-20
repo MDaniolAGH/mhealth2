@@ -36,7 +36,7 @@ const e = (o: Option) => Math.round(((o.o + 4 * o.m + o.p) / 6) * 10) / 10;
 <div class="biz-widget optboard not-content" data-budget-key={budgetKey} data-budget={budget} data-i18n={i18n}>
 	<p class="biz-kicker">{T.optionsBoard}</p>
 	<p class="biz-title" set:html={need} />
-	<div class="optboard__limits" role="group" aria-label="Hard limits">
+	<div class="optboard__limits" role="group" aria-label={T.hardLimitsAria}>
 		<span class="sdlc-legend__hint">{T.hardLimits}</span>
 		{limits.map((l) => <label><input type="checkbox" data-limit={l.key} /> <span set:html={l.label} /></label>)}
 	</div>
@@ -46,7 +46,7 @@ const e = (o: Option) => Math.round(((o.o + 4 * o.m + o.p) / 6) * 10) / 10;
 				<article class="optboard__opt" data-e={e(o)} data-breaks={(o.breaks ?? []).map((b) => b.limit).join(' ')}>
 					<header>
 						<b set:html={o.name} />
-						<span class="optboard__e" title="Three-point estimate in team hours">
+						<span class="optboard__e" title={T.estimateTitle}>
 							≈ {e(o)} h
 						</span>
 					</header>

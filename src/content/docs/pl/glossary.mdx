@@ -6,22 +6,22 @@ description: Krótkie definicje pojęć używanych w tym przewodniku.
 <dl class="glossary">
 
 <dt>Acceptance criterion (kryterium akceptacji)</dt>
-<dd>Zdanie, o którym test albo uruchomienie aplikacji może rozstrzygnąć, czy jest prawdziwe, np. AC-4. Często zapisywane jako Given/When/Then.</dd>
+<dd>Zdanie, którego prawdziwość może rozstrzygnąć test albo uruchomienie aplikacji, np. AC-4. Często zapisywane w formacie Given/When/Then.</dd>
 
 <dt>ADR (architecture decision record, zapis decyzji architektonicznej)</dt>
-<dd>Krótki dokument o jednej decyzji: jej kontekst, sama decyzja i jej konsekwencje. Trzymany w <code>docs/adr/</code>.</dd>
+<dd>Krótki dokument opisujący jedną decyzję: jej kontekst, samą decyzję i konsekwencje. Przechowywany w <code>docs/adr/</code>.</dd>
 
 <dt>Agent</dt>
-<dd>Model językowy w harnessie, dzięki któremu może czytać pliki, uruchamiać polecenia, oglądać wyniki i próbować jeszcze raz.</dd>
+<dd>Model językowy osadzony w harnessie, który pozwala mu czytać pliki, uruchamiać polecenia, oglądać wyniki i próbować jeszcze raz.</dd>
 
 <dt>Agent skill</dt>
 <dd>Folder z plikiem instrukcji <code>SKILL.md</code>, który agent wczytuje tylko wtedy, gdy zadanie tego wymaga, np. kursowe skille <code>ba-*</code> i <code>mh-*</code>.</dd>
 
 <dt><code>AGENTS.md</code></dt>
-<dd>Plik Markdown w katalogu głównym repozytorium z zasadami dla agentów kodujących. Ich punkt wejścia do projektu.</dd>
+<dd>Plik Markdown w katalogu głównym repozytorium z zasadami dla agentów kodujących. To od niego agenci zaczynają poznawanie projektu.</dd>
 
 <dt>AI Credits</dt>
-<dd>Jednostka, w której GitHub Copilot rozlicza się od czerwca 2026 r. Ubywa ich według liczby tokenów przetworzonych przez dany model.</dd>
+<dd>Jednostka, w której GitHub Copilot rozlicza użycie od czerwca 2026 r. Ich zużycie zależy od liczby tokenów przetworzonych przez dany model.</dd>
 
 <dt>Assumption (założenie)</dt>
 <dd>Coś, co uznajemy za prawdę bez potwierdzenia. Przydaje się tylko wtedy, gdy jest na tyle konkretne, że może okazać się błędne.</dd>
@@ -32,50 +32,50 @@ description: Krótkie definicje pojęć używanych w tym przewodniku.
 <dt>Context window (okno kontekstu)</dt>
 <dd>Cały tekst, który model widzi naraz podczas zadania, mierzony w tokenach.</dd>
 
+<dt>Deterministic (deterministyczny)</dt>
+<dd>Te same dane wejściowe za każdym razem dają ten sam wynik. Takie są kompilatory i narzędzia do uruchamiania testów, a modele językowe – nie.</dd>
+
 <dt>Dossier</dt>
 <dd>Folder <code>dossier/</code> w repozytorium twojej pary: log agenta, odrzucone próby i inne dowody, które zbierasz w trakcie pracy. Jest częścią projektu końcowego.</dd>
-
-<dt>Deterministic (deterministyczny)</dt>
-<dd>To samo wejście, ten sam wynik, za każdym razem. Kompilatory i narzędzia do uruchamiania testów takie są; modele językowe nie.</dd>
 
 <dt>EARS</dt>
 <dd><em>Easy Approach to Requirements Syntax</em>: wzorce zdań do zapisywania wymagań, np. „If [trigger], then [system] shall [response]”.</dd>
 
 <dt>Golden test</dt>
-<dd>Test, który porównuje zrzut ekranu widgetu z zatwierdzonym plikiem obrazu i nie przechodzi, jeśli się różnią.</dd>
+<dd>Test, który porównuje zrzut ekranu widgetu z zatwierdzonym obrazem wzorcowym i nie przechodzi, jeśli się różnią.</dd>
 
 <dt>Harness</dt>
-<dd>Oprogramowanie wokół modelu, które daje mu tools, pętlę, instrukcje i zasady: agent mode w Copilocie, Claude Code, Mistral Vibe.</dd>
+<dd>Oprogramowanie wokół modelu, które daje mu narzędzia (tools), pętlę, instrukcje i zasady, np. agent mode w Copilocie, Claude Code czy Mistral Vibe.</dd>
 
 <dt>Hook</dt>
-<dd>Skrypt, który harness uruchamia przed akcją agenta albo po niej; może ją zablokować, cokolwiek zdecyduje model.</dd>
+<dd>Skrypt, który harness uruchamia przed akcją agenta albo po niej. Może ją zablokować niezależnie od tego, co zdecyduje model.</dd>
 
 <dt>Intended purpose (przewidziane zastosowanie)</dt>
-<dd>Do czego służy produkt, tak jak określa to jego producent. Według unijnego MDR to od niego zależy, czy oprogramowanie jest wyrobem medycznym.</dd>
+<dd>Zastosowanie produktu określone przez jego producenta. Według unijnego MDR to od niego zależy, czy oprogramowanie jest wyrobem medycznym.</dd>
 
 <dt>INVEST</dt>
 <dd>Test dla user stories: Independent, Negotiable, Valuable, Estimable, Small, Testable (niezależna, negocjowalna, wartościowa, dająca się oszacować, mała, testowalna).</dd>
 
 <dt>Lethal trifecta</dt>
-<dd>Sesja agenta, która naraz ma dostęp do prywatnych danych, styka się z niezaufanymi treściami i ma sposób, żeby wysłać dane na zewnątrz. Usuń przynajmniej jedno z tych trzech.</dd>
+<dd>Sesja agenta, która jednocześnie ma dostęp do prywatnych danych, styka się z niezaufanymi treściami i może wysłać dane na zewnątrz. Usuń przynajmniej jeden z tych trzech elementów.</dd>
 
 <dt>MCP (Model Context Protocol)</dt>
-<dd>Otwarty protokół do podłączania do harnessu dodatkowych tools i źródeł danych.</dd>
+<dd>Otwarty protokół, który pozwala podłączyć do harnessu dodatkowe narzędzia i źródła danych.</dd>
 
 <dt>MoSCoW</dt>
 <dd>Priorytety ustalane przez klienta: Must, Should, Could, Won't (tym razem).</dd>
 
 <dt>Prompt injection</dt>
-<dd>Tekst w czymś, co agent czyta (w issue, na stronie internetowej, w wyniku narzędzia), który steruje nim jak polecenie.</dd>
+<dd>Tekst w materiale, który czyta agent (w issue, na stronie internetowej, w wyniku narzędzia), działający na niego jak polecenie.</dd>
 
 <dt>Quality gate</dt>
 <dd>Automatyczne, deterministyczne sprawdzenia, które każda zmiana musi przejść, zanim pójdzie dalej (etap 6).</dd>
 
 <dt>Required check (wymagany check)</dt>
-<dd>Check w CI, który ochrona brancha czyni obowiązkowym: jeśli nie przejdzie, pull requesta nie da się zmergować.</dd>
+<dd>Check w CI, który jest obowiązkowy dzięki ochronie brancha: jeśli nie przejdzie, pull requesta nie da się zmergować.</dd>
 
 <dt>SOUP (software of unknown provenance, oprogramowanie o nieznanym pochodzeniu)</dt>
-<dd>Pojęcie z IEC 62304: oprogramowanie, którego używasz, ale które nie powstało w twoim własnym procesie, np. pakiet z pub.dev. Każdy taki element się rejestruje, ocenia i monitoruje.</dd>
+<dd>Pojęcie z IEC 62304: oprogramowanie, którego używasz, ale które nie powstało w twoim własnym procesie, np. pakiet z pub.dev. Każdy taki element trzeba zarejestrować, ocenić i monitorować.</dd>
 
 <dt>Spec Kit</dt>
 <dd>Zestaw narzędzi GitHuba do spec-driven development: spec, plan, zadania, implementacja.</dd>
@@ -84,19 +84,19 @@ description: Krótkie definicje pojęć używanych w tym przewodniku.
 <dd>Agent uruchomiony przez innego agenta do jednej części zadania, z własnym, małym i świeżym kontekstem.</dd>
 
 <dt>Synthetic data (dane syntetyczne)</dt>
-<dd>Zmyślone dane o takim samym kształcie jak prawdziwe. Jedyne dane, których używamy na tym kursie.</dd>
+<dd>Zmyślone dane o takiej samej strukturze jak prawdziwe. Na tym kursie używamy wyłącznie takich danych.</dd>
 
 <dt>Synthetic user (syntetyczny użytkownik)</dt>
 <dd>Użytkownik, w którego rolę wciela się model językowy. Źródło hipotez, nigdy dowodów.</dd>
 
 <dt>Three-point estimate (estymacja trzypunktowa)</dt>
-<dd>Estymacja z trzech wartości: optymistycznej, najbardziej prawdopodobnej i pesymistycznej: E = (O + 4M + P) / 6, podawana jako przedział.</dd>
+<dd>Estymacja oparta na trzech wartościach – optymistycznej, najbardziej prawdopodobnej i pesymistycznej – liczona jako E = (O + 4M + P) / 6 i podawana jako przedział.</dd>
 
 <dt>Token</dt>
 <dd>Jednostka, którą model czyta i pisze: słowo albo kawałek słowa.</dd>
 
 <dt>Total cost of ownership (całkowity koszt posiadania, TCO)</dt>
-<dd>Koszt jednorazowy plus koszty bieżące plus czas i obowiązki samego klienta, liczone przez cały okres używania.</dd>
+<dd>Koszt jednorazowy plus koszty bieżące plus czas i obowiązki samego klienta – liczone przez cały okres użytkowania.</dd>
 
 <dt>Trailer</dt>
 <dd>Linijka <code>Key: value</code> na końcu opisu commita, np. <code>Refs: GOAL-1</code>, którą Git i inne narzędzia potrafią przeszukiwać.</dd>
@@ -105,6 +105,6 @@ description: Krótkie definicje pojęć używanych w tym przewodniku.
 <dd>Potrzeba zapisana z punktu widzenia osoby, która ją ma: „Jako …, chcę …, żeby …”.</dd>
 
 <dt>Worktree</dt>
-<dd>Drugi folder roboczy tego samego repozytorium Git, na własnym branchu, dzięki czemu dwa agenty nigdy nie edytują tych samych plików.</dd>
+<dd>Drugi folder roboczy tego samego repozytorium Git, na własnym branchu, dzięki czemu dwóch agentów nigdy nie edytuje tych samych plików.</dd>
 
 </dl>

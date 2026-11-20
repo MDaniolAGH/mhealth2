@@ -81,7 +81,7 @@ W5 covers the attacks in detail (OWASP Top 10 for LLM applications and for agent
 		'',
 		'Running tests is one tool. Tests check only what they check, and the agent can still be wrong about everything else.',
 	]}
-	explain="The harness gives the model tools (act), a loop (look at the result and try again), and keeps it inside the task and the project's rules. None of that makes it correct: that still takes your criteria, the gate, the tests and your review."
+	explain="The harness gives the model tools (to act) and a loop (to look at the result and try again), and it keeps the model inside the task and the project's rules. None of that makes it correct: that still takes your criteria, the gate, the tests and your review."
 />
 
 <Quiz
@@ -96,7 +96,7 @@ W5 covers the attacks in detail (OWASP Top 10 for LLM applications and for agent
 	why={[
 		'',
 		'A bigger model does not know a rule that is not written down or checked.',
-		'A sentence is a request. It costs context on every task and is still ignored sometimes.',
+		'A sentence is a request. It costs context on every task, and the agent still ignores it sometimes.',
 		'You will do this on every task, and sooner or later you will miss one.',
 	]}
 	explain="Fix the harness first. A rule in <code>AGENTS.md</code> is read on every task; a test enforces it every time, whoever wrote the code. Stage 6 shows such a test."
@@ -113,14 +113,14 @@ W5 covers the attacks in detail (OWASP Top 10 for LLM applications and for agent
 	answer={3}
 	why={[
 		'Reading issues is the job here. Removing it makes the agent useless for the task.',
-		'Models follow injected instructions often enough to matter. Never rely on it.',
+		'Models follow injected instructions often enough to matter. Never rely on training alone.',
 		'The server needs its secrets. Keep them out of the agent\'s reach instead, for example in a sandbox without them.',
 		'',
 	]}
 	explain="Without a way to send data out, a leaked secret stays on your machine. Approving outgoing actions costs you a click; the other two legs cost you the task itself. In a real setup you would also run the task in a sandbox without the secrets."
 />
 
-<AtWork>Teams now set up agents for the whole repository. Showing that you can tune a harness (instructions, tools, permissions) with a concrete example is something you can put on a CV.</AtWork>
+<AtWork>Teams now set up agents for the whole repository. A concrete example of how you tuned a harness (instructions, tools, permissions) is something you can put on a CV.</AtWork>
 
 :::tip[Do this in your project]
 Ask your agent, in a fresh session: *"Which tools can you use here, which instruction files did you read, and which commands may you run without asking me?"* Compare the answer with your `AGENTS.md` and your tool's settings. Fix the first gap you find, and switch off automatic approval of commands if it is on.

@@ -21,7 +21,7 @@ import LlmFlow from '../../../../components/LlmFlow.astro';
 
 <Banner
 	eyebrow="Dodatek · na podstawie wykładu Andreja Karpathy'ego"
-	title="Jak działają LLM-y, w 15 minut"
+	title="Jak działają LLM-y, w 20 minut"
 	sub="Chatbot to bardzo duża funkcja: czyta okno tokenów i zgaduje następny. Cała reszta (wiedza, styl, błędy) wynika właśnie z tego."
 	tokens={['Jak', ' dzia', 'łają', ' LLM', '-y', '?']}
 	stats={[
@@ -33,21 +33,21 @@ import LlmFlow from '../../../../components/LlmFlow.astro';
 
 <Tldr minutes={20} items={["Tekst jest dzielony na tokeny; model widzi wyłącznie tokeny.", "Model przewiduje następny token, potem kolejny; losowanie sprawia, że odpowiedzi się różnią.", "Wiedza w wagach to mgliste wspomnienie; context window to pamięć robocza."]} />
 
-Ta strona idzie śladem wykładu Andreja Karpathy'ego [*Deep Dive into LLMs like ChatGPT*](https://www.youtube.com/watch?v=7xTGNNLPyMI) (2025) – warto obejrzeć go w całości. Jest tutaj, bo każda zasada z części 1–3, od „daj agentowi dziennik klienta” po „nie ufaj żadnej liczbie bez źródła”, wynika z tego, jak działają te modele.
+Ta strona podąża za wykładem Andreja Karpathy'ego [*Deep Dive into LLMs like ChatGPT*](https://www.youtube.com/watch?v=7xTGNNLPyMI) (2025) – warto obejrzeć go w całości. Znalazła się w kursie, bo każda zasada z części 1–3 – od „daj agentowi dziennik klienta” po „nie ufaj żadnej liczbie bez źródła” – wynika z tego, jak działają te modele.
 
 ## 1. Wszystko zaczyna się od internetu
 
-Najpierw model uczy się na ogromnej ilości tekstu. Jego twórcy pobierają strony internetowe i je filtrują: odrzucają niechciane serwisy, wyciągają sam tekst, zostawiają wybrane języki, usuwają duplikaty i dane osobowe. To, co zostaje, to **dane do pre-trainingu**. Jeden otwarty przykład, FineWeb od Hugging Face, ma około **15 bilionów tokenów** (około 44 TB tekstu).
+Najpierw model uczy się na ogromnej ilości tekstu. Jego twórcy pobierają strony internetowe i je filtrują: odrzucają niechciane serwisy, wyciągają sam tekst, zostawiają wybrane języki, usuwają duplikaty i dane osobowe. To, co zostaje, to **dane do pre-trainingu**. Przykładowy otwarty zbiór, FineWeb od Hugging Face, liczy około **15 bilionów tokenów** (około 44 TB tekstu).
 
 Model przejmie wzorce z tego tekstu – razem z jego faktami, stylem i błędami.
 
 ## 2. Tokeny: co model naprawdę czyta
 
-Model nie czyta liter ani słów. Tekst jest dzielony na **tokeny**: często występujące kawałki tekstu, od pojedynczych znaków po całe słowa. Słownik tokenów powstaje z danych dzięki algorytmowi byte-pair encoding: zaczynasz od bajtów i raz za razem łączysz pary, które pojawiają się najczęściej. Tokenizer GPT-2 (2019) miał około 50 000 tokenów, GPT-4 – około 100 000, a GPT-4o – około 200 000.
+Model nie czyta liter ani słów. Tekst jest dzielony na **tokeny**: często występujące kawałki tekstu, od pojedynczych znaków po całe słowa. Słownik tokenów buduje się na podstawie danych algorytmem byte-pair encoding: zaczyna się od bajtów i raz za razem scala najczęściej występujące pary. Tokenizer GPT-2 (2019) miał około 50 000 tokenów, GPT-4 – około 100 000, a GPT-4o – około 200 000.
 
-<Predict id="strawberry" question="Z ilu tokenów składa się słowo „strawberry”? I czy polskie zdanie potrzebuje więcej tokenów niż to samo zdanie po angielsku, mniej, czy tyle samo?">
+<Predict id="strawberry" question="Z ilu tokenów składa się słowo „strawberry”? I czy polskie zdanie potrzebuje więcej, mniej czy tyle samo tokenów co to samo zdanie po angielsku?">
 
-„strawberry” to **3 tokeny** we wszystkich trzech tokenizerach poniżej. Po polsku zwykle potrzeba **więcej** tokenów niż po angielsku, żeby powiedzieć to samo: tokenizery uczyły się głównie na tekstach angielskich, więc angielskie słowa często są pojedynczymi tokenami, a polskie rozpadają się na kawałki. Wypróbuj w tokenizerze dwa zdania kliniczne: to samo znaczenie, a zupełnie inna liczba tokenów. Więcej tokenów to wyższy koszt i szybciej zapełniony context window.
+Słowo „strawberry” to **3 tokeny** we wszystkich trzech tokenizerach poniżej. Po polsku zwykle potrzeba **więcej** tokenów niż po angielsku, żeby powiedzieć to samo: tokenizery uczyły się głównie na tekstach angielskich, więc angielskie słowa często są pojedynczymi tokenami, a polskie rozpadają się na kawałki. Wypróbuj w tokenizerze dwa zdania kliniczne: to samo znaczenie, a zupełnie inna liczba tokenów. Więcej tokenów to wyższy koszt i szybciej zapełniony context window.
 
 </Predict>
 
@@ -63,17 +63,17 @@ Model nie czyta liter ani słów. Tekst jest dzielony na **tokeny**: często wys
 	{ label: 'Chiński', text: '研究参与者' },
 ]} />
 
-Porównaj wiersze. Większy słownik, wytrenowany na większej liczbie języków, tnie ten sam tekst na mniej, dłuższych kawałków: polskie zdanie spada z 19 tokenów w GPT-2 do 13 w GPT-4o, rosyjskie z 41 do 10, a chińskie słowo z 11 do 3. Angielski prawie się nie zmienia, bo od początku był tani. Wiersze odniesienia pokazują skrajności: model czytający bajty UTF-8 potrzebowałby tokenu na każdy bajt – dlatego polskie litery ze znakami diakrytycznymi (po dwa bajty) tak drogo kosztowały w GPT-2.
+Porównaj wiersze. Większy słownik, wytrenowany na większej liczbie języków, dzieli ten sam tekst na mniejszą liczbę dłuższych kawałków: polskie zdanie spada z 19 tokenów w GPT-2 do 13 w GPT-4o, rosyjskie z 41 do 10, a chińskie słowo z 11 do 3. Angielski prawie się nie zmienia, bo od początku był tani. Wiersze odniesienia pokazują skrajności: model czytający bajty UTF-8 potrzebowałby tokenu na każdy bajt – dlatego polskie litery ze znakami diakrytycznymi (po dwa bajty) były tak drogie w GPT-2.
 
-Kropki (·) oznaczają spacje: spacja zwykle należy do następnego tokenu. Zwróć uwagę, co model „widzi”, a czego nie: widzi `straw` i `berry`, a nie dziesięć liter. Zapamiętaj to na sekcję 6.
+Kropki (·) oznaczają spacje: spacja zwykle należy do następnego tokenu. Zwróć uwagę, co model „widzi”, a czego nie: widzi `straw` i `berry`, a nie dziesięć liter. Zapamiętaj to – przyda się w sekcji 6.
 
 ## 3. Model przewiduje następny token
 
-Sieć neuronowa to funkcja matematyczna z miliardami **parametrów** (wag). Dostaje okno tokenów i zwraca **prawdopodobieństwo dla każdego tokenu ze słownika**: jak bardzo prawdopodobne jest, że to właśnie on pojawi się jako następny.
+Sieć neuronowa to funkcja matematyczna z miliardami **parametrów** (wag). Dostaje okno tokenów i zwraca **prawdopodobieństwo dla każdego tokenu ze słownika**: szansę, że to właśnie on będzie następny.
 
-**Trening** pokazuje jej biliony prawdziwych przykładów i za każdym razem lekko przesuwa parametry tak, żeby token, który naprawdę był następny, dostał trochę wyższe prawdopodobieństwo. **Używanie** modelu (inference) wygląda tak: wybierz następny token na podstawie prawdopodobieństw, dopisz go do okna i powtórz. Każda odpowiedź chatbota, jaka kiedykolwiek pojawiła się na twoim ekranie, powstała w ten sposób – token po tokenie.
+Podczas **treningu** sieć widzi biliony prawdziwych przykładów, a jej parametry są za każdym razem lekko korygowane tak, żeby token, który naprawdę wystąpił jako następny, dostał nieco wyższe prawdopodobieństwo. **Używanie** modelu (inference) wygląda tak: wybierz następny token na podstawie prawdopodobieństw, dopisz go do okna i powtórz. Każda odpowiedź chatbota, jaka kiedykolwiek pojawiła się na twoim ekranie, powstała w ten sposób – token po tokenie.
 
-Wybór jest losowy, ale ważony prawdopodobieństwami. **Temperatura** decyduje, jak bardzo losowy: niska temperatura wyostrza rozkład w stronę najbardziej prawdopodobnego tokenu, a wysoka go spłaszcza.
+Wybór jest losowy, ale ważony prawdopodobieństwami. **Temperatura** decyduje o tym, jak bardzo jest losowy: niska temperatura wyostrza rozkład w stronę najbardziej prawdopodobnego tokenu, a wysoka go spłaszcza.
 
 <Sampler
 	prompt="After the surgery, the patient felt"
@@ -89,39 +89,39 @@ Wybór jest losowy, ale ważony prawdopodobieństwami. **Temperatura** decyduje,
 	]}
 />
 
-Przykład jest celowo po angielsku: tak wyglądają prompt i kandydaci na następny token dla modelu, który czyta angielskie zdanie. Losuj dziesięć razy przy temperaturze 1, potem przy 0,2, a potem przy 2. Właśnie dlatego ten sam prompt daje różne odpowiedzi: to efekt, który stał za ćwiczeniem „Siedem odpowiedzi” na W2, gdzie każda para wysłała Copilotowi ten sam prompt. W narzędziach takich jak Copilot nie da się ustawić temperatury, więc zmienność dostajesz, czy tego chcesz, czy nie.
+Przykład jest celowo po angielsku: tak wyglądają prompt i kandydaci na następny token dla modelu, który czyta angielskie zdanie. Wylosuj dziesięć razy przy temperaturze 1, potem przy 0,2, a potem przy 2. To dlatego ten sam prompt daje różne odpowiedzi. Ten sam efekt stał za ćwiczeniem „Siedem odpowiedzi” na W2, w którym każda para wysłała Copilotowi ten sam prompt. W narzędziach takich jak Copilot nie da się samodzielnie ustawić temperatury, więc zmienność dostajesz, czy chcesz, czy nie.
 
 ## 4. Od symulatora internetu do asystenta
 
 Model trenowany tylko na tekstach z sieci to **model bazowy**: Karpathy nazywa go symulatorem dokumentów z internetu. Daj mu początek strony, a on dopisze resztę. Nie odpowiada na pytania – pisze to, co zwykle pojawia się dalej.
 
-Asystent powstaje dzięki dalszemu treningowi, w kilku etapach. Karpathy porównuje to do szkolnego podręcznika:
+Asystent powstaje w wyniku dalszego, kilkuetapowego treningu. Karpathy porównuje te etapy do nauki z podręcznika szkolnego:
 
 <Picker
 	kicker="Jak powstaje asystent"
 	title="Trzy etapy treningu"
-	intro="Przeklikaj etapy. Analogia pochodzi od Karpathy'ego: czytanie podręcznika, analiza rozwiązanych przykładów, rozwiązywanie zadań."
+	intro="Przeklikaj się przez etapy. Analogia pochodzi od Karpathy'ego: czytanie podręcznika, analiza rozwiązanych przykładów, rozwiązywanie zadań."
 	initial="pre"
 	paths={[
-		{ key: 'pre', label: '1. Pre-training', tone: 'agent', summary: 'Czytanie podręcznika: biliony tokenów tekstu z sieci. Model uczy się języka i mnóstwa wiedzy.', items: [
+		{ key: 'pre', label: '1. Pre-training', tone: 'agent', summary: 'Czytanie podręcznika: biliony tokenów tekstu z sieci. Model przyswaja język i mnóstwo wiedzy.', items: [
 			'Dane: przefiltrowany tekst z internetu, do tego książki, kod i nie tylko',
 			'Wynik: model bazowy, który dopisuje ciąg dalszy dokumentów',
 			'Zdecydowanie najwięcej obliczeń; robią to rzadko i tylko duże laboratoria',
 		] },
 		{ key: 'sft', label: '2. Supervised fine-tuning', tone: 'client', summary: 'Rozwiązane przykłady: rozmowy napisane po to, żeby pokazać, jak odpowiada pomocny asystent.', items: [
-			'Dane: przykładowe dialogi pisane przez ludzi według instrukcji etykietowania, coraz częściej z pomocą modeli',
+			'Dane: przykładowe dialogi pisane przez ludzi według wytycznych dla anotatorów, coraz częściej z pomocą modeli',
 			'Wynik: model wchodzi w rolę asystenta',
 			'Kiedy rozmawiasz z asystentem, rozmawiasz ze statystyczną imitacją ludzi, którzy pisali te dialogi',
 		] },
 		{ key: 'rl', label: '3. Reinforcement learning', tone: 'you', summary: 'Zadania do rozwiązania: model próbuje wielu rozwiązań i dostaje nagrodę za te, które działają.', items: [
-			'W zadaniach z odpowiedzią, którą da się sprawdzić (matematyka, kod), model sam odkrywa własne sposoby rozumowania: stąd modele „myślące”',
+			'W zadaniach z odpowiedzią, którą da się sprawdzić (matematyka, kod), model sam odkrywa sposoby rozumowania – stąd biorą się modele „myślące”',
 			'W sprawach gustu (żarty, styl) ludzi zastępuje reward model wytrenowany na ludzkich preferencjach (RLHF)',
 			'Reward model da się oszukać, więc z tego etapu korzysta się ostrożnie',
 		] },
 	]}
 />
 
-Czy asystent to więc inny rodzaj modelu? Nie. To nadal model, który dopisuje ciąg dalszy dokumentu. Aplikacja czatu zamienia rozmowę w jeden dokument ze specjalnymi tokenami, a fine-tuning nauczył model, jak takie dokumenty się kończą. Wpisz wiadomość, wygeneruj odpowiedź i zobacz, gdzie trafia. Potem przełącz na model bazowy.
+Czy asystent to więc inny rodzaj modelu? Nie. To nadal model, który dopisuje ciąg dalszy dokumentu. Aplikacja czatu zamienia rozmowę w jeden dokument ze specjalnymi tokenami, a fine-tuning nauczył model, jak takie dokumenty kontynuować. Wpisz wiadomość, wygeneruj odpowiedź i zobacz, gdzie trafia. Potem przełącz na model bazowy.
 
 <ChatTemplate />
 
@@ -137,26 +137,26 @@ Gdy plik jest w **kontekście**. Rozróżnienie Karpathy'ego: wiedza w parametra
 |---|---|---|
 | Przypomina | mgliste wspomnienie dawno przeczytanego tekstu | to, co leży przed tobą na biurku |
 | Zawiera | wzorce z danych treningowych | twój prompt, pliki, wyniki narzędzi |
-| Aktualne? | zamrożone w chwili końca treningu | tak aktualne jak to, co do niego wrzucisz |
-| Twoja kontrola | żadna | pełna: na tym polega context engineering |
+| Aktualne? | zamrożone w chwili zakończenia treningu | tak aktualne, jak to, co do niego wrzucisz |
+| Twój wpływ | żaden | pełny: na tym polega context engineering |
 
-Spróbuj: wybierz pytanie i zobacz odpowiedź przy pustym biurku. Potem połóż plik na biurku, przeczytaj, co w nim jest, i zobacz, z której linii korzysta teraz odpowiedź. Dołóż duże rzeczy i zobacz, co spada: pełne context window też coś gubi.
+Spróbuj: wybierz pytanie i zobacz odpowiedź przy pustym biurku. Potem połóż plik na biurku, przeczytaj, co w nim jest, i zobacz, z której linii korzysta teraz odpowiedź. Dołóż duże elementy i zobacz, co spada z biurka: przepełnione context window też gubi informacje.
 
 <MemoryDesk />
 
 ## 6. Halucynacje i nierówne umiejętności
 
-Modele **halucynują**: piszą płynny, pewny siebie tekst, który jest nieprawdziwy. W treningu pewne siebie odpowiedzi prawie zawsze miały właściwy styl, więc model naśladuje pewność, nawet kiedy nie wie. Laboratoria ograniczają ten problem: uczą modele mówić „nie wiem” i dają im **tools** (wyszukiwanie, uruchamianie kodu). Ale halucynacje nigdy nie znikają całkiem.
+Modele **halucynują**: piszą płynny, pewny siebie tekst, który jest nieprawdziwy. W danych treningowych dobre odpowiedzi prawie zawsze brzmiały pewnie, więc model naśladuje pewność siebie, nawet kiedy czegoś nie wie. Laboratoria ograniczają ten problem: uczą modele mówić „nie wiem” i dają im **tools** (wyszukiwanie, uruchamianie kodu), ale problem nigdy nie znika całkowicie.
 
 <GuessMeter />
 
-Umiejętności modeli są też nierówne. Karpathy porównuje je do **Swiss cheese**, czyli sera szwajcarskiego: model jest świetny w trudnych zadaniach, a w łatwych ma przypadkowe dziury.
+Umiejętności modeli są też nierówne. Karpathy porównuje je do **Swiss cheese**, czyli sera szwajcarskiego: model świetnie radzi sobie z trudnymi zadaniami, a w łatwych ma przypadkowe dziury.
 
-- **Liczenie liter.** Model widzi `straw` + `berry`, a nie litery, więc pytanie „ile jest liter r w strawberry?” może pójść źle. Poproś go o kod, który policzy litery, a odpowie dobrze.
-- **9.11 czy 9.9?** Niektóre modele twierdziły, że 9.11 jest większe – możliwe, że dlatego, że w wielu tekstach, na przykład w numeracji wersetów Biblii albo w numerach wersji, 9.11 występuje po 9.9.
-- **Model potrzebuje tokenów, żeby myśleć.** Na każdy token przypada stała porcja obliczeń. Odpowiedź ściśnięta w jeden token to bardzo mało „myślenia”. Praca krok po kroku, w wielu tokenach albo z pomocą narzędzia, jest dużo pewniejsza.
+- **Liczenie liter.** Model widzi `straw` + `berry`, a nie litery, więc pytanie „ile jest liter r w strawberry?” może skończyć się błędem. Poproś go o napisanie kodu, który policzy litery, a odpowie poprawnie.
+- **9.11 czy 9.9?** Niektóre modele twierdziły, że 9.11 jest większe – być może dlatego, że w wielu tekstach, na przykład w numeracji wersetów Biblii albo w numerach wersji, 9.11 występuje po 9.9.
+- **Model potrzebuje tokenów, żeby myśleć.** Na każdy token przypada stała porcja obliczeń. Odpowiedź ściśnięta w jeden token to niewiele „myślenia”. Praca krok po kroku – w wielu tokenach albo z pomocą narzędzia – jest bardziej niezawodna.
 
-Tak to wygląda w praktyce. Model napisał krótki opis Mood Trackera. Każde zdanie brzmi równie pewnie, ale pochodzą z trzech różnych miejsc. Rozpoznasz z których?
+Tak to wygląda w praktyce. Model napisał krótki opis Mood Trackera. Każde zdanie brzmi równie pewnie, ale pochodzą one z trzech różnych źródeł. Rozpoznasz, z których?
 
 <SourceCheck />
 
@@ -167,21 +167,21 @@ Tak to wygląda w praktyce. Model napisał krótki opis Mood Trackera. Każde zd
 		{ key: 'tool', label: 'Potrzeba narzędzia albo sprawdzenia', tone: 'you' },
 	]}
 	items={[
-		{ text: 'Szkic dziesięciu pytań do wywiadu z koordynatorką badania', bin: 'ok', why: 'Praca językowa, niska stawka, a pytania i tak wybierasz ty.' },
+		{ text: 'Szkic dziesięciu pytań do wywiadu z koordynatorką badania', bin: 'ok', why: 'Praca językowa, niewiele można stracić, a pytania i tak wybierasz ty.' },
 		{ text: 'Policzenie, ile wpisów w pliku ma ocenę poniżej 3', bin: 'tool', why: 'Liczenie i arytmetyka: poproś model, żeby napisał i uruchomił kod, a potem sprawdź ten kod.' },
 		{ text: 'Podanie, której wersji biblioteki używa projekt', bin: 'tool', why: 'To fakt o twoim projekcie: przeczytaj <code>pubspec.lock</code>. Pamięć modelu jest mglista i nieaktualna.' },
-		{ text: 'Przepisanie akapitu twojego raportu prostszym językiem', bin: 'ok', why: 'W tym modele są najlepsze. Ale i tak to przeczytaj: sens może się przesunąć.' },
-		{ text: 'Podanie dawki leku dla pacjenta', bin: 'tool', why: 'Nigdy z samego modelu: fakt medyczny, przy którym grozi szkoda, wymaga wiarygodnego źródła i specjalisty.' },
+		{ text: 'Przepisanie akapitu raportu prostszym językiem', bin: 'ok', why: 'W tym modele są najlepsze. Mimo to przeczytaj wynik: sens może się zmienić.' },
+		{ text: 'Podanie dawki leku dla pacjenta', bin: 'tool', why: 'Nigdy na podstawie samego modelu: fakt medyczny, którego pomyłka grozi szkodą, wymaga wiarygodnego źródła i specjalisty.' },
 	]}
 />
 
 ## 7. Wszystko razem: model w harnessie
 
-Copilot, Claude Code i podobne narzędzia to nie sam model. To **harness** wokół niego: program, który buduje kontekst, wysyła go do modelu, czyta odpowiedź, a gdy model poprosi o narzędzie – uruchamia je. Wszystko z tej strony spotyka się w jednej pętli. Odtwórz ją z włączonym harnessem, potem przełącz na *Sam model* i porównaj zakończenia.
+Copilot, Claude Code i podobne narzędzia to nie sam model. To **harness** wokół niego: program, który buduje kontekst, wysyła go do modelu, czyta odpowiedź, a gdy model poprosi o narzędzie – uruchamia je. Wszystko, o czym była mowa na tej stronie, łączy się w jednej pętli. Odtwórz ją z włączonym harnessem, potem przełącz na *Sam model* i porównaj zakończenia.
 
 <LlmFlow />
 
-Model w obu przebiegach jest ten sam. Różnicę robi harness: pozwala modelowi **poprosić** o dowód i wkłada ten dowód do kontekstu. To pętla agenta z części 2, widziana od środka.
+Model w obu przebiegach jest ten sam. Różnica wynika z harnessu: pozwala modelowi **poprosić** o dowód i umieszcza ten dowód w kontekście. To pętla agenta z części 2, widziana od środka.
 
 <Quiz
 	question="Dlaczego ten sam prompt daje różne odpowiedzi przy kolejnych uruchomieniach?"
@@ -193,38 +193,38 @@ Model w obu przebiegach jest ten sam. Różnicę robi harness: pozwala modelowi 
 	]}
 	answer={1}
 	why={[
-		'Chatboty nie zmieniają swoich wag na podstawie twojego czatu w trakcie rozmowy.',
+		'Chatboty nie zmieniają swoich wag w trakcie rozmowy z tobą.',
 		'',
 		'Zwykle to ten sam model; losowość bierze się z losowania tokenów.',
 		'Tokenizacja jest deterministyczna: ten sam tekst zawsze daje te same tokeny.',
 	]}
-	explain="Losowość jest tu celowa. Przy temperaturze 0 zawsze wybierany jest najbardziej prawdopodobny token, ale narzędzia takie jak Copilot nie pozwalają jej ustawić. Licz się więc ze zmiennością: sprawdzaj wynik, a nie sformułowania."
+	explain="Losowość jest tu celowa. Przy temperaturze 0 zawsze wybierany jest najbardziej prawdopodobny token, ale narzędzia takie jak Copilot nie pozwalają ustawić temperatury. Licz się więc ze zmiennością: sprawdzaj wynik, a nie sformułowania."
 />
 
 <Quiz
-	question="Model z pełnym przekonaniem podaje ci cytowanie, które nie istnieje. Które wyjaśnienie pasuje najlepiej?"
+	question="Model z pełnym przekonaniem podaje ci odwołanie do publikacji, która nie istnieje. Które wyjaśnienie pasuje najlepiej?"
 	options={[
 		'Znalazł je w uszkodzonej bazie danych',
 		'Celowo kłamie, żeby ci się przypodobać',
 		'Jego narzędzie do wyszukiwania zwróciło zły wynik',
-		'Wygenerował prawdopodobny ciąg dalszy w stylu cytowania, bez żadnego źródła za nim',
+		'Wygenerował prawdopodobny ciąg dalszy, który wygląda jak odwołanie do źródła, choć żadne źródło za nim nie stoi',
 	]}
 	answer={3}
 	why={[
 		'Bez narzędzia nie ma żadnej bazy danych: są tylko wzorce w wagach.',
 		'Nie ma tu żadnej intencji; model dopisuje tekst w najbardziej prawdopodobny sposób.',
-		'Możliwe, kiedy model korzysta z narzędzi, ale klasyczna halucynacja zdarza się w ogóle bez narzędzi.',
+		'Możliwe, kiedy model korzysta z narzędzi, ale klasyczna halucynacja zdarza się zupełnie bez narzędzi.',
 		'',
 	]}
-	explain="To sedno halucynacji i powód, dla którego kurs wymaga źródeł sprawdzonych na własne oczy: płynne cytowanie to po prostu bardzo prawdopodobny tekst."
+	explain="To sedno halucynacji i powód, dla którego kurs wymaga źródeł sprawdzonych na własne oczy: gładko brzmiące odwołanie to po prostu bardzo prawdopodobny tekst."
 />
 
 ## Co to oznacza dla ciebie
 
 - **Tokeny** to jednostka, w której liczy się koszt i miejsce w context window. Tekst po polsku zużywa więcej jednego i drugiego.
-- **Losowanie** oznacza zmienność: sprawdzaj wyniki, a nie sformułowania. Ważne prompty uruchom więcej niż raz.
+- **Losowanie** oznacza zmienność: sprawdzaj wyniki, a nie sformułowania. Ważne prompty uruchamiaj więcej niż raz.
 - **Pamięć robocza wygrywa z mglistym wspomnieniem:** daj modelowi fakty (część 2, kontekst i wiedza o projekcie).
-- **Prawdopodobne nie znaczy prawdziwe:** fakty potrzebują źródeł (część 1), liczby – narzędzi, a twierdzenia o kodzie – `file:line`.
+- **Prawdopodobne nie znaczy prawdziwe:** fakty wymagają źródeł (część 1), liczby – narzędzi, a twierdzenia o kodzie – odwołań `file:line`.
 
 <AtWork>Jeśli w dwie minuty wyjaśnisz, dlaczego model halucynuje i co z tym robisz w swoim workflow, pokażesz, że rozumiesz narzędzia, których używasz, a nie tylko umiesz pisać do nich prompty. Właśnie tę różnicę ludzie zauważają w rozmowach technicznych.</AtWork>
 

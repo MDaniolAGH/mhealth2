@@ -1,6 +1,6 @@
 ---
 title: '4. User stories: od potrzeby do story'
-description: Pisz stories z potrzeb, na które zgodził się klient – każdą ze źródłem – i oddzielaj pomysły od wymagań.
+description: Pisz stories na podstawie potrzeb, na które zgodził się klient – każdą ze źródłem – i oddzielaj pomysły od wymagań.
 ---
 
 import StageFacts from '../../../../components/StageFacts.astro';
@@ -20,10 +20,10 @@ import Done from '../../../../components/Done.astro';
 
 > **Jako** *[kto]* **chcę** *[co]*, **żeby** *[po co]*.
 
-Kursowy skill `ba-requirements` zapisuje to samo jako wymaganie: *„[Kto] może/musi [zrobić albo dostać co], żeby [cel].”* Używajcie tego, co woli wasz zespół. Trzy zasady są ważniejsze niż format:
+Kursowy skill `ba-requirements` zapisuje to samo jako wymaganie: *„[Kto] może/musi [zrobić albo dostać co], żeby [cel].”* Używaj tej formy, którą woli twój zespół. Trzy zasady są ważniejsze niż format:
 
-1. **Potrzeba przed rozwiązaniem.** „Uczestnicy wiedzą, z kim się kontaktować” to potrzeba. „Przycisk kontaktu na pasku aplikacji” to pomysł, jak ją spełnić. Pomysły zostają pomysłami, dopóki klient ich nie zatwierdzi.
-2. **Każda story ma źródło**: linijkę w dzienniku klienta, interesariusza, obserwację. Nie ma źródła, nie ma story: trafia na listę *Pomysły*.
+1. **Potrzeba przed rozwiązaniem.** „Uczestnicy wiedzą, z kim się kontaktować” to potrzeba. „Przycisk kontaktu na pasku aplikacji” to pomysł, jak ją zaspokoić. Pomysły zostają pomysłami, dopóki klient ich nie zatwierdzi.
+2. **Każda story ma źródło**: linijkę w dzienniku klienta, interesariusza, obserwację. Nie ma źródła, nie ma story – trafia wtedy na listę *Pomysły*.
 3. **Mała.** Story, której nie da się skończyć i sprawdzić w kilka dni, to w rzeczywistości kilka stories (następna strona).
 
 <Scene
@@ -33,22 +33,22 @@ Kursowy skill `ba-requirements` zapisuje to samo jako wymaganie: *„[Kto] może
 		{ who: 'agent', name: 'Copilot', text: 'Oto 15 user stories dla ekranu About, pogrupowanych według użytkowników.' },
 		{ who: 'you', name: 'Ty', text: 'Ile z nich cytuje linijkę, która naprawdę mówi to, co twierdzi story?' },
 		{ who: 'agent', name: 'Copilot', text: 'Sześć. W pozostałych dziewięciu użyłem funkcji, które zwykle mają takie aplikacje.' },
-		{ who: 'you', name: 'Ty', text: 'To te dziewięć idzie na listę pomysłów. Pokażemy je Annie jako pytania, nie jako plan.' },
+		{ who: 'you', name: 'Ty', text: 'W takim razie tych dziewięć idzie na listę pomysłów. Pokażemy je Annie jako pytania, nie jako plan.' },
 	]}
 />
 
 <MultiCheck
-	title="Co jest nie tak z tą story napisaną przez agenta? Zaznacz każdy problem."
+	title="Co jest nie tak z tą story napisaną przez agenta? Zaznacz wszystkie problemy."
 	intro={'<pre>Jako uczestnik chcę etykietę wersji z package_info_plus,\nżeby aplikacja była szybka, a support@clinic.example mógł mi pomóc.</pre>'}
 	options={[
 		{ text: 'Nazywa rozwiązanie (paczkę i etykietę) zamiast potrzeby', correct: true, why: 'Potrzeba to „wsparcie wie, której wersji używam”. Jak ją pokazać, decyduje się później.' },
 		{ text: 'Dodaje nową paczkę – element SOUP, na który nikt się nie zgodził', correct: true, why: 'To decyzja produktowa ukryta w story. Każdą paczkę trzeba zapisać, ocenić i utrzymywać.' },
-		{ text: 'Słowa „szybka” nie da się przetestować', correct: true, why: 'Szybka dla kogo i mierzona jak? Bez progu nikt nie powie, czy story jest już zrobiona.' },
+		{ text: 'Słowa „szybka” nie da się przetestować', correct: true, why: 'Szybka dla kogo i jak to zmierzyć? Bez progu nikt nie powie, czy story jest już zrobiona.' },
 		{ text: 'Miesza dwie potrzeby: znajomość wersji i uzyskanie pomocy', correct: true, why: 'To dwie stories, być może dla dwóch różnych osób (wsparcia i uczestników), z różnymi priorytetami.' },
 		{ text: 'Adres kontaktowy jest zmyślony', correct: true, why: 'Nie ma go w żadnym dzienniku klienta. Prawdziwy kontakt to wciąż TODO po stronie klienta.' },
 		{ text: 'Nie ma źródła: z której wypowiedzi klienta pochodzi?', correct: true, why: 'Bez źródła nikt nie sprawdzi, czy klient w ogóle tego chciał.' },
 		{ text: 'Jest napisana z perspektywy uczestnika', correct: false, why: 'Dla user story to dobrze. Pytanie brzmi, czy to w ogóle jest potrzeba uczestnika.' },
-		{ text: 'Jest za krótka, żeby być porządną story', correct: false, why: 'Krótko to dobrze. Problemy są w treści, nie w długości.' },
+		{ text: 'Jest za krótka, żeby być porządną story', correct: false, why: 'Zwięzłość to zaleta. Problemy są w treści, nie w długości.' },
 	]}
 >
 
@@ -112,7 +112,7 @@ Przeważnie wiarygodnie brzmiące stories, o które nikt nie prosił: funkcje, k
 <AtWork>Stories ze źródłami to sposób, żeby na demo nie usłyszeć klasycznego „ale przecież o to nie prosiliśmy”.</AtWork>
 
 :::tip[Zrób to w swoim projekcie]
-Poproś agenta o stories z twojego dziennika klienta, z zasadą cytowania opisaną wyżej. Otwórz każdą cytowaną linijkę i sprawdź, czy mówi to, co twierdzi story. Resztę przenieś do *Pomysłów* i przynieś tę listę klientowi jako pytania, nie jako plan.
+Poproś agenta o stories na podstawie dziennika klienta, z opisaną wyżej zasadą cytowania. Otwórz każdą cytowaną linijkę i sprawdź, czy mówi to, co twierdzi story. Resztę przenieś do *Pomysłów* i przynieś tę listę klientowi jako pytania, nie jako plan.
 :::
 
 <Done />

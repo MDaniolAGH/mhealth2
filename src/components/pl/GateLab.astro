@@ -37,20 +37,20 @@ const i18n = JSON.stringify({
 			<div class="gate-group gate-group--after">
 				<p class="gate-group__label">To już nie gate: tu potrzebne są twoje kryteria i twój osąd</p>
 				<div class="gate-layer" data-layer="tests"><span class="gate-layer__n">7</span><span class="gate-layer__q"><b>Czy robi to, o co prosiliśmy?</b><span>testy sprawdzające kryteria (etap 7)</span></span><span class="gate-layer__status"></span></div>
-				<div class="gate-layer" data-layer="human"><span class="gate-layer__n">10</span><span class="gate-layer__q"><b>Czy to w ogóle właściwa rzecz?</b><span>twoje uruchomienie, review, klient (etapy 7 i 10)</span></span><span class="gate-layer__status"></span></div>
+				<div class="gate-layer" data-layer="human"><span class="gate-layer__n">10</span><span class="gate-layer__q"><b>Czy w ogóle robimy właściwą rzecz?</b><span>twoje uruchomienie, review, klient (etapy 7 i 10)</span></span><span class="gate-layer__status"></span></div>
 			</div>
 		</div>
 	</div>
 	<div class="gate-lab__result" aria-live="polite"><p>Wybierz defekt powyżej.</p></div>
 	<div class="gate-lab__data">
-		<div data-defect="analyze"><b>Złapany przez warstwę 1, analyzer:</b> <code>Undefined name 'AboutScreen'</code>. Kilka sekund po zmianie, zanim ktokolwiek przeczyta kod, a agent sam go poprawia.</div>
-		<div data-defect="style"><b>Złapany przez warstwę 2, formatter i reguły lintera.</b> Nikt nie musi tego podnosić w review i nikt nie musi się o to kłócić.</div>
-		<div data-defect="arch"><b>Złapany przez warstwę 3, regułę architektury:</b> mały test, który nie przechodzi, gdy plik w <code>lib/screens/</code> albo <code>lib/widgets/</code> importuje <code>http</code>, <code>sqflite</code> albo secure storage. Na serwerze to samo robi <code>lint-imports</code> dla warstw z <code>.importlinter</code>. Bez takich reguł warstwy rozmywają się, jeden wiarygodnie wyglądający wyjątek po drugim.</div>
+		<div data-defect="analyze"><b>Złapany przez warstwę 1, analyzer:</b> <code>Undefined name 'AboutScreen'</code>. Kilka sekund po zmianie, zanim ktokolwiek przeczyta kod – a agent sam to poprawia.</div>
+		<div data-defect="style"><b>Złapany przez warstwę 2, formatter i reguły lintera.</b> Nikt nie musi tego zgłaszać w review i nikt nie musi się o to kłócić.</div>
+		<div data-defect="arch"><b>Złapany przez warstwę 3, regułę architektury:</b> mały test, który nie przechodzi, gdy plik w <code>lib/screens/</code> albo <code>lib/widgets/</code> importuje <code>http</code>, <code>sqflite</code> albo secure storage. Na serwerze to samo robi <code>lint-imports</code> dla warstw z <code>.importlinter</code>. Bez takich reguł granice warstw się zacierają – wyjątek po wyjątku, każdy z pozoru uzasadniony.</div>
 		<div data-defect="secrets"><b>Złapany przez warstwę 4, secret scan,</b> zanim klucz trafi do historii Gita, skąd trudno go usunąć i trzeba uznać, że wyciekł: każdy, kto go ma, może podpisywać ważne tokeny logowania.</div>
-		<div data-defect="deps"><b>Złapany przez warstwę 5, dependency scan,</b> który porównuje <code>pubspec.lock</code> i <code>requirements.txt</code> z bazą znanych podatności. Nowy pakiet bez wiersza w <code>docs/soup.csv</code> też zostaje tu zatrzymany, przez test rejestru SOUP.</div>
+		<div data-defect="deps"><b>Złapany przez warstwę 5, skan zależności,</b> który porównuje <code>pubspec.lock</code> i <code>requirements.txt</code> z bazą znanych podatności. Nowy pakiet bez wiersza w <code>docs/soup.csv</code> też zostaje tu zatrzymany – przez test rejestru SOUP.</div>
 		<div data-defect="golden"><b>Złapany przez warstwę 6, golden test:</b> wyrenderowana karta nastroju nie zgadza się już z zatwierdzonym obrazem. W review zmiana o 8 px jest prawie niewidoczna.</div>
-		<div data-defect="tests"><b>Przechodzi przez każdy gate.</b> Kod jest poprawnie zbudowany, schludny, w dobrej warstwie i wygląda dobrze, gdy serwer działa. Łapie go dopiero <b>test dla AC-4</b>, który czeka 5 s na serwer, który nigdy nie odpowiada. Gate'y sprawdzają właściwości kodu, a nie twoje intencje.</div>
-		<div data-defect="human"><b>Przechodzi każde sprawdzenie, łącznie z testami.</b> Agent wpisał to zdanie także do <code>docs/product.md</code>, a test AC-5 sprawdza tylko, czy tekst na ekranie zgadza się z tym plikiem. Dopiero człowiek, który porówna go z <code>docs/client-log.md</code>, zauważy, że klient nigdy tego nie powiedział. Przeznaczenie w stylu „pomaga pacjentom radzić sobie z depresją” to twierdzenie medyczne: może zrobić z aplikacji regulowany wyrób medyczny.</div>
+		<div data-defect="tests"><b>Przechodzi przez każdy gate.</b> Kod jest poprawnie zbudowany, schludny, w dobrej warstwie i wygląda dobrze, gdy serwer działa. Łapie go dopiero <b>test dla AC-4</b>: czeka 5 s na serwer, który nigdy nie odpowiada. Gate'y sprawdzają właściwości kodu, a nie twoje intencje.</div>
+		<div data-defect="human"><b>Przechodzi każde sprawdzenie, łącznie z testami.</b> Agent wpisał to zdanie także do <code>docs/product.md</code>, a test AC-5 sprawdza tylko, czy tekst na ekranie zgadza się z tym plikiem. Dopiero człowiek, który porówna ten tekst z <code>docs/client-log.md</code>, zauważy, że klient nigdy tego nie powiedział. Przewidziane zastosowanie w rodzaju „pomaga pacjentom radzić sobie z depresją” to twierdzenie medyczne: może sprawić, że aplikacja stanie się regulowanym wyrobem medycznym.</div>
 	</div>
 </div>
 

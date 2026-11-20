@@ -18,7 +18,7 @@ Here is the walk itself. A new member of your pair's project opens the About scr
 
 <Predict id="trail-break" question="Below, you can break one link in the trail: the commit, the plan or the decision record. Which break do you think does the most damage, and why?">
 
-The missing decision record. A commit without `Refs:` is annoying, but the pull request may still be found by date. A plan answered only in chat loses who decided. Without the ADR, the **reason** is gone: nobody can tell a decision from an accident, and the next agent session will "fix" it by adding the package most code on the internet uses. Try all three and compare.
+The missing decision record. A commit without `Refs:` is annoying, but you may still find the pull request by date. A plan answered only in chat loses the record of who decided. Without the ADR, the **reason** is gone: nobody can tell a decision from an accident, and the next agent session will "fix" it by adding the package most code on the internet uses. Try all three and compare.
 
 </Predict>
 
@@ -30,8 +30,8 @@ Why it matters:
 
 - **Months later**, the answer to "why?" is in the records, not in someone's memory.
 - **Agents.** The next agent session plans from the same records (section 3). A broken trail for people is a broken context for agents.
-- **Regulated software.** Medical-device software standards, such as IEC 62304, expect requirements to be traceable to the design, the tests and the risk controls, and every third-party component (SOUP) to be recorded. With the intended purpose the client stated, the Mood Tracker is not a medical device. A different purpose sentence could change that (see [product development](../../product/purpose/)), and it handles health data either way, so the habit costs little.
-- **Two different regulatory questions.** *Is the app a medical device?* depends on its intended purpose (the EU Medical Device Regulation, MDR). *Does the app contain AI?* is a separate question under the EU AI Act. Using a coding agent to build the app does not make the app an AI system; an AI feature inside it, such as a chatbot or a predictor, would.
+- **Regulated software.** Medical-device software standards, such as IEC 62304, expect requirements to be traceable to the design, the tests and the risk controls, and every third-party component (SOUP) to be recorded. With the intended purpose the client stated, the Mood Tracker is not a medical device. A different purpose sentence could change that (see [product development](../../product/purpose/)). The app handles health data either way, so the habit costs little.
+- **Two different regulatory questions.** *Is the app a medical device?* depends on its intended purpose (the EU Medical Device Regulation, MDR). *Does the app contain AI?* is a separate question under the EU AI Act. Using a coding agent to build the app does not make the app an AI system; an AI feature inside it, such as a chatbot or a prediction model, would.
 - **AI-assisted work.** The trailers, the pull request and your agent log record which agent and model contributed, what it cost, and who reviewed it. In W6 you add these up for the whole semester.
 
 ```bash title="Following the trail with Git"

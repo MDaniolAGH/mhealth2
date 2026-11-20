@@ -1,6 +1,6 @@
 ---
 title: '2. Kontekst: co wie agent'
-description: Co trafia do okna kontekstu agenta, ile to kosztuje i dlaczego brakujące fakty są uzupełniane wiarygodnie brzmiącymi zgadywankami.
+description: Co trafia do okna kontekstu agenta, ile to kosztuje i dlaczego agent uzupełnia brakujące fakty wiarygodnie brzmiącymi domysłami.
 ---
 
 import ContextLab from '../../../../components/pl/ContextLab.astro';
@@ -11,9 +11,9 @@ import Tldr from '../../../../components/Tldr.astro';
 import AtWork from '../../../../components/AtWork.astro';
 import Done from '../../../../components/Done.astro';
 
-<Tldr minutes={5} items={["Agent wie tylko to, co jest w jego kontekście.", "Więcej kontekstu to wyższy koszt, gorsze skupienie i większe ryzyko.", "Brakujące fakty są uzupełniane pewnymi siebie zgadywankami."]} />
+<Tldr minutes={5} items={["Agent wie tylko to, co jest w jego kontekście.", "Więcej kontekstu to wyższy koszt, gorsze skupienie i większe ryzyko.", "Brakujące fakty agent uzupełnia domysłami podanymi z pełnym przekonaniem."]} />
 
-Model nie wie nic o twoim projekcie poza tym, co jest w jego **context window** przy bieżącym zadaniu: w tekście, który widzi naraz, mierzonym w **tokenach** (kawałkach słów; angielskie słowo to mniej więcej jeden–dwa tokeny). Wszystko, na czym pracuje agent, musi się tam zmieścić.
+Model nie wie nic o twoim projekcie poza tym, co jest w jego **context window** przy bieżącym zadaniu, czyli w tekście, który widzi naraz, mierzonym w **tokenach** (kawałkach słów; angielskie słowo to mniej więcej jeden–dwa tokeny). Wszystko, na czym pracuje agent, musi się tam zmieścić.
 
 <Predict id="ctx-more" question="Współczesne okna kontekstu mieszczą setki tysięcy tokenów. Dlaczego nie wrzucić tam całego repozytorium, tak na wszelki wypadek?">
 
@@ -33,22 +33,22 @@ W kontekście działającego agenta są:
 - **Log pracy**: jego własne wcześniejsze kroki i każdy wynik narzędzia, np. długi przebieg testów.
 - **Zmiany**: diffy zrobione do tej pory.
 
-Okna kontekstu w obecnych modelach są duże: setki tysięcy tokenów, a w kilku modelach milion. Rozmiar, którym model się chwali, i rozmiar, z którego dobrze korzysta, to nie to samo. Zapełnianie okna to i tak zły pomysł:
+Okna kontekstu w obecnych modelach są duże: setki tysięcy tokenów, a w kilku modelach milion. Rozmiar deklarowany przez producenta i rozmiar, który model dobrze wykorzystuje, to nie to samo. Zapełnianie okna to i tak zły pomysł:
 
-- **Koszt.** Każdy krok pętli przetwarza kontekst od nowa. Od czerwca 2026 r. Copilot rozlicza się za tokeny, w **GitHub AI Credits**, według stawki danego modelu; inni dostawcy też liczą za tokeny. Długa sesja z dużym kontekstem kosztuje więcej przy każdym kroku. Cache sprawia, że powtarzany kontekst jest tańszy, ale nie darmowy.
-- **Skupienie.** Niepotrzebne pliki i nieaktualne wyniki narzędzi konkurują z tym, co ważne. Długa sesja powoli zapełnia się starymi logami i agent może przestać przestrzegać zasad, których świeża sesja przestrzega.
-- **Sub-agenty pomagają.** Duże zadanie można podzielić tak, żeby każda część zaczynała od świeżego, małego kontekstu:
+- **Koszt.** Każdy krok pętli przetwarza kontekst od nowa. Od czerwca 2026 r. Copilot rozlicza tokeny w **GitHub AI Credits**, według stawki danego modelu; inni dostawcy też liczą za tokeny. Długa sesja z dużym kontekstem kosztuje więcej przy każdym kroku. Cache sprawia, że powtarzany kontekst jest tańszy, ale nie darmowy.
+- **Skupienie.** Niepotrzebne pliki i nieaktualne wyniki narzędzi konkurują z tym, co ważne. Długa sesja powoli zapełnia się starymi logami i agent może przestać przestrzegać zasad, których trzyma się w świeżej sesji.
+- **Sub-agenci pomagają.** Duże zadanie można podzielić tak, żeby każda część zaczynała od świeżego, małego kontekstu:
 
 <Subagents />
 
-Odwrotny błąd to **brakujące informacje**. Model nie zatrzymuje się, gdy brakuje mu faktu; zapełnia lukę czymś, co brzmi wiarygodnie. Przy ekranie About najgroźniejsza luka to własne słowa klienta: agent, który nie przeczytał `docs/product.md`, napisze intended purpose i adres kontaktowy, a oba będą wyglądać dokładnie jak prawdziwe.
+Odwrotny błąd to **brakujące informacje**. Model nie zatrzymuje się, gdy brakuje mu faktu. Zapełnia lukę czymś, co brzmi wiarygodnie. Przy ekranie About najgroźniejsza luka to własne słowa klienta: agent, który nie przeczytał `docs/product.md`, napisze intended purpose i adres kontaktowy, a oba będą wyglądać dokładnie jak prawdziwe.
 
-Dlatego ten pipeline robi dwie rzeczy. Daje agentowi fakty, których potrzebuje: cel, kryteria i przede wszystkim **wiedzę o projekcie**. I wymaga **dowodów**: testów napisanych pod twoje kryteria i checków, które działają bez niczyjej opinii. Test zamienia „wygląda dobrze” w „sprawdzone”.
+Dlatego ten pipeline robi dwie rzeczy. Daje agentowi fakty, których potrzebuje: cel, kryteria i przede wszystkim **wiedzę o projekcie**. I wymaga **dowodów**: testów napisanych pod twoje kryteria i checków, które nie zależą od niczyjej opinii. Test zamienia „wygląda dobrze” w „sprawdzone”.
 
 :::tip[Co włożyć do kontekstu, a co pominąć]
 - **Włóż**: kryteria, pliki, których dotyczy zmiana, potrzebne dokumenty projektu, zasady projektu.
 - **Pomiń**: całe repozytorium „na wszelki wypadek”, starą historię czatu, niezwiązane logi.
-- **Nigdy nie wkładaj** haseł, kluczy API, serwerowego `.env` ani prawdziwych danych osobowych czy danych o zdrowiu. Kontekst trafia do dostawcy modelu. To, co dostawca może przechowywać i jak długo, zależy od twojego planu: plany firmowe i prywatne mają różne warunki. Wiedz, na którym jesteś.
+- **Nigdy nie wkładaj** haseł, kluczy API, serwerowego `.env` ani prawdziwych danych osobowych czy danych o zdrowiu. Kontekst trafia do dostawcy modelu. To, co dostawca może przechowywać i jak długo, zależy od twojego planu: plany firmowe i prywatne mają różne warunki. Sprawdź, z którego korzystasz.
 - **Wybierz najmniejszy model, który spełnia twoje kryteria**, i **zaczynaj nową sesję**, kiedy zadanie jest skończone – po tym, jak zapiszesz w `NOTES.md`, co następna sesja musi wiedzieć.
 :::
 
@@ -62,12 +62,12 @@ Dlatego ten pipeline robi dwie rzeczy. Daje agentowi fakty, których potrzebuje:
 	]}
 	answer={1}
 	why={[
-		'Modele rzadko zatrzymują się z powodu brakującego faktu; dopisują tekst.',
+		'Modele rzadko zatrzymują się z powodu brakującego faktu. Po prostu piszą dalej.',
 		'',
-		'Tylko jeśli każą mu tak twoje zasady. Dlatego AGENTS.md Mood Trackera mówi: never invent client facts, use <TODO: client>.',
+		'Tylko jeśli tak każą mu twoje zasady. Dlatego AGENTS.md Mood Trackera mówi: never invent client facts, use <TODO: client>.',
 		'Nie ma kanału do klienta, a internet nie wie, co ten klient zdecydował.',
 	]}
-	explain="Model zapełnia luki najbardziej prawdopodobnym tekstem. Placeholder zostawia tylko wtedy, gdy każą mu tak zasady: <em>never invent facts the client must provide; use a visible <code>&lt;TODO: client&gt;</code></em>."
+	explain="Model zapełnia luki najbardziej prawdopodobnym tekstem. Placeholder zostawia tylko wtedy, gdy tak każą mu zasady: <em>never invent facts the client must provide; use a visible <code>&lt;TODO: client&gt;</code></em>."
 />
 
 <Quiz

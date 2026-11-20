@@ -127,7 +127,7 @@ const flows = {
 	</div>
 
 	<div class="sdlc-audits">
-		<div data-audit="idea"><h4>Audit record: the issue</h4><dl><dt>Record</dt><dd>Issue #7, "About screen", with the sketch</dd><dt>Lives in</dt><dd>The issue tracker</dd><dt>Points back to</dt><dd>The client who asked, and the client log entry</dd></dl></div>
+		<div data-audit="idea"><h4>Audit record: the issue</h4><dl><dt>Record</dt><dd>Issue #7, "About screen", with the sketch</dd><dt>Lives in</dt><dd>The issue tracker</dd><dt>Points back to</dt><dd>The client who asked, and the client-log entry</dd></dl></div>
 		<div data-audit="analysis"><h4>Audit record: GOAL-1</h4><dl><dt>Record</dt><dd>The goal definition, with an ID everything else can cite</dd><dt>Lives in</dt><dd>The issue, or <code>docs/goals/</code></dd><dt>Points back to</dt><dd>Issue #7</dd></dl></div>
 		<div data-audit="requirements"><h4>Audit record: the specification</h4><dl><dt>Record</dt><dd><code>docs/spec-about.md</code>, criteria AC-1…AC-6, headed with GOAL-1</dd><dt>Lives in</dt><dd>The repository, next to the code</dd><dt>Points back to</dt><dd>GOAL-1 and <code>docs/client-log.md</code></dd></dl></div>
 		<div data-audit="plan"><h4>Audit record: the approved plan</h4><dl><dt>Record</dt><dd>The plan, the documents it relied on, and <b>your written answers</b> to its questions</dd><dt>Lives in</dt><dd>The pull request, or <code>docs/plans/</code></dd><dt>Points back to</dt><dd>AC-1…AC-6, ADR-0002, <code>ARCHITECTURE.md</code></dd></dl></div>
@@ -146,7 +146,7 @@ const flows = {
 		<li data-stage="kb">Before planning, the agent reads the <b>project knowledge</b>: <code>ARCHITECTURE.md</code> (<em>screens never import http</em>), ADR-0002 (<em>build settings come from --dart-define</em>) and <code>docs/product.md</code> (<em>the purpose wording; the contact is still a TODO</em>). Without them it would have to guess all three.</li>
 		<li data-stage="plan">The agent proposes a plan: files, approach, the documents it used, <b>one contradiction</b> it found between the documents and the code, and two open questions. You answer in writing and approve.</li>
 		<li data-stage="implementation">On a branch, the agent implements the first step and runs the checks.</li>
-		<li data-stage="gate" data-result="fail">The gate <b>fails</b>: the architecture test reports <code>lib/screens/about_screen.dart</code> imports <code>package:http</code>. Same input, same verdict, every time.</li>
+		<li data-stage="gate" data-result="fail">The gate <b>fails</b>: the architecture test reports that <code>lib/screens/about_screen.dart</code> imports <code>package:http</code>. Same input, same verdict, every time.</li>
 		<li data-stage="implementation">The error goes back to the agent, which moves the call into <code>lib/services/</code>. Nobody had to copy and paste anything.</li>
 		<li data-stage="gate" data-result="pass">The gate <b>passes</b>. That proves the code is well-formed and in the right layer, not that the feature does what you asked.</li>
 		<li data-stage="tests">The tests run against the criteria, including the AC-4 test you read before the code existed: <em>no answer within 5 s shows "Server: unavailable"</em>. You also run the app on a phone with the server switched off.</li>

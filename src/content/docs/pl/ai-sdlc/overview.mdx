@@ -10,7 +10,7 @@ import Tldr from '../../../../components/Tldr.astro';
 import AtWork from '../../../../components/AtWork.astro';
 import Done from '../../../../components/Done.astro';
 
-<Tldr minutes={5} items={["Agent szybko pisze kod. Ludzie decydują, sprawdzają i tłumaczą.", "Dziesięć etapów; każdy zostawia ślad, który można pokazać.", "Wypróbuj mapę: przeprowadź jedną funkcję od pomysłu do merge'a."]} />
+<Tldr minutes={5} items={["Agent szybko pisze kod. Ludzie decydują, sprawdzają i tłumaczą.", "Dziesięć etapów, a każdy zostawia ślad, który można pokazać.", "Wypróbuj mapę: przeprowadź jedną funkcję od pomysłu do merge'a."]} />
 
 Agent kodujący napisze ekran we Flutterze w kilka minut. Ale ktoś i tak musi:
 
@@ -20,7 +20,7 @@ Agent kodujący napisze ekran we Flutterze w kilka minut. Ale ktoś i tak musi:
 - sprawdzić, co agent zrobił, i udowodnić, że to działa;
 - umieć wytłumaczyć tę zmianę kilka miesięcy później.
 
-Ten przewodnik śledzi **jedną funkcję** – ekran About w Mood Trackerze – od szkicu do zmergowanego pull requesta. Na każdym etapie pokazuje, kto wykonuje pracę, co wchodzi, co wychodzi i co to sprawdza.
+Ten przewodnik śledzi **jedną funkcję** – ekran About w Mood Trackerze – od szkicu do zmergowanego pull requesta. Na każdym etapie pokazuje, kto wykonuje pracę, co jest na wejściu, co na wyjściu i co sprawdza wynik.
 
 <Checklist
 	id="outcomes"
@@ -28,22 +28,22 @@ Ten przewodnik śledzi **jedną funkcję** – ekran About w Mood Trackerze – 
 	items={[
 		'Wyjaśnić, co agent dodaje do modelu językowego i dlaczego ten sam model zachowuje się inaczej w innym harnessie',
 		'Zdecydować, co powinno trafić do kontekstu agenta i ile to kosztuje',
-		'Utrzymywać wiedzę o projekcie (architekturę, decyzje, notatki, słowa klienta), której agent potrzebuje, żeby dobrze planować',
+		'Utrzymywać wiedzę o projekcie (architekturę, decyzje, notatki, słowa klienta), której agent potrzebuje do dobrego planowania',
 		'Napisać <code>AGENTS.md</code> i zamienić jego najważniejsze zasady w automatyczne sprawdzenia',
-		'Przeprowadzić funkcję przez wszystkie dziesięć etapów i powiedzieć, co zostawia po sobie każdy z nich',
+		'Przeprowadzić funkcję przez wszystkie dziesięć etapów i wskazać, co zostawia po sobie każdy z nich',
 		'Prześledzić zmergowaną linijkę kodu wstecz aż do celu i decyzji, która ją uzasadniła',
 	]}
 />
 
 <Predict id="who-does-most" question="Zanim spojrzysz na mapę: ile z dziesięciu etapów, od pomysłu do zmergowanej zmiany, agent kodujący może zrobić <b>sam</b>, bez niczyjej kontroli?">
 
-Żadnego. Tylko etap 5 leży wyłącznie w torze Agent, a nawet tam gate (etap 6) sprawdza każdą zmianę, a plan (etap 4) najpierw zatwierdzasz ty. Etapy 1, 2 i 10 należą tylko do ciebie. Agent pisze dużą część kodu, ale decydują i sprawdzają ludzie i deterministyczne narzędzia.
+Żadnego. Tylko etap 5 leży wyłącznie w torze Agent, a nawet tam każdą zmianę sprawdza gate (etap 6), a plan (etap 4) wcześniej zatwierdzasz ty. Etapy 1, 2 i 10 należą tylko do ciebie. Agent pisze dużą część kodu, ale decydują i sprawdzają ludzie oraz deterministyczne narzędzia.
 
 </Predict>
 
 ## Mapa
 
-Praca płynie z góry na dół. Kolor etapu pokazuje, kto wykonuje pracę; etap, który zajmuje dwa tory, jest wspólny. Po lewej jest **wiedza o projekcie**: dokumenty, które agent czyta, zanim zacznie planować, i które aktualizuje się na etapie dokumentacji.
+Praca płynie z góry na dół. Kolor etapu pokazuje, kto wykonuje pracę. Etap, który zajmuje dwa tory, jest wspólny. Po lewej jest **wiedza o projekcie**: dokumenty, które agent czyta, zanim zacznie planować, i które aktualizuje się na etapie dokumentacji.
 
 **Wypróbuj.** Kliknij **Przejdź krok po kroku**, żeby przeprowadzić ekran About przez każdy etap, łącznie z checkiem, który nie przechodzi. W **Pokaż** możesz dodać pętle zwrotne, przepływy wiedzy albo ślad audytowy. Kliknij etap albo dokument w wiedzy o projekcie. Strzałkami na klawiaturze przechodzisz kolejne kroki.
 
@@ -60,14 +60,14 @@ Ekran About to neutralne zadanie z demo na W3. Klientem jest fikcyjna klinika re
 - **ADR-0002, ADR-0003**: zapisy decyzji o ustawieniach builda i wersji aplikacji.
 - **PR #12**: pull request ze zmianą.
 
-Wszystkie zostały **napisane na potrzeby tego przewodnika**. To nie jest zapis prawdziwej sesji z agentem; liczby i hash commita są zmyślone, a wyniki narzędzi są wyraźnie oznaczone jako przykładowe.
+Wszystkie zostały **napisane na potrzeby tego przewodnika**. To nie jest zapis prawdziwej sesji z agentem. Liczby i hash commita są zmyślone, a wyniki narzędzi są wyraźnie oznaczone jako przykładowe.
 :::
 
 ## Odczuwana szybkość a zmierzona szybkość
 
 <Predict id="felt-speed" question="W randomizowanym badaniu z 2025 r. doświadczeni programiści open source naprawiali prawdziwe issues we własnych, dojrzałych projektach – czasem z narzędziami AI, czasem bez. Czy z AI byli szybsi? I o ile szybsi <b>myśleli</b>, że są?">
 
-Z narzędziami AI byli o około **19% wolniejsi**, a po wszystkim nadal uważali, że byli o około 20% szybsi. Przed badaniem spodziewali się, że będą szybsi o 24% ([METR, lipiec 2025](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)). Autorzy nazywają to migawką narzędzi z początku 2025 r. w jednym konkretnym środowisku, a nie ogólnym prawem. Lekcja na ten kurs: mierz czas, łącznie ze sprawdzaniem i poprawkami, w swoim logu agenta. Nie szacuj go na podstawie tego, jak praca ci się wydawała.
+Z narzędziami AI byli o około **19% wolniejsi**, a po wszystkim nadal uważali, że byli o około 20% szybsi. Przed badaniem spodziewali się, że będą szybsi o 24% ([METR, lipiec 2025](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)). Autorzy nazywają to migawką narzędzi z początku 2025 r. w jednym konkretnym środowisku, a nie ogólnym prawem. Wniosek na ten kurs: mierz czas w logu agenta, łącznie ze sprawdzaniem i poprawkami. Nie szacuj go na podstawie odczuć.
 
 </Predict>
 
@@ -79,14 +79,14 @@ Niczego nie oddajesz co tydzień. To, co ćwiczysz na kolejnych zajęciach, traf
 |---|---|---|
 | **W2** | 1, 2, 4 | jak działa model, koszt kontekstu, `AGENTS.md` twojej pary, sprawdzanie tego, co agent twierdzi o przejętym kodzie |
 | **W3** | 3, etapy 2–4 | architektura tak, jak widzi ją agent, sprawdzona w kodzie; ekran About na trzech poziomach specyfikacji; ADR |
-| **W4** | etapy 5–7, 9 | pętla agenta, równoległa praca agentów w osobnych worktree, testy, które szukają błędów, zamiast je potwierdzać; wkład przez pull request |
+| **W4** | etapy 5–7, 9 | pętla agenta, równoległa praca agentów w osobnych worktree, testy, które szukają błędów, a nie potwierdzają, że wszystko działa; wkład przez pull request |
 | **W5** | etapy 6 i 10 | CI z AI jako reviewerem, MCP, polityka bezpieczeństwa dla agentów |
 | **W6** | 6 | ile kosztowała praca z agentami: log agenta, trailery w commitach, bilans semestru |
 | **Brief twojej pary** | wszystkie dziesięć | `ARCHITECTURE.md`, zapisy decyzji i `NOTES.md` od pierwszych zajęć; zmiany przez pull requesty, gate'y w CI, review od innej pary |
 
 Część przewodnika o [rozwoju produktu](../../product/overview/) obejmuje pracę przed etapem 1: od briefu klienta do prośby, która staje się issue #7.
 
-<AtWork>Jeśli umiesz przeprowadzić kogoś przez ślad funkcji zbudowanej z agentem (cel, kryteria, plan, pull request, review), masz mocny punkt do portfolio. Pokazuje, że potrafisz oceniać, a nie tylko produkować.</AtWork>
+<AtWork>Jeśli umiesz przeprowadzić kogoś przez ślad funkcji zbudowanej z agentem (cel, kryteria, plan, pull request, review), masz mocny element portfolio. To pokazuje, że potrafisz oceniać, a nie tylko produkować.</AtWork>
 
 :::tip[Zrób to w swoim projekcie (10 min)]
 Naszkicuj dziesięć etapów dla pierwszej funkcji ze swojego briefu. Przy każdym etapie zapisz, kto go wykonuje i jaki ślad zostawia. Wrzuć zdjęcie szkicu do `NOTES.md`.

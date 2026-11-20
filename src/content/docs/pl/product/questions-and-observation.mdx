@@ -19,7 +19,7 @@ import Done from '../../../../components/Done.astro';
 
 ## Pytania, które zmieniają rekomendację
 
-Czas klienta jest cenny. Zadawaj tylko pytania, których odpowiedzi zmieniają to, co zaproponujesz. Przy każdym zapisz, co zrobisz przy każdej możliwej odpowiedzi: jeśli żadna odpowiedź niczego nie zmieni, nie pytaj.
+Czas klienta jest cenny. Zadawaj tylko pytania, których odpowiedzi zmieniają to, co zaproponujesz. Przy każdym zapisz, co zrobisz w zależności od odpowiedzi. Jeśli żadna odpowiedź niczego nie zmieni, nie pytaj.
 
 ```text title="docs/questions.md (przykład)"
 1. Czy cel musi być podany w samej aplikacji, czy komisji bioetycznej
@@ -48,14 +48,14 @@ Dobre pytanie jest **otwarte, neutralne i konkretne**. Nie podsuwa odpowiedzi (�
 	]}
 	items={[
 		{ text: 'Czy komisja bioetyczna wymaga podania celu w samej aplikacji, czy wystarczy formularz zgody?', bin: 'keep', why: 'Każda odpowiedź prowadzi do innej propozycji, a jedna z nich w ogóle nie wymaga oprogramowania.' },
-		{ text: 'Jakiego koloru ma być przycisk About?', bin: 'drop', why: 'Żadna odpowiedź nie zmienia rekomendacji. Zdecydujcie o tym później, przy projektowaniu, albo zostawcie to istniejącemu motywowi.' },
+		{ text: 'Jakiego koloru ma być przycisk About?', bin: 'drop', why: 'Żadna odpowiedź nie zmienia rekomendacji. Zdecydujcie o tym później, przy projektowaniu, albo zdajcie się na istniejący motyw.' },
 		{ text: 'Czy fajny ekran About pomógłby waszym uczestnikom?', bin: 'rewrite', why: 'To pytanie sugerujące: podsuwa rozwiązanie i aż prosi się o „tak”. Zapytaj raczej: „Jak uczestnicy szukają dziś pomocy i co nie działa?”' },
 		{ text: 'Czy uczestnicy instalują aplikację z publicznego sklepu, czy dostają ją od kliniki?', bin: 'keep', why: 'Jeśli ze sklepu, to tekst w sklepie jest jedną z opcji – i miejscem, gdzie może się wśliznąć twierdzenie medyczne.' },
 		{ text: 'Czy użyć wbudowanej we Fluttera strony z licencjami?', bin: 'drop', why: 'To pytanie techniczne do twojej pary, nie do klienta. Nie zmienia jego decyzji.' },
 	]}
 />
 
-:::note[Synteza wywiadów z agentem]
+:::note[Synteza wywiadów z pomocą agenta]
 Po wywiadach agent w kilka minut pogrupuje twoje notatki w tematy. Wymagaj, żeby **każdy temat był poparty cytatem**, i sprawdź, czy każdy cytat istnieje i mówi to, co twierdzi temat. Notatki z wywiadów to dane osobowe, często dane o zdrowiu: używaj zanonimizowanych notatek, nie wrzucaj ich do konsumenckich narzędzi AI, a na tym kursie korzystaj wyłącznie z materiałów syntetycznych.
 :::
 
@@ -63,7 +63,7 @@ Po wywiadach agent w kilka minut pogrupuje twoje notatki w tematy. Wymagaj, żeb
 
 ## Spotkanie z klientem
 
-Masz trzy pytania, każde z „jeśli A → X, jeśli B → Y”. Na spotkaniu założenia zamieniają się w fakty – albo w nowe pytania.
+Masz trzy pytania, każde z rozpisanym „jeśli A → X, jeśli B → Y”. Na spotkaniu założenia zamieniają się w fakty – albo w nowe pytania.
 
 <Scene
 	title="Wtorek, 10:00: spotkanie w klinice"
@@ -78,7 +78,7 @@ Masz trzy pytania, każde z „jeśli A → X, jeśli B → Y”. Na spotkaniu z
 	]}
 />
 
-Zapisz, co klient **powiedział**, a nie to, na co liczysz – z datą i z tym, kto to powiedział. Potem odeślij notatki do sprawdzenia. Od teraz te linijki to jedyne źródło faktów o kliencie:
+Zapisz, co klient **powiedział**, a nie to, na co liczysz – z datą i informacją, kto to powiedział. Potem odeślij notatki do sprawdzenia. Od teraz te linijki to jedyne źródło faktów o kliencie:
 
 ```text title="docs/client-log.md (fragment, przykład)"
 2026-11-13  Spotkanie z Anną (koordynatorka) i Tomkiem (wsparcie)
@@ -95,13 +95,13 @@ Zwróć uwagę na trzecią linijkę. Będzie ważna na [stronie z opcjami](../op
 
 ## Obserwacje z aplikacji
 
-Prototyp, który przejęliście, jest pełen niespodzianek. Opisz, co **robi**, udowodnij to i powiedz, dlaczego to ważne dla tego klienta. Trzymaj osobno trzy rzeczy:
+Prototyp, który przejęliście, jest pełen niespodzianek. Opisz, co **robi**, udowodnij to i powiedz, dlaczego to ważne dla tego klienta. Rozróżniaj trzy rzeczy:
 
 - **Obserwacja**: co robi aplikacja albo kod, z dowodem (`file:line` albo kroki, które każdy może powtórzyć na danych syntetycznych).
 - **Interpretacja**: co to może znaczyć. Oznacz niepewne fragmenty.
 - **Implikacja**: dlaczego klienta powinno to obchodzić.
 
-Nie zaczynaj od „znajdź buga”. Słowo *bug* pasuje tylko wtedy, gdy oczekiwane zachowanie zostało uzgodnione, a aplikacja mu przeczy. Agent świetnie sobie radzi z szukaniem; ty odtwarzasz to, co znalazł, zanim trafi do twojego raportu.
+Nie zaczynaj od „znajdź buga”. Słowo *bug* pasuje tylko wtedy, gdy oczekiwane zachowanie zostało uzgodnione, a aplikacja zachowuje się inaczej. Agent świetnie radzi sobie z szukaniem, ale zanim jego znalezisko trafi do raportu, sam je odtwarzasz.
 
 <Sorter
 	title="Obserwacja, interpretacja czy implikacja?"
@@ -115,12 +115,12 @@ Nie zaczynaj od „znajdź buga”. Słowo *bug* pasuje tylko wtedy, gdy oczekiw
 		{ text: 'Poprzedniemu zespołowi nie zależało na wsparciu.', bin: 'int', why: 'Zgadywanie na temat ludzi – i to niesprawiedliwe. Nic w kodzie nie mówi, dlaczego ekranu brakuje.' },
 		{ text: 'Dziś wsparcie nie wie, której wersji używa uczestnik, chyba że uczestnik znajdzie ją gdzieś indziej.', bin: 'imp', why: 'Dlaczego obserwacja jest ważna dla tego klienta. Sprawdź to „gdzieś indziej”: wersję mogą pokazywać ustawienia aplikacji w telefonie.' },
 		{ text: 'Serwer podaje wersję 1.0.0 w opisie API pod <code>/openapi.json</code>.', bin: 'obs', why: 'Da się to odtworzyć: uruchom serwer i otwórz ten URL. Wersję ustawia <code>app/main.py</code>.' },
-		{ text: 'Wersja aplikacji to pewnie ta z <code>pubspec.yaml</code>.', bin: 'int', why: 'Prawdopodobne i warte sprawdzenia: <code>pubspec.yaml</code> mówi <code>1.0.0+1</code>, ale build może to nadpisać. Dopóki nie zbudujesz aplikacji i nie sprawdzisz, to tylko interpretacja.' },
+		{ text: 'Wersja aplikacji to pewnie ta z <code>pubspec.yaml</code>.', bin: 'int', why: 'Prawdopodobne i warte sprawdzenia: w <code>pubspec.yaml</code> jest <code>1.0.0+1</code>, ale build może to nadpisać. Dopóki nie zbudujesz aplikacji i nie sprawdzisz, to tylko interpretacja.' },
 	]}
 />
 
 <Quiz
-	question="Agent raportuje: „Bug: aplikacja nie ma ekranu About, więc łamie dobre praktyki.” Co jest nie tak z tą obserwacją?"
+	question="Agent zgłasza: „Bug: aplikacja nie ma ekranu About, więc łamie dobre praktyki.” Co jest nie tak z tą obserwacją?"
 	options={[
 		'Nic: brak ekranu About to bug w każdej aplikacji',
 		'Nazywa brakującą funkcję bugiem, choć nikt nie uzgodnił oczekiwań',

@@ -9,12 +9,12 @@ const i18n = JSON.stringify({
 	relevant: '{p}% istotnych',
 	nOf: '{n} z {total}',
 	none: 'brak',
-	stop: '<b>Stop.</b> Ten kontekst zawiera {what}. Wszystko, co jest w kontekście, trafia do dostawcy modelu. Sekrety i prawdziwe dane o zdrowiu nigdy tam nie trafiają, bez względu na zadanie.',
+	stop: '<b>Stop.</b> Ten kontekst zawiera {what}. Wszystko, co jest w kontekście, trafia do dostawcy modelu. Sekrety i prawdziwe dane zdrowotne nie mogą tam trafić, bez względu na zadanie.',
 	and: ' i ',
-	notFit: '<b>To się nie mieści.</b> Harness będzie musiał coś wyrzucić albo streścić, a ty nie decydujesz, co. Mogą wypaść akurat te fakty, które się liczą.',
+	notFit: '<b>To się nie mieści.</b> Harness będzie musiał coś wyrzucić albo streścić, a o tym, co, nie decydujesz ty. Mogą wypaść akurat te fakty, które się liczą.',
 	missing: '<b>Brakujące fakty:</b> {what}. Agent się nie zatrzyma; wypełni te luki wiarygodnie brzmiącymi domysłami.',
-	noise: '<b>Kompletny, ale to głównie szum.</b> Każdy fakt tu jest, tylko zakopany w {k} tokenów niezwiązanego tekstu, za które płacisz od nowa na każdym kroku pętli.',
-	lean: '<b>Minimalny i kompletny.</b> Wszystko, czego potrzebuje to zadanie, i niewiele więcej: tanio na każdym kroku i nic, co agent musiałby zgadywać.',
+	noise: '<b>Kompletny, ale to głównie szum.</b> Każdy fakt tu jest, tylko zakopany wśród {k} tokenów niepotrzebnego tekstu, za które płacisz od nowa w każdym kroku pętli.',
+	lean: '<b>Minimalny i kompletny.</b> Wszystko, czego wymaga to zadanie, i niewiele więcej: każdy krok jest tani, a agent nie musi niczego zgadywać.',
 	segTitle: ': około {k} tokenów',
 });
 ---
@@ -38,7 +38,7 @@ const i18n = JSON.stringify({
 		<label class="ctx-item" data-kind="stale"><input type="checkbox" data-tokens="25000" /> pełny log testów z zeszłego tygodnia</label>
 		<label class="ctx-item" data-kind="noise"><input type="checkbox" data-tokens="380000" /> cała dokumentacja Fluttera</label>
 		<label class="ctx-item" data-kind="danger"><input type="checkbox" data-tokens="200" data-danger="sekret" /> <code>.env</code> z tajnym kluczem JWT serwera</label>
-		<label class="ctx-item" data-kind="danger"><input type="checkbox" data-tokens="30000" data-danger="prawdziwe dane o zdrowiu" /> eksport prawdziwych wpisów nastroju uczestników</label>
+		<label class="ctx-item" data-kind="danger"><input type="checkbox" data-tokens="30000" data-danger="prawdziwe dane zdrowotne" /> eksport prawdziwych wpisów nastroju uczestników</label>
 	</div>
 	<div class="ctx-lab__bar" role="img" aria-label="Zapełnienie context window"></div>
 	<div class="ctx__scale"><span>0</span><span class="ctx-lab__used"></span><span>okno: 200k tokenów (poglądowo)</span></div>

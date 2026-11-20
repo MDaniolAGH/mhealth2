@@ -1,6 +1,6 @@
 ---
-title: '5. Testowalne, uszeregowane, podzielone'
-description: Acceptance criteria w formacie Given/When/Then, lekki test INVEST, priorytety MoSCoW, dzielenie stories i słowa, które znaczą jedno.
+title: '5. Testowalne, z priorytetem, podzielone'
+description: Acceptance criteria w formacie Given/When/Then, lekki test INVEST, priorytety MoSCoW, dzielenie stories i słowa o jednym znaczeniu.
 ---
 
 import StageFacts from '../../../../components/StageFacts.astro';
@@ -21,7 +21,7 @@ Story staje się testowalna, kiedy ma **acceptance criteria**: konkretne sytuacj
 
 > **Given** *[kontekst]*, **when** *[działanie albo zdarzenie]*, **then** *[obserwowalny wynik]*.
 
-Story S2 z poprzedniej strony, z jej najbardziej ryzykownym kryterium:
+Story S2 z poprzedniej strony i jej dwa najbardziej ryzykowne kryteria:
 
 ```text title="S2: acceptance criteria (fragment)"
 Given the server does not answer,
@@ -58,23 +58,23 @@ To są AC-4 i AC-5 z [przykładu AI SDLC](../../ai-sdlc/idea-to-plan/#stage-requ
 	answer={2}
 	why={[
 		'Może być jak najbardziej wartościowa. Problem w tym, że nikt nie powie, kiedy jest gotowa.',
-		'Jest otwarta co do rozwiązania i to akurat dobrze. Trudno ją oszacować, bo jest za duża i za mglista: a to S i T.',
+		'Jest otwarta na różne rozwiązania – i to akurat dobrze. Trudno ją oszacować, ale dlatego, że jest za duża i za mglista, a to już S i T.',
 		'',
-		'Zgodna z czym, sprawdzana jak, do kiedy? To nie jest testowalne i to nie jest jedna story.',
+		'Zgodna z czym, sprawdzana w jaki sposób, do kiedy? To nie jest testowalne i to nie jest jedna story.',
 	]}
 	explain="„Zgodna z przepisami” ukrywa cały projekt. Podziel to według regulacji i obowiązków (sprawdzenie intended purpose, inwentaryzacja danych, rejestr SOUP), a potem napisz kryteria dla każdej części."
 />
 
 ## Priorytety: Must, Should, Could, Won't
 
-Priorytety **MoSCoW** to decyzja klienta; ty proponujesz i wyjaśniasz kompromisy. *Won't (tym razem)* to przydatna odpowiedź: zapisuje, że coś rozważono i świadomie pominięto.
+Priorytety **MoSCoW** to decyzja klienta; ty proponujesz i wyjaśniasz kompromisy. *Won't (tym razem)* to przydatna odpowiedź: dokumentuje, że coś rozważono i świadomie pominięto.
 
 <Scene
 	title="Środa, 14:00: szybki telefon w sprawie priorytetów"
 	messages={[
 		{ who: 'you', name: 'Ty', text: 'Anno, jeśli w tym sprincie zdążymy tylko z jednym: cel i kontakt czy wersja?' },
 		{ who: 'client', name: 'Anna', text: 'Cel i kontakt. Bez nich komisja nie zatwierdzi kolejnej grupy uczestników.' },
-		{ who: 'other', name: 'Tomek', text: 'To potem wersja. Do tego czasu mogę prowadzić ludzi przez ustawienia telefonu.' },
+		{ who: 'other', name: 'Tomek', text: 'Potem wersja. Do tego czasu mogę prowadzić ludzi krok po kroku przez ustawienia telefonu.' },
 	]}
 />
 
@@ -104,13 +104,13 @@ Wiele sporów nie dotyczy danych, tylko słów. Pojęcie jest zdefiniowane, kied
 
 | Pojęcie | Proponowana definicja | Przypadki brzegowe i reguła | Właściciel |
 |---|---|---|---|
-| **Wersja aplikacji** | wersja i numer buildu zainstalowanej aplikacji, np. `1.3.0 (12)` | build debug: pokaż „dev”; aktualizacja w trakcie badania: pokaż nową wersję, bez historii | koordynatorka: *do potwierdzenia* |
+| **Wersja aplikacji** | wersja i numer buildu zainstalowanej aplikacji, np. `1.3.0 (12)` | build debugowy: pokaż „dev”; aktualizacja w trakcie badania: pokaż nową wersję, bez historii | koordynatorka: *do potwierdzenia* |
 | **Wersja serwera** | wersja, którą serwer podaje pod `GET /version` | serwer nie działa: „unavailable”; starszy serwer bez `/version`: „unknown” | twoja para |
 | **Kontakt** | osoba i kanał, które klinika wskazała do pytań uczestników | jeszcze niewskazany: „not yet confirmed”; poza godzinami pracy: *do decyzji klienta* | koordynatorka |
 
 <Predict id="term-version" question="Wsparcie pyta uczestniczkę: „Jaką ma pani wersję?” Uczestniczka odczytuje z ekranu About „1.3.0 (12)”, a w ustawieniach telefonu widzi „1.3.0”. Czy to problem?">
 
-Tylko jeśli nikt nie zdefiniował tego pojęcia. Z definicją powyżej wsparcie wie, że liczba w nawiasie to numer buildu i że dwa buildy mogą mieć tę samą wersję 1.3.0. Bez niej wsparcie i twoja para będą rozumieć „wersję” inaczej, a zgłoszenie błędu wskaże zły build. Definicje są tanie przed wydaniem i drogie po nim.
+Tylko jeśli nikt nie zdefiniował tego pojęcia. Dzięki definicji powyżej wsparcie wie, że liczba w nawiasie to numer buildu i że dwa buildy mogą mieć tę samą wersję 1.3.0. Bez niej wsparcie i twoja para będą różnie rozumieć „wersję”, a zgłoszenie błędu wskaże zły build. Definicje są tanie przed wydaniem i drogie po nim.
 
 </Predict>
 

@@ -26,8 +26,8 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: {
-				en: 'Mobile Apps in Medicine - From Idea to Market',
-				pl: 'Aplikacje Mobilne w Medycynie - Od Pomysłu do Wprowadzenia na Rynek',
+				en: 'Mobile Apps in Medicine – From Idea to Market',
+				pl: 'Aplikacje Mobilne w Medycynie – Od Pomysłu do Wprowadzenia na Rynek',
 			},
 			components: { SiteTitle: './src/components/SiteTitle.astro' },
 			defaultLocale: 'root',
@@ -72,7 +72,7 @@ export default defineConfig({
 							items: [
 								{ label: 'Stages 1–4: idea to plan', translations: { pl: 'Etapy 1–4: od pomysłu do planu' }, slug: 'ai-sdlc/idea-to-plan' },
 								{ label: 'Stages 5–6: code and the gate', translations: { pl: 'Etapy 5–6: kod i quality gate' }, slug: 'ai-sdlc/code-and-gate' },
-								{ label: 'Stages 7–10: tests to merge', translations: { pl: 'Etapy 7–10: od testów do merge' }, slug: 'ai-sdlc/tests-to-merge' },
+								{ label: 'Stages 7–10: tests to merge', translations: { pl: "Etapy 7–10: od testów do merge'a" }, slug: 'ai-sdlc/tests-to-merge' },
 							],
 						},
 						{ label: '6. Auditability', translations: { pl: '6. Audytowalność' }, slug: 'ai-sdlc/auditability' },

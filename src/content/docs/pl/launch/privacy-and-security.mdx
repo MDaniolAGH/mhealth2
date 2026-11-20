@@ -1,6 +1,6 @@
 ---
 title: '2. Dane, ryzyko i bezpieczeństwo'
-description: Dane o zdrowiu w świetle RODO, dokumentacja ryzyka, która zaczyna od szkody, bezpieczeństwo aplikacji mobilnej i API oraz pakiet dowodów, który to wszystko pokazuje.
+description: Dane dotyczące zdrowia w świetle RODO, dokumentacja ryzyka zaczynająca się od szkody, bezpieczeństwo aplikacji mobilnej i API oraz pakiet dowodów, który to wszystko pokazuje.
 ---
 
 import Sorter from '../../../../components/Sorter.astro';
@@ -12,58 +12,58 @@ import Tldr from '../../../../components/Tldr.astro';
 import AtWork from '../../../../components/AtWork.astro';
 import Done from '../../../../components/Done.astro';
 
-<Tldr minutes={8} items={["Wpisy o nastroju to dane o zdrowiu. Wypisz każde miejsce, w którym są dane, i przy każdym podaj powód.", "Ryzyko zaczyna się od szkody dla człowieka, dopiero potem przechodzi do kodu.", "W aplikacji mobilnej nie da się ukryć żadnego sekretu."]} />
+<Tldr minutes={8} items={["Wpisy o nastroju to dane o zdrowiu. Wypisz każde miejsce, w którym przechowywane są dane, i przy każdym podaj powód.", "Analizę ryzyka zaczynasz od szkody dla człowieka, dopiero potem przechodzisz do kodu.", "W aplikacji mobilnej nie da się ukryć żadnego sekretu."]} />
 
 ## Dane o zdrowiu i RODO
 
-Nastrój zgłaszany przez samego uczestnika to **dane o zdrowiu**, czyli szczególna kategoria danych z art. 9 RODO – bez względu na to, czy aplikacja jest wyrobem medycznym. Liczą się dwie role:
+Nastrój zgłaszany przez samego uczestnika to **dane dotyczące zdrowia**, czyli jedna ze szczególnych kategorii danych z art. 9 RODO – bez względu na to, czy aplikacja jest wyrobem medycznym. Liczą się dwie role:
 
-- **Administrator danych** (klinika) decyduje, po co i jak dane są przetwarzane: jaka jest podstawa prawna, czy potrzebna jest ocena skutków dla ochrony danych (**DPIA**, art. 35) i jak długo dane są przechowywane.
-- **Ty** budujesz to, co sprawia, że zgodność z przepisami jest możliwa – albo niemożliwa. Nie decydujesz o podstawie prawnej; dbasz o to, żeby system potrafił zrobić to, co obiecuje administrator danych.
+- **Administrator danych** (klinika) decyduje o celach i sposobach przetwarzania danych: jaka jest podstawa prawna, czy potrzebna jest ocena skutków dla ochrony danych (**DPIA**, art. 35) i jak długo dane są przechowywane.
+- **Ty** budujesz to, co sprawia, że zgodność z przepisami jest możliwa – albo niemożliwa. Nie decydujesz o podstawie prawnej, ale dbasz o to, żeby system potrafił zrobić to, co obiecuje administrator.
 
-Zacznij od **inwentaryzacji danych**: przy każdej danej zapisz, gdzie jest, kto może ją zobaczyć, jak długo jest przechowywana i **po co** w ogóle istnieje. Dane trafiają w więcej miejsc niż tylko baza danych: w pamięci telefonu, w cache'ach, logach, kopiach zapasowych, raportach o awariach, fixture'ach testowych i we wszystkim, co wklejasz do narzędzia AI.
+Zacznij od **inwentaryzacji danych**: dla każdego elementu danych zapisz, gdzie się znajduje, kto ma do niego dostęp, jak długo jest przechowywany i **po co** w ogóle istnieje. Dane są nie tylko w bazie danych, lecz także w pamięci telefonu, cache'ach, logach, kopiach zapasowych, raportach o awariach, fixture'ach testowych i we wszystkim, co wklejasz do narzędzi AI.
 
 <Sorter
 	title="Jakie to dane?"
-	intro="Elementy z aplikacji do śledzenia nastroju takiej jak Mood Tracker."
+	intro="Elementy aplikacji do śledzenia nastroju, takiej jak Mood Tracker."
 	bins={[
-		{ key: 'health', label: 'Dane o zdrowiu (art. 9)', tone: 'you' },
+		{ key: 'health', label: 'Dane dotyczące zdrowia (art. 9)', tone: 'you' },
 		{ key: 'personal', label: 'Dane osobowe', tone: 'client' },
 		{ key: 'none', label: 'Same w sobie nie są danymi osobowymi', tone: 'neutral' },
 	]}
 	items={[
-		{ text: 'Ocena nastroju 3 z notatką „znowu zła noc”', bin: 'health', why: 'Samopoczucie opisane przez osobę, którą da się zidentyfikować, to dane o zdrowiu.' },
+		{ text: 'Ocena nastroju 3 z notatką „znowu zła noc”', bin: 'health', why: 'Samopoczucie opisane przez możliwą do zidentyfikowania osobę to dane dotyczące zdrowia.' },
 		{ text: 'Adres e-mail uczestnika', bin: 'personal', why: 'Identyfikuje osobę. W aplikacji do badania zdradza też, że ta osoba bierze udział w badaniu, a to samo w sobie może coś mówić o jej zdrowiu.' },
 		{ text: 'Wersja aplikacji <code>1.3.0 (12)</code>', bin: 'none', why: 'Sama w sobie nic nie mówi o człowieku. Obok ID uczestnika staje się częścią jego danych.' },
-		{ text: 'Linia w logu serwera z adresem IP i godziną', bin: 'personal', why: 'Adres IP może identyfikować ludzi. Logi to dane osobowe i często się o nich zapomina przy inwentaryzacji.' },
+		{ text: 'Linia w logu serwera z adresem IP i godziną', bin: 'personal', why: 'Adres IP może pozwolić zidentyfikować osobę. Logi to dane osobowe, o których przy inwentaryzacji często się zapomina.' },
 		{ text: 'Raport o awarii, który zawiera treść wpisu widoczną na ekranie', bin: 'health', why: 'Narzędzia do raportowania awarii i analityki mogą po cichu kopiować dane o zdrowiu do zewnętrznej firmy. Sprawdź, co wysyłają.' },
 	]}
 />
 
-Prawa uczestników muszą działać **technicznie**: dostęp, sprostowanie, usunięcie, ograniczenie przetwarzania, przenoszenie danych. Przy każdym z nich zapytaj: czy system to potrafi i ile to trwa? To, o czym może zdecydować tylko administrator danych, zapisz jako **pytania**, nie jako odpowiedzi. I nigdy nie twierdź, że system „jest zgodny z RODO”: zgodność nie jest cechą samego kodu. W Polsce organem ochrony danych jest UODO (*Urząd Ochrony Danych Osobowych*).
+Prawa uczestników muszą dać się zrealizować **technicznie**: dostęp do danych, ich sprostowanie, usunięcie, ograniczenie przetwarzania i przenoszenie. Przy każdym z nich zapytaj: czy system to potrafi i ile to trwa? To, o czym może zdecydować tylko administrator danych, zapisz jako **pytania**, nie jako odpowiedzi. I nigdy nie twierdź, że system „jest zgodny z RODO” – zgodność nie jest cechą samego kodu. W Polsce organem nadzorczym jest UODO (*Urząd Ochrony Danych Osobowych*).
 
 :::caution[Narzędzia AI też są podmiotami przetwarzającymi]
-Wklejenie danych uczestników do narzędzia AI oznacza wysłanie ich do innej firmy. Na tym kursie używaj tylko danych syntetycznych. W prawdziwym projekcie każda usługa, która przetwarza dane osobowe w twoim imieniu (hosting, raportowanie awarii, API modelu AI), wymaga umowy i miejsca w inwentaryzacji danych.
+Wklejenie danych uczestników do narzędzia AI oznacza wysłanie ich do innej firmy. Na tym kursie używaj tylko danych syntetycznych. W prawdziwym projekcie każda usługa, która przetwarza dane osobowe w twoim imieniu (hosting, raportowanie awarii, API modelu AI), wymaga umowy powierzenia i musi się znaleźć w inwentaryzacji danych.
 :::
 
 <span id="risk" class="stage-anchor"></span>
 
 ## Ryzyko: najpierw szkoda, potem kod
 
-Zarządzanie ryzykiem dla oprogramowania medycznego (ISO 14971) najpierw pyta, **co może pójść źle dla człowieka**, a dopiero potem, co może pójść źle w kodzie. To dobra praktyka w każdej aplikacji zdrowotnej.
+Zarządzanie ryzykiem w oprogramowaniu medycznym (ISO 14971) zaczyna od pytania, **co złego może spotkać człowieka**, a dopiero potem pyta, co może pójść źle w kodzie. To dobra praktyka w każdej aplikacji zdrowotnej.
 
 - **Zagrożenie**: źródło szkody (pokazana błędna informacja).
 - **Sekwencja zdarzeń → sytuacja zagrożenia**: jak człowiek zostaje narażony.
 - **Szkoda**: uszczerbek na zdrowiu albo, szerzej, na prywatności.
-- **Kontrola ryzyka**, w tej kolejności: najpierw bezpieczniejszy projekt, potem środki ochronne, na końcu informacja. Każda kontrola potrzebuje sposobu na jej **weryfikację**.
+- **Kontrola ryzyka**, w tej kolejności: najpierw bezpieczniejszy projekt, potem środki ochronne, na końcu informacja. Każdą kontrolę trzeba móc **zweryfikować**.
 
 ```text title="Tabela ryzyka (fragment, ekran About, przykład)"
 # | Zagrożenie             | Sekwencja → sytuacja zagrożenia                 | Szkoda
 1 | Pokazany zły kontakt   | kontakt zgadnięty albo nieaktualny → uczestnik  | opóźniona pomoc
   |                        | w kryzysie dzwoni pod numer, którego nikt nie   | w kryzysie
   |                        | odbiera                                         | (poważna)
-2 | Cel obiecuje za dużo   | opis w sklepie: „pomaga radzić sobie            | błędne poleganie
-  |                        | z depresją” → uczestnik używa aplikacji         | na aplikacji
+2 | Cel obiecuje za dużo   | opis w sklepie: „pomaga radzić sobie            | nadmierne zaufanie
+  |                        | z depresją” → uczestnik używa aplikacji         | do aplikacji
   |                        | zamiast leczenia                                | (poważna)
 
 Kontrole
@@ -74,50 +74,50 @@ Kontrole
 
 <Predict id="worst" question="Które pole ekranu About mogłoby wyrządzić najpoważniejszą szkodę, gdyby było błędne: wersja aplikacji, wersja serwera, cel czy kontakt?">
 
-**Kontakt**. Błędna wersja zirytuje zespół wsparcia. Błędny kontakt może zostawić osobę w kryzysie bez pomocy. Dlatego AC-5 zabrania wymyślonych kontaktów, a tabela ryzyka dodaje linijkę na nagłe wypadki. Analiza ryzyka często przenosi twoją uwagę z najbardziej skomplikowanego kodu na najprostszy tekst.
+**Kontakt**. Błędna wersja zirytuje zespół wsparcia. Błędny kontakt może zostawić osobę w kryzysie bez pomocy. Dlatego AC-5 zabrania wymyślania kontaktów, a tabela ryzyka dodaje linijkę z numerem alarmowym. Analiza ryzyka często przenosi uwagę z najbardziej skomplikowanego kodu na najprostszy tekst.
 
 </Predict>
 
 ## Bezpieczeństwo aplikacji mobilnej i API
 
-Większość załatwiają dwie checklisty OWASP: **MASVS** dla aplikacji i **API Security Top 10** dla serwera. Skille z kursu: `/mh-owasp-masvs`, `/mh-owasp-api`, `/mh-secrets-and-config`.
+Większość zagadnień obejmują dwie checklisty OWASP: **MASVS** dla aplikacji i **API Security Top 10** dla serwera. Kursowe skille: `/mh-owasp-masvs`, `/mh-owasp-api`, `/mh-secrets-and-config`.
 
 | Grupa MASVS | Pytanie dla aplikacji zdrowotnej |
 |---|---|
 | STORAGE | Gdzie aplikacja trzyma dane o zdrowiu i tokeny? Czy są zaszyfrowane? Czy trafiają do kopii zapasowych w chmurze? |
-| CRYPTO | Kryptografia platformy i rozsądne zarządzanie kluczami, a nie domowe rozwiązania? |
+| CRYPTO | Kryptografia z platformy i rozsądne zarządzanie kluczami zamiast domowych rozwiązań? |
 | AUTH | Co się dzieje przy wylogowaniu i gdy token wygasa? |
 | NETWORK | TLS wszędzie? Został jakiś nieszyfrowany ruch po debugowaniu? |
-| PLATFORM | Deep linki, WebView, zrzuty ekranu wrażliwych ekranów? |
+| PLATFORM | Deep linki, WebView, zrzuty ekranów z wrażliwymi danymi? |
 | CODE | Aktualne zależności? Walidacja danych wejściowych? |
-| RESILIENCE | Czy model zagrożeń uzasadnia ochronę przed modyfikacją aplikacji? Przy pilotażu często nie; napisz dlaczego |
-| PRIVACY | Zbieranie danych minimalne, przejrzyste, pod kontrolą użytkownika? |
+| RESILIENCE | Czy model zagrożeń uzasadnia ochronę przed modyfikacją aplikacji? W pilotażu często nie – napisz dlaczego |
+| PRIVACY | Czy zbieranie danych jest minimalne, przejrzyste i pod kontrolą użytkownika? |
 
 :::danger[Aplikacja mobilna nie dochowa tajemnicy]
-Wszystko, co jest w aplikacji (stałe, wartości `--dart-define`, assety), może wyciągnąć każdy, kto ma aplikację. Klucze API do płatnych usług, sekret JWT serwera, hasła do bazy danych: nigdy w aplikacji. Domyślne ustawienie deweloperskie, które „działa tylko lokalnie”, to problem do zgłoszenia, jeśli nic nie powstrzymuje go przed trafieniem na produkcję.
+Wszystko, co jest w aplikacji (stałe, wartości `--dart-define`, assety), może wyciągnąć każdy, kto ją ma. Klucze API do płatnych usług, sekret JWT serwera, hasła do bazy danych – nigdy nie umieszczaj ich w aplikacji. Domyślne ustawienie deweloperskie, które „działa tylko lokalnie”, trzeba zgłosić jako problem, jeśli nic nie zapobiega jego trafieniu na produkcję.
 :::
 
-Sprawdzaj API tak, jak zrobiłby to atakujący: zapytaniami i dwoma syntetycznymi użytkownikami. Pierwsze pytanie prawie zawsze brzmi: **czy użytkownik A może odczytać albo zmienić dane użytkownika B, zmieniając ID?** (API1, broken object-level authorisation, czyli błędna autoryzacja na poziomie obiektu).
+Sprawdzaj API tak, jak zrobiłby to atakujący: wysyłaj zapytania jako dwóch syntetycznych użytkowników. Pierwsze pytanie prawie zawsze brzmi: **czy użytkownik A może odczytać albo zmienić dane użytkownika B, zmieniając ID?** (API1, broken object-level authorisation, czyli błędna autoryzacja na poziomie obiektu).
 
 <span id="evidence" class="stage-anchor"></span>
 
 ## Pakiet dowodów
 
-Wszystko z części 2 staje się tutaj dowodem: cele, kryteria akceptacji, testy, pull requesty, zapisy decyzji. Dla oprogramowania medycznego IEC 62304 wymaga właśnie takiej **śledzalności**: wymaganie → projekt → kod → test, a dla każdej kontroli ryzyka – test. Wymaga też listy **SOUP**: każdej biblioteki zewnętrznej, z wersją, powodem, dla którego jest w projekcie, i jej znanymi problemami. **Klasa bezpieczeństwa** oprogramowania (A, B albo C) zależy od najpoważniejszej szkody, do której może się przyczynić awaria oprogramowania, i decyduje o tym, ile procesu potrzeba.
+Wszystko z części 2 staje się tutaj dowodem: cele, kryteria akceptacji, testy, pull requesty, zapisy decyzji. Dla oprogramowania medycznego IEC 62304 wymaga właśnie takiej **śledzalności**: wymaganie → projekt → kod → test, a dla każdej kontroli ryzyka – test. Wymaga też listy **SOUP**, czyli wszystkich bibliotek zewnętrznych z wersją, powodem użycia i znanymi problemami. **Klasa bezpieczeństwa** oprogramowania (A, B albo C) zależy od najpoważniejszej szkody, do której może się przyczynić awaria oprogramowania, i decyduje o tym, jak rozbudowany musi być proces.
 
 Nawet w przypadku dziennika ten sam pakiet odpowiada na pytania, które zada klient, audytor albo następny zespół.
 
 <Checklist
 	id="evidence-pack"
-	title="Pakiet dowodów: co mieć przed releasem"
+	title="Pakiet dowodów: co musisz mieć przed releasem"
 	items={[
 		'Intended purpose w czterech linijkach, cytowany za klientem',
 		'Notatka o kwalifikacji (i plan ścieżki, jeśli to wyrób)',
-		'Inwentaryzacja danych z decyzjami administratora danych i otwartymi pytaniami',
+		'Inwentaryzacja danych z decyzjami administratora i otwartymi pytaniami',
 		'Tabela ryzyka z weryfikacją każdej kontroli',
 		'Przegląd bezpieczeństwa (MASVS, API Top 10) z dowodami albo powodami pominięcia',
 		'Śledzalność: każde wymaganie ma test albo jest oznaczone jako „niezweryfikowane”',
-		'Lista SOUP, która dokładnie zgadza się z plikami lock',
+		'Lista SOUP dokładnie zgodna z plikami lock',
 		'Raporty z testów, w tym z uruchomień na prawdziwych urządzeniach',
 	]}
 />
@@ -132,18 +132,18 @@ Nawet w przypadku dziennika ten sam pakiet odpowiada na pytania, które zada kli
 	]}
 	answer={2}
 	why={[
-		'Szyfrowanie to jedna kontrola. Zgodność zależy też od podstawy prawnej, celów, okresu przechowywania i praw osób, a to nie są cechy kodu.',
+		'Szyfrowanie to tylko jedno zabezpieczenie. Zgodność zależy też od podstawy prawnej, celów, okresu przechowywania i praw osób, których dane dotyczą, a to nie są cechy kodu.',
 		'Na kursie tak. Prawdziwe wdrożenie z prawdziwymi uczestnikami przetwarza prawdziwe dane o zdrowiu.',
 		'',
 		'Mogą być, przy właściwych decyzjach i kontrolach. Tylko że sam kod tego nie zagwarantuje.',
 	]}
-	explain="Inżynierowie sprawiają, że zgodność jest możliwa: pokazują, co potrafi system, i wypisują, o czym musi zdecydować administrator danych. Za samą zgodność odpowiada administrator danych."
+	explain="Inżynierowie sprawiają, że zgodność jest możliwa: pokazują, co potrafi system, i wypisują, o czym musi zdecydować administrator danych. Za samą zgodność odpowiada administrator."
 />
 
-<AtWork>Inwentaryzacje danych i przeglądy zagrożeń to miejsce, w którym juniorzy w health tech najczęściej zaczynają dokładać się do pracy nad zgodnością z przepisami. Są konkretne, wymagają czytania kodu i mało kto lubi robić je porządnie.</AtWork>
+<AtWork>Od inwentaryzacji danych i przeglądów zagrożeń juniorzy w health tech najczęściej zaczynają udział w pracy nad zgodnością z przepisami. To konkretne zadania, wymagają czytania kodu, a mało kto lubi wykonywać je porządnie.</AtWork>
 
 :::tip[Zrób to w swoim projekcie]
-Uruchom `/mh-data-inventory` dla tej części aplikacji, której dotyczy twój brief, i sprawdź każdy wiersz, który dostaniesz. Potem uruchom `/mh-secrets-and-config`. Otwarte kwestie (podstawa prawna, okres przechowywania, DPIA) przynieś klientowi jako pytania.
+Uruchom `/mh-data-inventory` dla tej części aplikacji, której dotyczy twój brief, i sprawdź każdy wiersz wyniku. Potem uruchom `/mh-secrets-and-config`. Otwarte kwestie (podstawa prawna, okres przechowywania, DPIA) przedstaw klientowi w formie pytań.
 :::
 
 <Done />

@@ -49,7 +49,7 @@ The **client** is the manufacturer and makes the decision, normally with a regul
 If the software is a device, **Rule 11** in Annex VIII of the MDR sets its class:
 
 - Software that gives information used to take decisions for diagnosis or therapy: **class IIa**, or **IIb** if those decisions could cause a serious deterioration of health or a surgical intervention, or **III** if they could cause death or irreversible deterioration.
-- Software that monitors physiological processes: **IIa**, or **IIb** for vital parameters where a change could mean immediate danger.
+- Software that monitors physiological processes: **IIa**, or **IIb** for vital physiological parameters where a change could mean immediate danger to the patient.
 - All other software: **class I**.
 
 The class sets the route. Pick one to see what it brings:
@@ -61,12 +61,12 @@ The class sets the route. Pick one to see what it brings:
 	paths={[
 		{ key: 'no', label: 'Not a device', tone: 'client', summary: 'No MDR obligations. Everything else still applies.', items: [
 			'Keep the qualification memo, and repeat it whenever a function or the purpose changes',
-			'GDPR: mood entries are health data (Article 9); data inventory, legal basis, maybe a DPIA',
+			'GDPR: mood entries are health data (Article 9); data inventory, legal basis, possibly a DPIA',
 			'Security: OWASP MASVS for the app, the API Top 10 for the server',
 			'Store text and health declarations that claim nothing beyond the purpose',
 			'A plan for incidents, updates and the end of the study',
 		] },
-		{ key: 'one', label: 'Class I', tone: 'audit', summary: 'You declare conformity yourself, without a notified body. Still a lot of work.', items: [
+		{ key: 'one', label: 'Class I', tone: 'audit', summary: 'The manufacturer declares conformity itself, without a notified body. Still a lot of work.', items: [
 			'A quality management system (the MDR requires one; ISO 13485 is the usual standard)',
 			'Technical documentation (MDR Annexes II and III)',
 			'Risk management (ISO 14971), software life cycle (IEC 62304), usability engineering (IEC 62366-1)',
@@ -86,7 +86,7 @@ The class sets the route. Pick one to see what it brings:
 
 <Predict id="narrow" question="The clinic would love a feature that suggests a breathing exercise whenever a participant reports feeling anxious. Recommending an action based on health data could push the app towards a device. What options does the client have?">
 
-At least three. **Take the device route**, with its cost and time. **Narrow the feature** so it no longer reacts to health data, for example a breathing exercise that anyone can open at any time, for everyone the same. Or **move the decision to a person**: the study team reviews entries under its own clinical procedures, outside the app. Which one is right is the client's decision, made with an expert, but you should put all three on the table. This is the "device? → narrow the purpose" loop on the map.
+At least three. **Take the device route**, with its cost and time. **Narrow the feature** so it no longer reacts to health data, for example a breathing exercise that anyone can open at any time, the same for everyone. Or **move the decision to a person**: the study team reviews entries under its own clinical procedures, outside the app. Which one is right is the client's decision, made with an expert, but you should put all three on the table. This is the "device? → narrow the purpose" loop on the map.
 
 </Predict>
 

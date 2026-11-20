@@ -31,7 +31,7 @@ There are three levels of automated test, from fast and narrow to slow and broad
 | **End-to-end** | `integration_test` package | a device or emulator | open About with the real server running, then with it stopped |
 | **Your run** | the app itself | a phone or emulator | server switched off, very large font, dark mode, a narrow screen |
 
-Here is the widget test for the riskiest criterion. Note how the plan's decision, a timeout passed in as a parameter and a service the test can replace, makes it possible. Widget tests run on a fake clock, so the 5 seconds take no real time:
+Here is the widget test for the riskiest criterion. Note how the plan's decision makes it possible: the timeout is passed in as a parameter, and the test can replace the service. Widget tests run on a fake clock, so the 5 seconds take no real time:
 
 ```dart title="test/screens/about_screen_test.dart (illustrative)"
 testWidgets('AC-4: no answer within 5 s shows "Server: unavailable"',
@@ -57,7 +57,7 @@ testWidgets('AC-4: no answer within 5 s shows "Server: unavailable"',
 
 <Predict id="mutants" question="Would this test fail for each of these bugs? (1) The timeout is 10 s instead of 5 s. (2) The timeout is 3 s. (3) A reply that arrives late replaces &quot;unavailable&quot; with &quot;Server 1.0.0&quot;.">
 
-(1) **Fails**: at 5.1 s the screen still says "checking…". (2) **Fails**: at 4.9 s it already says "unavailable". (3) **Passes**: the last `pump` lets the late reply in, but nothing checks the screen afterwards. A test that survives a real bug proves less than it seems to; finding such tests is what mutation testing in W4 is for. The fix is two more lines:
+(1) **Fails**: at 5.1 s the screen still says "checking…". (2) **Fails**: at 4.9 s it already says "unavailable". (3) **Passes**: the last `pump` lets the late reply in, but nothing checks the screen afterwards. A test that still passes with a real bug in the code proves less than it seems to; finding such tests is what mutation testing in W4 is for. The fix is two more lines:
 
 ```dart
   await tester.pump(const Duration(seconds: 1)); // the late reply arrives
@@ -74,7 +74,7 @@ The agent can make the same wrong assumption in the code and in the test. If it 
 </Predict>
 
 :::tip[Who writes the test that matters most?]
-For the riskiest criterion, write the test yourself, or at least read it closely **before** the implementation exists. Then ask: *would this test fail if the feature were broken?* Break the code on purpose and run it. In W4, mutation testing asks the same question automatically, for many small deliberate bugs.
+For the riskiest criterion, write the test yourself, or at least read it closely **before** the implementation exists. Then ask: *would this test fail if the feature were broken?* Break the code on purpose and run the test. In W4, mutation testing asks the same question automatically, for many small deliberate bugs.
 :::
 
 <span id="stage-docs" class="stage-anchor"></span>
@@ -168,7 +168,7 @@ The reviewer checks the pull request against the review checklist and leaves a r
 		'Every client fact (purpose, contact, wording) is in <code>docs/client-log.md</code>',
 		'The documentation describes the code as it now is',
 		'No secrets, no real personal or health data; no new package without a SOUP row and agreement',
-		'No test was changed or deleted to make it pass (<code>git diff -- test/</code>)',
+		'No test was changed or deleted to make the change pass (<code>git diff -- test/</code>)',
 		'Every new package exists, is the one you meant, and is maintained: agents sometimes invent package names, and attackers register them',
 		'No dead code, duplicated helpers or &quot;improvements&quot; outside the plan',
 		'You could explain any line of it if asked',
@@ -226,7 +226,7 @@ When the pull request is merged, the project knowledge describes the new feature
 		'Two automatic checks are still not a person who takes responsibility.',
 		'',
 		'Tests check what you specified, not whether it was the right thing.',
-		'Then it waits. Unreviewed code is how the "intended purpose nobody said" reaches users.',
+		'Then it waits. Unreviewed code is how an "intended purpose" the client never stated reaches users.',
 	]}
 	explain="The AI review is one more input. It cannot take responsibility, and text planted in the pull request can steer it (W5)."
 />

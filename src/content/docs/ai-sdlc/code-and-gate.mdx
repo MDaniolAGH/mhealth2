@@ -23,7 +23,7 @@ import Done from '../../../components/Done.astro';
 
 <StageFacts tone="agent" who={'<span class="sdlc-chip is-agent">Agent</span> inside its harness'} input="The approved plan, <code>NOTES.md</code>, <code>AGENTS.md</code>" output="Small, reviewable changes on a branch, each with a commit message that says why" />
 
-The agent works on a **branch** (here `feat/about-screen`), never directly on `main`. It implements the plan and follows the standards, the architecture and the interfaces the plan fixed. It runs the checks after every change (stage 6) and loops until they pass. In W4 you ran several agents in parallel, each in its own **worktree** (a second working folder of the same repository, on its own branch), so that two agents never edit the same files.
+The agent works on a **branch** (here `feat/about-screen`), never directly on `main`. It implements the plan and follows the standards, the architecture and the interfaces that the plan set. It runs the checks after every change (stage 6) and loops until they pass. In W4 you ran several agents in parallel, each in its own **worktree** (a second working folder of the same repository, on its own branch), so that two agents never edit the same files.
 
 You can also hand a whole issue to the **Copilot cloud agent**: it works in a sandbox on GitHub and opens a pull request. Nothing about the pipeline changes. The issue must carry the criteria, the pull request goes through the same gate, and you review it as you would review a colleague's.
 
@@ -77,7 +77,7 @@ A **quality gate** is a set of automatic checks that every change must pass befo
 | 5 | **Can we trust what it depends on?** | Every package is code you did not write or review: a SOUP item that must be recorded and watched | vulnerability scan, register check | OSV-Scanner; `tests/test_soup_register.py` |
 | 6 | **Does the UI still look as approved?** | Small visual changes slip past a code review | screenshot comparison | golden tests (`matchesGoldenFile`) |
 
-Two questions are deliberately **not** in the gate: *does it do what we asked?* is answered by tests against the criteria (stage 7), and *is it the right thing to build?* only by people (stages 7 and 10).
+Two questions are deliberately **not** in the gate. Tests against the criteria answer *does it do what we asked?* (stage 7), and only people can answer *is it the right thing to build?* (stages 7 and 10).
 
 ### What makes a check a gate
 
@@ -102,7 +102,7 @@ None of the automated ones, and not even the tests, if the agent also wrote the 
 
 <GateLab />
 
-The gate is cheap and certain about a few things. The tests are about what you asked for. People are about whether it was worth asking for. You need all three.
+The gate is cheap and certain about a few things. The tests check what you asked for. People judge whether it was worth asking for. You need all three.
 
 ### What a gate cannot tell you
 
@@ -178,7 +178,7 @@ jobs:
       - run: python -m pytest -q
 ```
 
-Golden images recorded on macOS may differ by a few pixels on Linux (see `NOTES.md`). Decide on purpose where the golden tests run; never regenerate them to make CI pass. In the repository settings, mark both jobs as **required** checks, or a failure only shows a red cross.
+Golden images recorded on macOS may differ by a few pixels on Linux (see `NOTES.md`). Decide on purpose where the golden tests run; never regenerate them to make CI pass. In the repository settings, mark both jobs as **required** checks; otherwise a failure only shows a red cross and does not block the merge.
 
 </TabItem>
 <TabItem label="An architecture rule">

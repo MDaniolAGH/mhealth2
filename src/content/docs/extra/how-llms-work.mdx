@@ -21,7 +21,7 @@ import LlmFlow from '../../../components/LlmFlow.astro';
 
 <Banner
 	eyebrow="Extra · after Andrej Karpathy"
-	title="How LLMs work, in 15 minutes"
+	title="How LLMs work, in 20 minutes"
 	sub="A chatbot is a very large function that reads a window of tokens and guesses the next one. Everything else (knowledge, style, mistakes) follows from that."
 	tokens={['How', ' L', 'LM', 's', ' work', '?']}
 	stats={[
@@ -37,13 +37,13 @@ This page follows the story of Andrej Karpathy's lecture [*Deep Dive into LLMs l
 
 ## 1. It starts with the internet
 
-A model is first trained on a huge amount of text. Builders download web pages and filter them: drop unwanted sites, extract the text, keep the languages they want, remove duplicates, remove personal information. What is left is the **pre-training data**. One open example, Hugging Face's FineWeb, holds about **15 trillion tokens** (about 44 TB of text).
+A model is first trained on a huge amount of text. Model builders download web pages and filter them: drop unwanted sites, extract the text, keep the languages they want, remove duplicates, remove personal information. What is left is the **pre-training data**. One open example, Hugging Face's FineWeb, holds about **15 trillion tokens** (about 44 TB of text).
 
 The model will absorb the patterns of this text, including its facts, its style and its mistakes.
 
 ## 2. Tokens: what the model actually reads
 
-A model does not read letters or words. Text is cut into **tokens**: frequent pieces of text, from single characters to whole words. The vocabulary is built from the data with an algorithm called byte-pair encoding: start from bytes, and keep merging the pairs that appear most often. GPT-2's tokenizer (2019) had about 50,000 tokens, GPT-4's about 100,000, GPT-4o's about 200,000.
+A model does not read letters or words. Text is cut into **tokens**: frequent pieces of text, from single characters to whole words. The vocabulary is built from the data with an algorithm called byte-pair encoding: start from bytes, and keep merging the pairs that appear most often. GPT-2's tokenizer (2019) had about 50,000 tokens, GPT-4's about 100,000, and GPT-4o's about 200,000.
 
 <Predict id="strawberry" question="How many tokens is the word &quot;strawberry&quot;? And will a Polish sentence need more tokens than the same sentence in English, fewer, or the same?">
 
@@ -95,7 +95,7 @@ Sample ten times at temperature 1, then at 0.2, then at 2. This is why the same 
 
 A model trained only on web text is a **base model**: Karpathy calls it an internet document simulator. Give it the start of a page, and it continues the page. It does not answer questions; it writes what usually comes next.
 
-The assistant comes from more training, in stages. Karpathy compares it to a school textbook:
+The assistant comes from more training, in stages. Karpathy compares the stages to learning from a school textbook:
 
 <Picker
 	kicker="How an assistant is made"
@@ -121,7 +121,7 @@ The assistant comes from more training, in stages. Karpathy compares it to a sch
 	]}
 />
 
-So is the assistant a different kind of model? No. It is still a document completer. The chat app wraps your conversation into one document with special tokens, and fine-tuning taught the model how documents like that continue. Type a message, generate the reply and watch where it goes. Then switch to the base model.
+So is the assistant a different kind of model? No. It is still a document completer. The chat app turns your conversation into one document with special tokens, and fine-tuning taught the model how documents like that continue. Type a message, generate the reply and watch where it goes. Then switch to the base model.
 
 <ChatTemplate />
 
@@ -146,7 +146,7 @@ Try it: pick a question and look at the answer with an empty desk. Then put a fi
 
 ## 6. Hallucinations and uneven abilities
 
-Models **hallucinate**: they produce fluent, confident text that is false. In training, confident answers were almost always the right style, so a model imitates confidence even when it does not know. Labs reduce this by training models to say "I don't know" and by giving them **tools** (search, running code), but it never goes away.
+Models **hallucinate**: they produce fluent, confident text that is false. In the training data, confident answers were almost always the right style, so a model imitates confidence even when it does not know. Labs reduce this by training models to say "I don't know" and by giving them **tools** (search, running code), but the problem never goes away completely.
 
 <GuessMeter />
 

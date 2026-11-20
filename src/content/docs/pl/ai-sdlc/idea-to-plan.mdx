@@ -18,20 +18,20 @@ import Done from '../../../../components/Done.astro';
 <StageStrip />
 
 :::note[Przykład: ekran About]
-Klient, klinika rehabilitacyjna prowadząca sześciomiesięczne badanie (fikcyjny klient z W1), prosi o ekran About w Mood Trackerze: wersja aplikacji, wersja serwera, do czego służy aplikacja i do kogo pisać z pytaniami. To neutralne zadanie z demo na W3, więc nie dotyka żadnego z obszarów, które briefy C01–C07 zostawiają tobie do odkrycia.
+Klient, klinika rehabilitacyjna prowadząca sześciomiesięczne badanie (fikcyjny klient z W1), prosi o ekran About w Mood Trackerze: wersja aplikacji, wersja serwera, do czego służy aplikacja i do kogo pisać z pytaniami. To neutralne zadanie z demo na W3, więc nie dotyka żadnego z obszarów, które briefy C01–C07 zostawiają do samodzielnego odkrycia.
 
-Artefakty poniżej zostały **napisane na potrzeby tego przewodnika**. To nie jest zapis prawdziwej sesji z agentem, a liczby i hashe są zmyślone.
+Poniższe artefakty powstały **na potrzeby tego przewodnika**. To nie jest zapis prawdziwej sesji z agentem, a liczby i hashe są zmyślone.
 :::
 
 <span id="stage-idea" class="stage-anchor"></span>
 
 ## 1. Pomysł
 
-<StageFacts tone="you" who={'<span class="sdlc-chip is-you">Ty</span> albo klient, który chce tej funkcji'} input="Potrzeba użytkownika" output="Szkic i jedno zdanie, zapisane jako issue" />
+<StageFacts tone="you" who={'<span class="sdlc-chip is-you">Ty</span> albo klient, który chce tej funkcji'} input="Potrzeba użytkownika" output="Szkic i jedno zdanie zapisane jako issue" />
 
 > *„Uczestnicy ciągle pytają, którą wersję mają, a nasza komisja bioetyczna chce, żeby aplikacja mówiła, do czego służy.”*
 
-Szkic od koordynatora badania pokazuje ekran z nazwą aplikacji, wersją, jednym zdaniem o badaniu i kontaktem. To wystarczy, żeby zacząć rozmowę, więc zapisz to jako issue (tutaj issue #7). Nie wystarczy, żeby zacząć kodować: szkic nie mówi, skąd wziąć wersję, co ma się dziać, gdy serwer nie działa, jakie zdanie o badaniu ani czyj kontakt. (Skąd wzięła się ta prośba i dlaczego ekran About wygrał z innymi opcjami – o tym jest część o [rozwoju produktu](../../product/overview/).)
+Szkic koordynatora badania pokazuje ekran z nazwą aplikacji, wersją, jednym zdaniem o badaniu i kontaktem. To wystarczy, żeby zacząć rozmowę, więc zapisz to jako issue (tutaj issue #7). Nie wystarczy jednak, żeby zacząć kodować: szkic nie mówi, skąd wziąć wersję, co ma się dziać, gdy serwer nie działa, jakie zdanie o badaniu pokazać ani czyj to ma być kontakt. (Skąd wzięła się ta prośba i dlaczego ekran About wygrał z innymi opcjami – o tym mówi część o [rozwoju produktu](../../product/overview/).)
 
 <span id="stage-analysis" class="stage-anchor"></span>
 
@@ -39,7 +39,7 @@ Szkic od koordynatora badania pokazuje ekran z nazwą aplikacji, wersją, jednym
 
 <StageFacts tone="you" who={'<span class="sdlc-chip is-you">Ty</span> – spojrzenie biznesowe i techniczne razem'} input="Pomysł; karta produktu i architektura, żeby zobaczyć, czego pomysł dotyka" output="Krótka definicja celu z ID" />
 
-Analiza zamienia pomysł w **cel**. Potrzebuje obu spojrzeń. Strona biznesowa wie, po co ta funkcja; strona techniczna wie, ile kosztuje i czego dotyka. Odpowiedz na cztery pytania i zapisz, co jest poza zakresem:
+Analiza zamienia pomysł w **cel**. Potrzebne są do tego oba spojrzenia. Strona biznesowa wie, po co jest ta funkcja, a techniczna – ile kosztuje i czego dotyka. Odpowiedz na cztery pytania i zapisz, co jest poza zakresem:
 
 1. **Co robi ten ekran?**
 2. **Jaką wartość daje?**
@@ -61,9 +61,9 @@ Ograniczenia     Żadnych nowych pakietów (każdy to pozycja SOUP). Działa, gd
 Poza zakresem    Strona z licencjami, changelog, sprawdzanie aktualizacji.
 ```
 
-<Predict id="hidden-decisions" question="Pomijasz analizę i wpisujesz w agent mode tylko <em>„dodaj ekran About”</em>. Wypisz decyzje, które agent podejmie za klienta, nie pytając nikogo.">
+<Predict id="hidden-decisions" question="Pomijasz analizę i wpisujesz w agent mode tylko <em>„dodaj ekran About”</em>. Wypisz decyzje, które agent podejmie za klienta, nikogo nie pytając.">
 
-Skąd wziąć wersję (nowy pakiet?), co pokazać, gdy serwer nie działa, jakie zdanie opisuje przeznaczenie aplikacji, czyj kontakt, w jakim języku. Każdy z tych strzałów brzmi rozsądnie i każda z tych decyzji należy do klienta albo do ciebie. GOAL-1 ustala je, zanim powstanie jakikolwiek kod. W demo na W3 liczyliśmy te ukryte decyzje na prawdziwym diffie.
+Skąd wziąć wersję (nowy pakiet?), co pokazać, gdy serwer nie działa, jakie zdanie opisuje przeznaczenie aplikacji, czyj kontakt podać, w jakim języku. Każdy z tych strzałów brzmi rozsądnie, ale każda z tych decyzji należy do klienta albo do ciebie. GOAL-1 ustala je, zanim powstanie jakikolwiek kod. W demo na W3 liczyliście te ukryte decyzje na prawdziwym diffie.
 
 </Predict>
 
@@ -73,13 +73,13 @@ Skąd wziąć wersję (nowy pakiet?), co pokazać, gdy serwer nie działa, jakie
 
 <StageFacts tone="you-agent" who={'<span class="sdlc-chip is-you">Ty</span> decydujesz · <span class="sdlc-chip is-agent">Agent</span> może napisać szkic i zadawać pytania'} input="Cel, dziennik klienta, dokumentacja architektury i API, <code>AGENTS.md</code>" output="<code>docs/spec-about.md</code>: ponumerowane kryteria, które da się zaobserwować" />
 
-Wymagania to cel zapisany tak, żeby o każdym zdaniu dało się **rozstrzygnąć, czy jest prawdziwe, czy fałszywe** – testem albo uruchomieniem aplikacji. Składa się na nie kilka źródeł:
+Wymagania to cel zapisany tak, żeby o każdym zdaniu dało się **rozstrzygnąć, czy jest prawdziwe, czy fałszywe** – testem albo uruchomieniem aplikacji. Czerpiesz je z kilku źródeł:
 
 - **Słowa klienta.** `docs/client-log.md` i karta produktu; makieta, jeśli jest.
 - **Wiedza o projekcie.** Co mówi dokumentacja architektury i API, np. który endpoint zwraca wersję.
 - **Standardy pracy.** Co już ustala `AGENTS.md`, np. żadnych nowych pakietów bez pytania.
 
-Dobry początek: niech agent najpierw będzie krytykiem, tak jak w demo na W3. *„Zanim cokolwiek napiszesz, zadaj mi pytania, których potrzebujesz do tej specyfikacji. Oddziel pytania do klienta od technicznych.”*
+Dobry początek: niech agent najpierw będzie krytykiem, tak jak w demo na W3. *„Zanim cokolwiek napiszesz, zadaj mi pytania, na które potrzebujesz odpowiedzi, żeby napisać tę specyfikację. Pytania do klienta oddziel od technicznych.”*
 
 ```markdown title="docs/spec-about.md"
 # About screen: acceptance criteria (GOAL-1)
@@ -105,10 +105,10 @@ To samo kryterium można zapisać w formie **EARS** (*Easy Approach to Requireme
 
 > **AC-4 (EARS)** *If* the server does not answer within 5 seconds, *then* the About screen *shall* show "Server: unavailable".
 
-Większość przypadków brzegowych to zdania typu „If… then… shall”. Jeśli nie umiesz takiego napisać, wymaganie nie jest jeszcze jasne.
+Większość przypadków brzegowych da się zapisać zdaniem typu „If… then… shall”. Jeśli nie umiesz takiego napisać, wymaganie nie jest jeszcze jasne.
 
 <Quiz
-	question="O którym z tych kryteriów da się rozstrzygnąć testem albo uruchomieniem, czy jest spełnione?"
+	question="Które z tych kryteriów da się jednoznacznie sprawdzić testem albo uruchomieniem aplikacji?"
 	options={[
 		'Ekran About ładuje się szybko, nawet na starszych telefonach',
 		'Uczestnicy uważają ekran About za łatwy do zrozumienia',
@@ -117,22 +117,22 @@ Większość przypadków brzegowych to zdania typu „If… then… shall”. Je
 	]}
 	answer={3}
 	why={[
-		'„Szybko” nie ma progu. Da się to przetestować, gdy go określisz: „widoczny w ciągu 1 s od dotknięcia About na telefonie referencyjnym”.',
-		'Da się to rozstrzygnąć dopiero wtedy, gdy ustalisz, jak to mierzysz, np. „4 z 5 uczestników znajduje kontakt bez pomocy”.',
+		'„Szybko” nie ma progu. Da się to przetestować dopiero wtedy, gdy go określisz: „widoczny w ciągu 1 s od dotknięcia About na telefonie referencyjnym”.',
+		'Da się to rozstrzygnąć dopiero wtedy, gdy ustalisz, jak to zmierzysz, np. „4 z 5 uczestników znajduje kontakt bez pomocy”.',
 		'Nikt nie zaobserwuje „czystości”. Zamień to na reguły quality gate (etap 6).',
 		'',
 	]}
-	explain="Tylko ostatnie wskazuje obserwowalny wynik i próg. Pozostałe staną się kryteriami, gdy powiesz, co zaobserwujesz i na czym."
+	explain="Tylko ostatnie podaje obserwowalny wynik i próg. Pozostałe staną się kryteriami, gdy określisz, co i na czym zaobserwujesz."
 />
 
 <Predict id="first-test" question="Które kryterium przetestujesz jako pierwsze i dlaczego?">
 
-**AC-4 i AC-5.** To na krawędziach rozsądnie brzmiące zgadywanie najczęściej okazuje się błędne – i tam nikt tego nie zauważy, patrząc na ekran: na twoim laptopie serwer zawsze działa, a placeholder wygląda niewinnie. AC-4 ma granicę, którą da się przetestować dokładnie (odpowiedź tuż przed upływem 5 s się wyświetla; brak odpowiedzi po 5 s – nie). AC-5 chroni słowa samego klienta, które agent w przeciwnym razie by zmyślił.
+**AC-4 i AC-5.** To w przypadkach brzegowych rozsądnie brzmiące założenia najczęściej okazują się błędne i tam nikt tego nie zauważy, patrząc na ekran: na twoim laptopie serwer zawsze działa, a placeholder wygląda niewinnie. AC-4 ma granicę, którą da się dokładnie przetestować (odpowiedź, która przyjdzie tuż przed upływem 5 s, zostanie wyświetlona; jeśli do 5 s odpowiedzi nie ma – już nie). AC-5 chroni słowa klienta, które inaczej agent by zmyślił.
 
 </Predict>
 
 :::caution[Co tu najczęściej idzie nie tak]
-- Kryteria, których nikt nie zaobserwuje, np. „kod jest czysty”.
+- Kryteria, których nie da się zaobserwować, np. „kod jest czysty”.
 - Brak przypadków brzegowych: serwer nie działa, wartości jeszcze nie ma, bardzo długi tekst, duża czcionka.
 - Agent pisze kryteria, według których potem sam będzie oceniany, a ty ich nie czytasz.
 :::
@@ -146,7 +146,7 @@ Większość przypadków brzegowych to zdania typu „If… then… shall”. Je
 Poproś agenta o plan, **zanim** cokolwiek zmieni. Plan mówi, *co* powstanie i *jak*: które pliki, jakie podejście, jakie sprawdzenia. Na W3 robiliście to w Spec Kit, narzędziu GitHuba do spec-driven development: spec → plan → zadania → implementacja.
 
 :::danger[Nie ma planu bez wiedzy o projekcie]
-Wskaż agentowi architekturę, zapisy decyzji, kartę produktu i notatki, **zanim** zacznie planować (prompt do planowania z rozdziału 3), i wymagaj, żeby plan **wymienił dokumenty, z których korzystał**. Plan bez źródeł jest zgadnięty. Porównaj dwie wersje poniżej: dzięki wiedzy kod trafił do właściwej warstwy, obyło się bez nowego pakietu, a słowa klienta zostały słowami klienta.
+Wskaż agentowi architekturę, zapisy decyzji, kartę produktu i notatki, **zanim** zacznie planować (prompt do planowania z rozdziału 3), i wymagaj, żeby plan **wymienił dokumenty, z których korzystał**. Plan bez źródeł to zgadywanie. Porównaj dwie wersje poniżej: dzięki wiedzy o projekcie kod trafił do właściwej warstwy, obyło się bez nowego pakietu, a w aplikacji znalazły się słowa klienta, a nie agenta.
 :::
 
 <Tabs>
@@ -216,74 +216,74 @@ Checks
   Run the tests.
 ```
 
-Każda linia brzmi rozsądnie, a pięć z nich to błędy w tym projekcie. Ekran, który sam woła `http`, łamie architekturę. Nowy pakiet to niezarejestrowana pozycja SOUP, a `AGENTS.md` każe w takiej sytuacji zatrzymać się i zapytać. Intended purpose to zdanie, którego klient nigdy nie powiedział – i do tego **twierdzenie medyczne**, które może zmienić to, jak aplikacja jest regulowana. Adres kontaktowy jest zmyślony. A bez timeoutu spinner kręci się w nieskończoność, gdy serwer nie działa.
+Każda linia brzmi rozsądnie, ale w tym projekcie pięć z nich to błędy. Ekran, który sam wywołuje `http`, łamie architekturę. Nowy pakiet to niezarejestrowana pozycja SOUP, a `AGENTS.md` każe w takiej sytuacji zatrzymać się i zapytać. Intended purpose to zdanie, którego klient nigdy nie wypowiedział, a do tego **twierdzenie medyczne**, które może zmienić status regulacyjny aplikacji. Adres kontaktowy jest zmyślony. A bez timeoutu spinner kręci się w nieskończoność, gdy serwer nie działa.
 
 </TabItem>
 </Tabs>
 
-Sprawdzaj plan tymi pytaniami. Twoje zaznaczenia zapisują się w tej przeglądarce, więc możesz wrócić do tej listy na labach:
+Sprawdzaj plan według tej listy. Zaznaczenia zapisują się w przeglądarce, więc możesz do niej wrócić na laboratoriach:
 
 <Checklist
 	id="plan-review"
 	items={[
 		'<b>Wymienia dokumenty</b>, z których korzystał, i są to właściwe dokumenty',
-		'Pasuje do <code>ARCHITECTURE.md</code> i trzyma się każdego istotnego zapisu decyzji',
+		'Jest zgodny z <code>ARCHITECTURE.md</code> i ze wszystkimi istotnymi zapisami decyzji',
 		'Każdemu kryterium odpowiada co najmniej jeden krok',
-		'Wszystkie pliki mieszczą się w tym, na co pozwala zadanie; żaden pakiet nie jest dodany bez pytania',
-		'Podejście da się przetestować (tutaj: timeout jest parametrem, więc AC-4 da się przetestować)',
-		'Każdy fakt o kliencie pochodzi z <code>docs/client-log.md</code>; nic nie jest zmyślone',
-		'Pytania agenta mają odpowiedzi <b>na piśmie</b>, a znalezione sprzeczności są poprawione albo zapisane',
+		'Wszystkie pliki mieszczą się w zakresie zadania; żaden pakiet nie został dodany bez pytania',
+		'Podejście da się przetestować (tutaj: timeout jest parametrem, więc AC-4 można sprawdzić testem)',
+		'Każdy fakt o kliencie pochodzi z <code>docs/client-log.md</code>; nic nie zostało zmyślone',
+		'Na pytania agenta są odpowiedzi <b>na piśmie</b>, a znalezione sprzeczności zostały poprawione albo odnotowane',
 	]}
 />
 
 <Predict id="plan-flaw" question="Przeczytaj jeszcze raz zatwierdzony plan w pierwszej zakładce. Jedna linia w <b>Files</b> przeczy sekcji <b>Questions</b> z tego samego planu. Która?">
 
-`edit lib/config.dart  appVersion  AC-2`. Czytanie wersji z `lib/config.dart` z góry zakłada odpowiedź na pytanie 2 (`--dart-define`), a przecież pytanie 2 wciąż pyta, czy nie użyć zamiast tego pakietu. Najpierw odpowiedz na pytanie albo uzależnij ten krok od odpowiedzi. Plany, które po cichu zakładają odpowiedzi na własne otwarte pytania, zdarzają się często; wyłapywanie ich to część zatwierdzania planu.
+`edit lib/config.dart  appVersion  AC-2`. Czytanie wersji z `lib/config.dart` z góry zakłada odpowiedź na pytanie 2 (`--dart-define`), choć pytanie 2 wciąż rozważa, czy nie użyć zamiast tego pakietu. Najpierw odpowiedz na pytanie albo uzależnij ten krok od odpowiedzi. Plany, które po cichu przesądzają własne otwarte pytania, zdarzają się często. Wyłapywanie takich miejsc to część zatwierdzania planu.
 
 </Predict>
 
-Odpowiedzi na pytania z planu to decyzje, więc trzeba je zapisać: tutaj *„1: pokazuj «not yet confirmed». 2: `--dart-define`, jak w ADR-0002; zapisz to jako ADR.”* Plan jest tani, implementacja nie. Możesz odrzucić plan albo poprosić o dwie alternatywy i wybrać jedną – za ułamek tego, ile kosztuje cofanie kodu.
+Odpowiedzi na pytania z planu to decyzje, więc trzeba je zapisać. Tutaj: *„1: pokazuj «not yet confirmed». 2: `--dart-define`, jak w ADR-0002; zapisz to jako ADR.”* Plan jest tani, implementacja nie. Możesz odrzucić plan albo poprosić o dwie alternatywy i wybrać jedną – za ułamek kosztu cofania kodu.
 
 <Quiz
 	question="Plan proponuje <code>lib/repositories/about_repository.dart</code>. <code>ARCHITECTURE.md</code> wymienia <code>repositories/</code>, ale takiego folderu nie ma. Jak najlepiej zareagować?"
 	options={[
 		'Zapytać, na czym opiera się plan, zdecydować, czy rację ma dokument, czy kod, poprawić jedno z nich i zaplanować od nowa',
 		'Zatwierdzić: dokument mówi, że ta warstwa istnieje, więc agent trzyma się architektury',
-		'Pozwolić agentowi najpierw to zaimplementować, a o folderze zdecydować na review kodu',
+		'Pozwolić agentowi najpierw to zaimplementować, a o folderze zdecydować przy review kodu',
 		'Usunąć <code>ARCHITECTURE.md</code>, żeby plan nie był sprzeczny z żadnym dokumentem',
 	]}
 	answer={0}
 	why={[
 		'',
-		'Dokument mija się z kodem. Jeśli za nim pójdziesz, zbudujesz coś na fałszywym założeniu.',
+		'Dokument nie zgadza się z kodem. Jeśli za nim pójdziesz, zbudujesz coś na fałszywym założeniu.',
 		'Cofanie kodu kosztuje dużo więcej niż poprawienie planu.',
-		'Wtedy każdy kolejny plan znowu zgaduje architekturę.',
+		'Wtedy każdy kolejny plan znowu będzie zgadywał architekturę.',
 	]}
-	explain="Sprzeczność między dokumentami a kodem to ważne znalezisko, a nie drobiazg. Rozstrzygnij ją świadomie i zapisz, jak; inaczej następny plan trafi na to samo fałszywe założenie."
+	explain="Sprzeczność między dokumentami a kodem to ważne znalezisko, a nie drobiazg. Rozstrzygnij ją świadomie i zapisz rozstrzygnięcie. Inaczej następny plan oprze się na tym samym fałszywym założeniu."
 />
 
 <Quiz
-	question="Co najmocniej wskazuje, że plan jest zgadnięty, a nie oparty na wiedzy o projekcie?"
+	question="Po czym najlepiej poznać, że agent zgadywał, zamiast oprzeć plan na wiedzy o projekcie?"
 	options={[
 		'Jest krótki: mniej niż strona, tylko pięć plików',
 		'Zadaje ci dwa pytania, zanim cokolwiek zmieni',
-		'Nie wymienia żadnych dokumentów, a jego opisu przeznaczenia aplikacji nie ma w dzienniku klienta',
+		'Nie wymienia żadnych dokumentów, a opisu przeznaczenia aplikacji, który podaje, nie ma w dzienniku klienta',
 		'Wymienia testy, które napisze dla każdego kryterium',
 	]}
 	answer={2}
 	why={[
 		'Krótki plan jest w porządku, jeśli jest kompletny.',
-		'Pytania to dobry znak: agent znalazł luki, zamiast je zapychać zgadywaniem.',
+		'Pytania to dobry znak: agent znalazł luki, zamiast zapychać je zgadywaniem.',
 		'',
 		'Przypisanie testów do kryteriów to dokładnie to, co robi dobry plan.',
 	]}
-	explain="Prawdziwy sprawdzian to źródła. Plan, który nie powołuje się na żadne dokumenty, zgadł architekturę, a fakt o kliencie, którego nie da się znaleźć w dzienniku klienta, został zmyślony."
+	explain="Rozstrzygają źródła. Plan, który nie powołuje się na żadne dokumenty, zgaduje architekturę, a fakt o kliencie, którego nie ma w dzienniku klienta, jest zmyślony."
 />
 
 <AtWork>Pisanie specyfikacji, którą agent potrafi wykonać, a człowiek sprawdzić, szybko staje się jedną z kluczowych umiejętności inżyniera (spec-driven development).</AtWork>
 
 :::tip[Zrób to w swoim projekcie]
-Dla pierwszej funkcji ze swojego briefu napisz `GOAL-n` (cztery pytania plus *poza zakresem*) i `docs/spec-<feature>.md` z co najmniej jednym przypadkiem brzegowym i jednym „to się nie może zmienić”. Zanim agent cokolwiek naszkicuje, poproś go o pytania, na które potrzebuje odpowiedzi – osobno do klienta i osobno techniczne.
+Dla pierwszej funkcji z briefu napisz `GOAL-n` (cztery pytania plus *poza zakresem*) i `docs/spec-<feature>.md` z co najmniej jednym przypadkiem brzegowym i jednym kryterium „to nie może się zmienić”. Zanim agent cokolwiek naszkicuje, poproś go o pytania, na które potrzebuje odpowiedzi – osobno do klienta i osobno techniczne.
 :::
 
 <Done />

@@ -13,7 +13,7 @@ import Tldr from '../../../../components/Tldr.astro';
 import AtWork from '../../../../components/AtWork.astro';
 import Done from '../../../../components/Done.astro';
 
-<Tldr minutes={7} items={["Małe commity na branchu, każdy mówi, dlaczego.", "Gate: deterministyczne sprawdzenia, za każdym razem ten sam werdykt.", "Zielony gate to jeszcze nie poprawnie działająca funkcja."]} />
+<Tldr minutes={7} items={["Małe commity na branchu, każdy z wyjaśnieniem, dlaczego powstał.", "Gate: deterministyczne sprawdzenia, za każdym razem ten sam werdykt.", "Zielony gate to jeszcze nie poprawnie działająca funkcja."]} />
 
 <StageStrip />
 
@@ -21,13 +21,13 @@ import Done from '../../../../components/Done.astro';
 
 ## 5. Implementacja
 
-<StageFacts tone="agent" who={'<span class="sdlc-chip is-agent">Agent</span> w swoim harnessie'} input="Zatwierdzony plan, <code>NOTES.md</code>, <code>AGENTS.md</code>" output="Małe zmiany na branchu, łatwe do review, każda z wiadomością commita, która mówi, dlaczego" />
+<StageFacts tone="agent" who={'<span class="sdlc-chip is-agent">Agent</span> w swoim harnessie'} input="Zatwierdzony plan, <code>NOTES.md</code>, <code>AGENTS.md</code>" output="Małe zmiany na branchu, łatwe do przejrzenia, każda z wiadomością commita wyjaśniającą, dlaczego powstała" />
 
-Agent pracuje na **branchu** (tutaj `feat/about-screen`), nigdy bezpośrednio na `main`. Realizuje plan i trzyma się standardów, architektury i interfejsów, które ustalił plan. Po każdej zmianie uruchamia sprawdzenia (etap 6) i kręci się w pętli, aż przejdą. Na W4 uruchamialiście kilka agentów równolegle, każdego w osobnym **worktree** (drugi folder roboczy tego samego repozytorium, na własnym branchu), żeby dwa agenty nigdy nie edytowały tych samych plików.
+Agent pracuje na **branchu** (tutaj `feat/about-screen`), nigdy bezpośrednio na `main`. Realizuje plan i trzyma się ustalonych w nim standardów, architektury i interfejsów. Po każdej zmianie uruchamia sprawdzenia (etap 6) i poprawia kod w pętli, dopóki nie przejdą. Na W4 uruchamialiście kilka agentów równolegle, każdego w osobnym **worktree** (drugi folder roboczy tego samego repozytorium, na własnym branchu), żeby dwóch agentów nigdy nie edytowało tych samych plików.
 
-Całe issue możesz też oddać **Copilot cloud agent**: pracuje w sandboxie na GitHubie i otwiera pull request. W pipeline nic się nie zmienia. Issue musi zawierać kryteria, pull request przechodzi przez ten sam gate, a ty robisz mu review tak samo jak pull requestowi od kogoś z zespołu.
+Całe issue możesz też przypisać do **Copilot cloud agent**, który pracuje w sandboxie na GitHubie i otwiera pull request. Pipeline się przez to nie zmienia. Issue musi zawierać kryteria, pull request przechodzi przez ten sam gate, a ty robisz review tak samo jak w przypadku pull requesta od kogoś z zespołu.
 
-Każda zmiana kończy się **commitem**, a wiadomość commita też jest częścią dokumentacji. Oprócz tego, *co* się zmieniło, dobra wiadomość mówi, *dlaczego*, jak to *zweryfikowano* i jak to *powstało*. Oto format przyjęty na kursie (`docs/commits.md`):
+Każda zmiana kończy się **commitem**, a wiadomość commita też jest częścią dokumentacji. Dobra wiadomość mówi nie tylko, *co* się zmieniło, lecz także *dlaczego*, jak to *zweryfikowano* i jak *powstało*. Oto format przyjęty na kursie (`docs/commits.md`):
 
 ```text title="Wiadomość commita (przykład)"
 feat(app): add About screen with app and server version
@@ -46,55 +46,55 @@ Time: <minutes> min
 Cost: <AI credits|unknown>
 ```
 
-Linie `Key: value` na końcu to **trailery Gita**. Git i inne narzędzia potrafią je odczytać, więc `git log --grep="GOAL-1"` wypisze każdy commit związany z tym celem, a linie o AI trafiają do agent logu twojej pary. Agent nigdy nie wypełnia pól *Decision*, *Time* ani *Cost*: to twoja działka.
+Linie `Key: value` na końcu to **trailery Gita**. Git i inne narzędzia potrafią je odczytać, więc `git log --grep="GOAL-1"` wypisze każdy commit związany z tym celem, a linie dotyczące AI trafiają do logu agenta twojej pary. Agent nigdy nie wypełnia pól *Decision*, *Time* ani *Cost*: to twoja działka.
 
 :::note[Commit robisz ty]
-`AGENTS.md` Mood Trackera mówi: *do not commit, push or open pull requests unless asked.* Najpierw robisz review diffu, potem commitujesz z wiadomością taką jak powyżej. Odrzucone próby nie są commitami; trafiają do `dossier/rejected.csv`.
+`AGENTS.md` Mood Trackera mówi: *do not commit, push or open pull requests unless asked.* Najpierw robisz review diffu, potem commitujesz z wiadomością taką jak powyżej. Odrzucone próby nie trafiają do commitów, tylko do `dossier/rejected.csv`.
 :::
 
 :::caution[Co tu najczęściej idzie nie tak]
 - Jeden gigantyczny commit o nazwie „add about”.
 - Zmiany w plikach, o których plan nie wspominał.
-- „Naprawianie” padającego testu przez jego osłabienie albo wygenerowanie od nowa pliku golden, żeby test przeszedł. `AGENTS.md` zabrania obu rzeczy, a diff je pokazuje.
+- „Naprawianie” padającego testu przez osłabienie go albo ponowne wygenerowanie pliku golden, żeby test przeszedł. `AGENTS.md` zabrania jednego i drugiego, a diff to ujawnia.
 :::
 
 <span id="stage-gate" class="stage-anchor"></span>
 
-## 6. Quality gate: co musi być prawdą, zanim ktokolwiek przeczyta kod
+## 6. Quality gate: co musi być spełnione, zanim ktokolwiek przeczyta kod
 
 <StageFacts tone="tool" who={'<span class="sdlc-chip is-tool">Narzędzia deterministyczne</span>'} input="Zmieniony kod" output="Zaliczone albo dokładny komunikat błędu, który wraca do agenta" />
 
-**Quality gate** to zestaw automatycznych sprawdzeń, przez które musi przejść każda zmiana, zanim pójdzie dalej. Nie zaczynaj od listy narzędzi. Zacznij od pytań: **czego musimy być pewni przy każdej zmianie, za każdym razem, niezależnie od tego, kto albo co ją napisał?** Każde narzędzie to tylko jeden ze sposobów, żeby odpowiedzieć na jedno z tych pytań.
+**Quality gate** to zestaw automatycznych sprawdzeń, przez które musi przejść każda zmiana, zanim pójdzie dalej. Nie zaczynaj od listy narzędzi. Zacznij od pytań: **czego musimy być pewni przy każdej zmianie, za każdym razem, niezależnie od tego, kto albo co ją napisał?** Każde narzędzie to tylko jeden ze sposobów odpowiedzi na któreś z tych pytań.
 
 ### Czego chcemy być pewni
 
 | # | Pytanie | Dlaczego to ważne | Rodzaj sprawdzenia | Jak to zrobić w Mood Trackerze |
 |---|---|---|---|---|
 | 1 | **Czy kod jest poprawnie zbudowany?** | Kod, który się nie kompiluje albo ma błędy typów, od tej chwili marnuje wszystkim czas | analiza statyczna | `flutter analyze` |
-| 2 | **Czy jest napisany tak, jak u nas się pisze?** | Spójny kod taniej się czyta, a styl przestaje być tematem review | reguły lintera, formatowanie | `flutter_lints`, `dart format` |
-| 3 | **Czy szanuje architekturę?** | Warstwy kruszą się po jednym „małym wyjątku” naraz, a agenty kopiują każdy wzorzec, jaki zobaczą | reguły zależności | `lint-imports` (serwer); test dla aplikacji (poniżej) |
+| 2 | **Czy jest napisany tak, jak u nas się pisze?** | Spójny kod czyta się szybciej, a styl przestaje być tematem review | reguły lintera, formatowanie | `flutter_lints`, `dart format` |
+| 3 | **Czy szanuje architekturę?** | Warstwy rozmywają się przez kolejne „małe wyjątki”, a agenci kopiują każdy wzorzec, jaki zobaczą | reguły zależności | `lint-imports` (serwer); test dla aplikacji (poniżej) |
 | 4 | **Czy można to bezpiecznie udostępnić?** | Klucz albo hasło w historii Gita jest publiczne w chwili, w której publiczne staje się repozytorium | secret scan | git-secrets, gitleaks |
-| 5 | **Czy możemy ufać temu, od czego zależy?** | Każdy pakiet to cudzy kod, którego nikt z was nie przejrzał: pozycja SOUP, którą trzeba zapisać i obserwować | skan podatności, sprawdzenie rejestru | OSV-Scanner; `tests/test_soup_register.py` |
-| 6 | **Czy UI wygląda tak, jak zostało zatwierdzone?** | Drobne zmiany wizualne prześlizgują się przez code review | porównanie zrzutów ekranu | golden testy (`matchesGoldenFile`) |
+| 5 | **Czy możemy ufać temu, od czego zależy?** | Każdy pakiet to cudzy kod, którego nikt z was nie przejrzał: pozycja SOUP, którą trzeba zarejestrować i monitorować | skan podatności, sprawdzenie rejestru | OSV-Scanner; `tests/test_soup_register.py` |
+| 6 | **Czy UI nadal wygląda tak, jak zatwierdzono?** | Drobne zmiany wizualne prześlizgują się przez code review | porównanie zrzutów ekranu | golden testy (`matchesGoldenFile`) |
 
-Dwóch pytań celowo **nie ma** w gate: na *czy kod robi to, o co prosiliśmy?* odpowiadają testy względem kryteriów (etap 7), a na *czy to w ogóle właściwa rzecz do zbudowania?* – tylko ludzie (etapy 7 i 10).
+W gate celowo **nie ma** dwóch pytań. Na pytanie *czy kod robi to, o co prosiliśmy?* odpowiadają testy względem kryteriów (etap 7), a na pytanie *czy w ogóle warto to budować?* – tylko ludzie (etapy 7 i 10).
 
 ### Kiedy sprawdzenie staje się gate'em
 
-- **Deterministyczne.** To samo wejście zawsze dostaje ten sam werdykt. Model językowy nie daje takiej gwarancji – i właśnie dlatego gate istnieje.
+- **Deterministyczne.** Dla tego samego wejścia werdykt jest zawsze ten sam. Model językowy nie daje takiej gwarancji – i właśnie dlatego gate istnieje.
 - **Wiążące i z dowodami.** Zaliczone albo nie, nigdy „prawie”. Gdy sprawdzenie zostanie oznaczone jako **required** w regułach ochrony branchy w repozytorium, porażka blokuje merge i nikt, ani człowiek, ani agent, nie może z nią dyskutować. Każde uruchomienie zostawia log: które narzędzie, w jakiej wersji, co powiedziało o którym commicie.
 - **Fail-closed.** Jeśli sprawdzenia nie da się uruchomić (brakuje narzędzia, wysypało się), liczy się to jako porażka, a nie zaliczenie.
-- **Zapadka.** Reguły mogą być tylko coraz ostrzejsze. Nigdy nie osłabiaj reguły, nie edytuj `.importlinter` ani nie usuwaj testu, żeby zmiana przeszła; `AGENTS.md` tego zabrania, a diff to pokazuje.
+- **Zapadka.** Reguły mogą się tylko zaostrzać. Nigdy nie osłabiaj reguły, nie edytuj `.importlinter` ani nie usuwaj testu, żeby zmiana przeszła. Zabrania tego `AGENTS.md`, a diff i tak to pokaże.
 
-Gate jest też **niezależny od autora**: opinia agenta o własnym kodzie nie jest dowodem; werdykt gate'u jest.
+Gate jest też **niezależny od autora**: opinia agenta o własnym kodzie nie jest dowodem, a werdykt gate'u – tak.
 
 ### Warstwy obrony
 
-Żadne pojedyncze sprawdzenie nie łapie wszystkiego. Myśl o gate jak o warstwach – jak o plastrach w modelu „sera szwajcarskiego” z nauki o bezpieczeństwie. Każda warstwa zadaje **jedno pytanie** i przepuszcza każdy defekt, którego to pytanie nie obejmuje. Defekt dociera do użytkownika tylko wtedy, gdy przejdzie przez wszystkie warstwy.
+Żadne pojedyncze sprawdzenie nie łapie wszystkiego. Traktuj gate jak zestaw warstw – plastrów w modelu „sera szwajcarskiego” znanym z nauk o bezpieczeństwie. Każda warstwa zadaje **jedno pytanie** i przepuszcza każdy defekt, którego to pytanie nie obejmuje. Defekt dociera do użytkownika tylko wtedy, gdy przejdzie przez wszystkie warstwy.
 
 <Predict id="gate-purpose" question="Agent wpisuje intended purpose, którego klient nigdy nie podał. Która warstwa to zatrzyma?">
 
-Żadna z automatycznych – i nawet testy nie, jeśli agent wpisał to samo zdanie także do `docs/product.md`. Zauważy to tylko człowiek, który porówna tekst z `docs/client-log.md`. Wrzuć ten defekt poniżej i zobacz, jak przelatuje przez wszystkie warstwy.
+Żadna z automatycznych. Nawet testy nie, jeśli agent wpisał to samo zdanie także do `docs/product.md`. Zauważy to tylko człowiek, który porówna tekst z `docs/client-log.md`. Wrzuć ten defekt poniżej i zobacz, jak przelatuje przez wszystkie warstwy.
 
 </Predict>
 
@@ -107,12 +107,12 @@ Gate jest tani i daje pewność w kilku sprawach. Testy sprawdzają to, o co pro
 ### Czego gate ci nie powie
 
 :::danger[Zaliczony gate nie oznacza poprawnej funkcji]
-Mood Tracker, który przejmujesz, przechodzi `flutter analyze` i wszystkie swoje testy. To mówi ci, że kod jest poprawnie zbudowany i robi to, co sprawdzają jego testy. Nie mówi ci, czy robi to, czego potrzebuje twój klient: to masz sprawdzić na labach. Gate dowodzi, że kod jest poprawnie zbudowany, spójny i bezpieczny do udostępnienia. Dopiero testy względem twoich kryteriów i uruchomienie aplikacji pokazują, że robi to, o co prosisz.
+Mood Tracker, który przejmujesz, przechodzi `flutter analyze` i wszystkie swoje testy. Wiesz więc, że kod jest poprawnie zbudowany i robi to, co sprawdzają jego testy. Nie wiesz natomiast, czy robi to, czego potrzebuje klient – to masz sprawdzić na laboratoriach. Gate dowodzi, że kod jest poprawnie zbudowany, spójny i bezpieczny do udostępnienia. Dopiero testy względem twoich kryteriów i uruchomienie aplikacji pokazują, że robi to, o co prosisz.
 :::
 
 ### Gdzie działa gate: jak najwcześniej
 
-Im wcześniej działa sprawdzenie, tym tańsza poprawka. Te same sprawdzenia działają w trzech miejscach:
+Im wcześniej działa sprawdzenie, tym tańsza poprawka. Te same sprawdzenia uruchamia się w trzech miejscach:
 
 | Gdzie | Kiedy | Kto widzi porażkę | Koszt porażki |
 |---|---|---|---|
@@ -178,7 +178,7 @@ jobs:
       - run: python -m pytest -q
 ```
 
-Pliki golden nagrane na macOS mogą się różnić o kilka pikseli na Linuksie (zob. `NOTES.md`). Świadomie zdecyduj, gdzie uruchamiasz golden testy; nigdy nie generuj ich od nowa tylko po to, żeby CI przeszło. W ustawieniach repozytorium oznacz oba joby jako **required** checks, inaczej porażka pokaże tylko czerwony krzyżyk.
+Pliki golden nagrane na macOS mogą się na Linuksie różnić o kilka pikseli (zob. `NOTES.md`). Świadomie zdecyduj, gdzie uruchamiasz golden testy. Nigdy nie generuj ich od nowa tylko po to, żeby CI przeszło. W ustawieniach repozytorium oznacz oba joby jako **required** checks – w przeciwnym razie porażka skończy się tylko czerwonym krzyżykiem.
 
 </TabItem>
 <TabItem label="Reguła architektury">
@@ -212,7 +212,7 @@ void main() {
 }
 ```
 
-`AGENTS.md` z przekazanego projektu wymienia tę regułę jako „not checked by a test yet”. Z tym plikiem już jest sprawdzana. Sprawdziliśmy to na przekazanej wersji R0 (Flutter 3.35): test przechodzi, a pada z `Actual: ['lib/screens/home_screen.dart']`, gdy tylko ten plik zaimportuje `package:http`.
+`AGENTS.md` z przekazanego projektu wymienia tę regułę jako „not checked by a test yet”. Dzięki temu plikowi już jest sprawdzana. Sprawdziliśmy to na przekazanej wersji R0 (Flutter 3.35): test przechodzi, ale pada z `Actual: ['lib/screens/home_screen.dart']`, gdy tylko ten plik zaimportuje `package:http`.
 
 </TabItem>
 </Tabs>
@@ -220,7 +220,7 @@ void main() {
 </details>
 
 <Quiz
-	question="Quality gate przechodzi: <code>flutter analyze</code> nie zgłasza żadnych problemów, a formatter jest zadowolony. Co wiesz?"
+	question="Quality gate przechodzi: <code>flutter analyze</code> nie zgłasza żadnych problemów, a formatter jest zadowolony. Co z tego wiesz?"
 	options={[
 		'Funkcja spełnia wszystkie sześć kryteriów akceptacji',
 		'Kod jest poprawnie zbudowany i spójny – i na razie nic więcej',
@@ -231,34 +231,34 @@ void main() {
 	why={[
 		'Analyzer nie zna twoich kryteriów. Pokażą to tylko testy względem nich i uruchomienie aplikacji.',
 		'',
-		'Te dwa narzędzia nie szukają sekretów ani podatnych pakietów; robią to warstwy 4 i 5, a nawet one łapią tylko to, co znają.',
+		'Te dwa narzędzia nie szukają sekretów ani podatnych pakietów. Robią to warstwy 4 i 5, a i one łapią tylko to, co znają.',
 		'Merge wymaga jeszcze testów, dokumentacji i review człowieka.',
 	]}
 	explain="Analyzer i formatter odpowiadają na pytania 1 i 2 z quality gate. Kryteria wymagają testów, bezpieczeństwo – skanów, a merge – człowieka."
 />
 
 <Quiz
-	question="Zmiana od agenta nie przechodzi testu architektury. Agent proponuje dopisać plik do listy wyjątków w teście, „bo ten ekran jest wyjątkowy”. Co robisz?"
+	question="Zmiana przygotowana przez agenta nie przechodzi testu architektury. Agent proponuje dopisać plik do listy wyjątków w teście, „bo ten ekran jest wyjątkowy”. Co robisz?"
 	options={[
 		'Akceptujesz: agent przeczytał kod i zna ten ekran najlepiej',
-		'Na razie usuwasz test, bo blokuje postępy zespołu',
-		'Mergujesz zmianę dziś i otwierasz issue, żeby poprawić test później',
-		'Odrzucasz: przenosisz wywołanie do <code>lib/services/</code> albo świadomie zmieniasz regułę, z ADR',
+		'Na razie usuwasz test, bo blokuje pracę zespołu',
+		'Mergujesz zmianę już dziś, a na poprawienie testu otwierasz issue',
+		'Odrzucasz: przenosisz wywołanie do <code>lib/services/</code> albo świadomie zmieniasz regułę i zapisujesz to w ADR',
 	]}
 	answer={3}
 	why={[
-		'Opinia agenta o własnej zmianie nie jest dowodem. Reguła istnieje właśnie na taką chwilę.',
-		'Usunięty test niczego nie chroni, a nikt nie pamięta, żeby go przywrócić.',
+		'Opinia agenta o własnej zmianie nie jest dowodem. Reguła istnieje właśnie na takie sytuacje.',
+		'Usunięty test niczego nie chroni, a nikt nie pamięta o jego przywróceniu.',
 		'„Później” rzadko nadchodzi, a następny agent skopiuje ten wyjątek.',
 		'',
 	]}
-	explain="Reguła osłabiona po to, żeby przepuścić jedną zmianę, przestaje chronić wszystkie kolejne. Jeśli reguła ma się zmienić, to jest decyzja z zapisem, a nie efekt uboczny diffu."
+	explain="Reguła osłabiona po to, żeby przepuścić jedną zmianę, przestaje chronić wszystkie kolejne. Zmiana reguły to decyzja, którą się zapisuje, a nie efekt uboczny diffu."
 />
 
 <AtWork>Ustawienie wymaganego sprawdzenia w CI zajmuje mniej więcej pół godziny i pokazuje, że rozumiesz, jak pracują zespoły.</AtWork>
 
 :::tip[Zrób to w swoim projekcie]
-Dodaj workflow quality gate do swojego repozytorium, oznacz jego joby jako required checks dla `main` i otwórz pull request, który celowo oblewa jeden z nich. Wrzuć do dossier zrzut ekranu zablokowanego merge'a, a potem zamknij pull request.
+Dodaj workflow quality gate do repozytorium, oznacz jego joby jako required checks dla `main` i otwórz pull request, który celowo nie przechodzi jednego z nich. Wrzuć do dossier zrzut ekranu zablokowanego merge'a, a potem zamknij pull request.
 :::
 
 <Done />

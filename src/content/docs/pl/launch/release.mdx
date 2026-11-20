@@ -17,29 +17,29 @@ import Done from '../../../../components/Done.astro';
 
 | Kanał | Kiedy się sprawdza | Uważaj na |
 |---|---|---|
-| **TestFlight** (iOS) | zamknięte grupy; do 10 000 zewnętrznych testerów | zewnętrzni testerzy wymagają Beta App Review; **każdy build wygasa po 90 dniach** |
+| **TestFlight** (iOS) | zamknięte grupy; do 10 000 zewnętrznych testerów | zewnętrzni testerzy wymagają przejścia Beta App Review; **każdy build wygasa po 90 dniach** |
 | **Google Play closed testing** | znana lista testerów na Androidzie | obowiązują te same zasady co dla publicznej aplikacji, łącznie z deklaracją dotyczącą zdrowia |
-| **Publiczny opis w sklepie** | każdy może ją znaleźć i zainstalować | pełne review; opis jest publiczny, więc liczy się w nim każde słowo |
+| **Publikacja w sklepie** | każdy może znaleźć i zainstalować aplikację | pełne review; opis jest publiczny, więc liczy się w nim każde słowo |
 
 <Predict id="ninety" question="Badanie kliniki trwa pół roku, a uczestnicy z iPhone'ami dostają aplikację przez TestFlight. Co się stanie w czwartym miesiącu, jeśli nic nie zrobisz?">
 
-Build **wygaśnie po 90 dniach** i w środku badania aplikacja przestanie działać uczestnikom z iPhone'ami. Półroczne badanie wymaga co najmniej jednego nowego buildu, wgranego i zatwierdzonego na czas, oraz krótkiej wiadomości do uczestników. To właśnie taki szczegół, który zamienia się w kryzys w zespole wsparcia, jeśli nikt go nie zaplanuje.
+Build **wygaśnie po 90 dniach** i w środku badania aplikacja przestanie działać uczestnikom z iPhone'ami. Półroczne badanie wymaga co najmniej jednego nowego buildu, wgranego i zatwierdzonego na czas, oraz krótkiej wiadomości do uczestników. To typowy szczegół, który – jeśli nikt go nie zaplanuje – kończy się kryzysem w zespole wsparcia.
 
 </Predict>
 
 ## Co sprawdzają sklepy
 
-Review w sklepie nie dotyczy tylko awarii. W aplikacjach zdrowotnych tekst i dane liczą się tak samo:
+Review w sklepie nie dotyczy tylko awarii. W aplikacjach zdrowotnych tekst i dane są równie ważne:
 
-- **Twierdzenia medyczne.** Według App Store Review Guidelines Apple'a (1.4.1) sklep może poprosić aplikację medyczną o dokumenty regulacyjne. Twierdzenia, których nie obejmuje twój intended purpose, to najszybsza droga do odrzucenia.
+- **Twierdzenia medyczne.** Zgodnie z App Store Review Guidelines Apple'a (pkt 1.4.1) aplikacja medyczna może zostać poproszona o dokumenty potwierdzające dopuszczenie regulacyjne. Twierdzenia, których nie obejmuje intended purpose, to najszybsza droga do odrzucenia.
 - **Deklaracja dotycząca zdrowia.** Google Play wymaga, żeby **każda** aplikacja wypełniła w Play Console deklarację dotyczącą aplikacji zdrowotnych – także taka, która nie ma żadnych funkcji zdrowotnych.
-- **Privacy labels.** Sekcja *App Privacy* u Apple'a i *Data safety* w Google Play muszą się zgadzać z tym, co aplikacja naprawdę zbiera. Twórz je na podstawie inwentaryzacji danych, a nie z pamięci.
-- **Zasady platform.** Na przykład od 31 sierpnia 2026 r. Google Play wymaga, żeby nowe aplikacje i aktualizacje były kierowane na Androida 16 (API level 36). Takie zasady zmieniają się co roku.
+- **Privacy labels.** Sekcje *App Privacy* u Apple'a i *Data safety* w Google Play muszą się zgadzać z tym, co aplikacja naprawdę zbiera. Wypełniaj je na podstawie inwentaryzacji danych, a nie z pamięci.
+- **Zasady platform.** Na przykład od 31 sierpnia 2026 r. Google Play wymaga, żeby nowe aplikacje i aktualizacje miały jako docelową wersję Androida 16 (API level 36). Takie zasady zmieniają się co roku.
 
 <Scene
 	title="Wtorek: review bety"
 	messages={[
-		{ who: 'other', name: 'Recenzja w sklepie', text: 'Opis aplikacji zawiera twierdzenia dotyczące zdrowia („wspiera twoje zdrowie psychiczne”). Prześlij dokumentację potwierdzającą dopuszczenie regulacyjne albo popraw opis.' },
+		{ who: 'other', name: 'Review w sklepie', text: 'Opis aplikacji zawiera twierdzenia dotyczące zdrowia („wspiera twoje zdrowie psychiczne”). Prześlij dokumentację potwierdzającą dopuszczenie regulacyjne albo popraw opis.' },
 		{ who: 'you', name: 'Ty', text: 'To zdanie napisał Copilot i mi umknęło. 🙈 Zamieniam je na cel z docs/product.md, słowo w słowo.' },
 		{ who: 'client', name: 'Anna', text: 'Szczerze mówiąc, dobrze, że to wyłapali. To zdanie zaniepokoiłoby też naszą komisję.' },
 	]}
@@ -47,7 +47,7 @@ Review w sklepie nie dotyczy tylko awarii. W aplikacjach zdrowotnych tekst i dan
 
 ## Wersje i buildy
 
-Każdy release ma **wersję** (to, co widzą ludzie, np. `1.3.0`) i **numer buildu** (który dokładnie build, np. `12`). Ekran About z części 2 pokazuje oba, więc zespół wsparcia wie, którego buildu używa uczestnik. Prowadź **release notes** dla każdego buildu i wypuszczaj aplikację stopniowo, jeśli sklep na to pozwala (staged rollout w Google Play, phased release w App Store), żeby wadliwy build trafił do niewielu osób.
+Każdy release ma **wersję** (to, co widzą użytkownicy, np. `1.3.0`) i **numer buildu** (wskazuje konkretny build, np. `12`). Ekran About z części 2 pokazuje oba, więc zespół wsparcia wie, którego buildu używa uczestnik. Do każdego buildu pisz **release notes**, a jeśli sklep na to pozwala, wypuszczaj aplikację stopniowo (staged rollout w Google Play, phased release w App Store), żeby wadliwy build trafił tylko do niewielu osób.
 
 ```bash title="Buildy release (Flutter)"
 flutter build appbundle --release --build-name=1.3.0 --build-number=12 \
@@ -64,25 +64,25 @@ Klucze do podpisywania i keystore'y nigdy nie trafiają do repozytorium. Konta d
 	id="release-check"
 	title="Zanim build trafi do uczestników"
 	items={[
-		'Przetestowany jako build <b>release</b>, na prawdziwych telefonach: starszym Androidzie i małym iPhonie',
-		'Sprawdzony duży tekst i etykiety dla czytnika ekranu; tryb ciemny czytelny',
+		'Przetestowany jako build <b>release</b> na prawdziwych telefonach: starszym Androidzie i małym iPhonie',
+		'Sprawdzony powiększony tekst i etykiety dla czytnika ekranu; czytelny tryb ciemny',
 		'Tylko te uprawnienia, których aplikacja naprawdę potrzebuje',
 		'W buildzie nie zostały ustawienia debug, konta testowe ani nieszyfrowany ruch',
 		'Raportowanie awarii nie wysyła żadnych danych o zdrowiu',
 		'Zrzuty ekranu do sklepu zrobione wyłącznie na danych syntetycznych',
 		'Opis w sklepie mieści się w intended purpose; deklaracja dotycząca zdrowia i privacy labels zgadzają się z inwentaryzacją danych',
 		'Wersja i numer buildu widoczne w aplikacji; release notes napisane',
-		'W kalendarzu jest termin następnego buildu, zanim cokolwiek wygaśnie',
+		'Termin następnego buildu wpisany do kalendarza, zanim cokolwiek wygaśnie',
 	]}
 />
 
 <Quiz
-	question="W privacy labelu podajesz, że aplikacja „nie zbiera danych o zdrowiu”, bo wpisy o nastroju są przechowywane na twoim własnym serwerze. Czy to prawda?"
+	question="W privacy labelu podajesz, że aplikacja „nie zbiera danych o zdrowiu”, bo wpisy o nastroju są przechowywane na twoim własnym serwerze. Czy to poprawne?"
 	options={[
 		'Tak: w privacy labels liczy się tylko zbieranie danych przez zewnętrzne firmy',
 		'Tak: dane zostają w klinice, więc nie są zbierane',
 		'Nie: label musi opisywać to, co zbiera aplikacja, łącznie z danymi wysyłanymi na twój własny serwer',
-		'To bez znaczenia, nikt nie sprawdza labeli',
+		'To bez znaczenia: nikt nie sprawdza labeli',
 	]}
 	answer={2}
 	why={[
@@ -91,13 +91,13 @@ Klucze do podpisywania i keystore'y nigdy nie trafiają do repozytorium. Konta d
 		'',
 		'Błędny label to naruszenie zasad sklepu i złamana obietnica wobec użytkowników. Traktuj go jak kod: opieraj go na dowodach.',
 	]}
-	explain="Privacy labels opisują dane, które zbiera aplikacja, i to, jak są wykorzystywane. Twórz je na podstawie inwentaryzacji danych, tak samo jak dokumenty do RODO."
+	explain="Privacy labels opisują dane, które zbiera aplikacja, i to, jak są wykorzystywane. Twórz je na podstawie inwentaryzacji danych, tak samo jak dokumentację RODO."
 />
 
-<AtWork>Wypuszczanie aplikacji do sklepów – z podpisywaniem, review, privacy labels i staged rolloutem – to umiejętność, której wielu programistów uczy się dopiero w pracy. Jeden przeprowadzony release, nawet zamkniętej bety, to dobra linijka w CV.</AtWork>
+<AtWork>Wypuszczanie aplikacji do sklepów – z podpisywaniem, review, privacy labels i staged rolloutem – to umiejętność, której wielu programistów uczy się dopiero w pracy. Nawet jeden przeprowadzony release, choćby zamkniętej bety, zasługuje na linijkę w CV.</AtWork>
 
 :::tip[Zrób to w swoim projekcie]
-Zdecyduj, jak użytkownicy twojego klienta dostaliby aplikację (TestFlight, closed testing, publiczny sklep), i zapisz dlaczego. Naszkicuj privacy labels na podstawie inwentaryzacji danych i przejdź checklistę release'u na jednym buildzie release na prawdziwym telefonie.
+Zdecyduj, jak użytkownicy twojego klienta dostaliby aplikację (TestFlight, closed testing, publiczny sklep), i zapisz dlaczego. Naszkicuj privacy labels na podstawie inwentaryzacji danych i przejdź checklistę release'u dla jednego buildu release na prawdziwym telefonie.
 :::
 
 <Done />

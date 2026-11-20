@@ -16,7 +16,7 @@ import Done from '../../../components/Done.astro';
 Which tools read it (checked in November 2026):
 
 - **GitHub Copilot** reads `AGENTS.md` in VS Code, in Copilot CLI and in the Copilot cloud agent (formerly "coding agent"). It also has its own files: `.github/copilot-instructions.md` for the whole repository and `.github/instructions/*.instructions.md` for parts of it.
-- **Claude Code** reads its own `CLAUDE.md`. Recent versions fall back to `AGENTS.md` when there is no `CLAUDE.md`; the safe way that works in every version is a `CLAUDE.md` containing the line `@AGENTS.md`, which imports it.
+- **Claude Code** reads its own `CLAUDE.md`. Recent versions fall back to `AGENTS.md` when there is no `CLAUDE.md`. The safe option, which works in every version, is a `CLAUDE.md` that contains the line `@AGENTS.md`; this line imports it.
 - **Other agents**: more than twenty tools follow the [agents.md](https://agents.md/) format. Support still changes quickly, so check in practice: ask the agent which instruction files it read.
 
 A useful `AGENTS.md` answers seven questions. The examples are from the Mood Tracker's own `AGENTS.md`:
@@ -69,7 +69,7 @@ Section 7 has a full template.
 	explain="<code>AGENTS.md</code> says <b>how to work</b> and is read on every task. <code>ARCHITECTURE.md</code> says <b>what the system is</b>, and is read when a task needs it. <code>AGENTS.md</code> points to it."
 />
 
-<AtWork>Many open-source repositories now have an <code>AGENTS.md</code>. Contributing one, with a check behind each important rule, is a small and visible open-source contribution.</AtWork>
+<AtWork>Many open-source repositories now have an <code>AGENTS.md</code>. Adding one, with a check behind each important rule, is a small and visible open-source contribution.</AtWork>
 
 :::tip[Do this in your project]
 Pick one rule in your `AGENTS.md` that is marked "convention, not checked", or that you have had to repeat to the agent. Turn it into a test or a lint rule, run it, and move the rule to "checked by `<test>`".

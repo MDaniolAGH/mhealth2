@@ -14,7 +14,7 @@ import Done from '../../../../components/Done.astro';
 
 Na [mapie](../overview/) pasek audytowalności biegnie wzdłuż wszystkich etapów. Każdy etap zostawia **zapis**, który wskazuje na poprzedni, więc z dowolnej linii zmergowanego kodu możesz cofnąć się aż do celu – i do decyzji, która go uzasadniła. Włącz na mapie **Ślad audytowy** i kliknij etap, żeby zobaczyć jego zapis.
 
-A oto sama droga wstecz. Nowa osoba w projekcie twojej pary otwiera kod ekranu About i zadaje całkiem rozsądne pytanie.
+Teraz sama droga wstecz. Nowa osoba w projekcie twojej pary otwiera kod ekranu About i zadaje całkiem rozsądne pytanie.
 
 <Predict id="trail-break" question="Poniżej możesz zerwać jedno ogniwo śladu: commit, plan albo zapis decyzji. Jak myślisz, które zerwanie wyrządza najwięcej szkody i dlaczego?">
 
@@ -22,19 +22,19 @@ Brakujący zapis decyzji. Commit bez `Refs:` jest irytujący, ale pull request d
 
 </Predict>
 
-Naciśnij **Dlaczego to tu jest?**, żeby iść po śladzie krok po kroku. Potem zerwij ogniwo i przejdź jeszcze raz, żeby zobaczyć, co ginie.
+Naciśnij **Dlaczego to tu jest?**, żeby przejść po śladzie krok po kroku. Potem zerwij ogniwo i przejdź go jeszcze raz, żeby zobaczyć, co ginie.
 
 <AuditWalk />
 
 Dlaczego to ważne:
 
 - **Po miesiącach** odpowiedź na „dlaczego?” jest w zapisach, a nie w czyjejś pamięci.
-- **Agenty.** Następna sesja agenta planuje na podstawie tych samych zapisów (rozdział 3). Zerwany ślad dla ludzi to zerwany kontekst dla agentów.
-- **Oprogramowanie regulowane.** Normy dla oprogramowania wyrobów medycznych, takie jak IEC 62304, wymagają, żeby wymagania dało się prześledzić do projektu, testów i środków kontroli ryzyka, a każdy zewnętrzny komponent (SOUP) był zapisany. Przy intended purpose, który podał klient, Mood Tracker nie jest wyrobem medycznym. Inne zdanie o przeznaczeniu mogłoby to zmienić (zob. [rozwój produktu](../../product/purpose/)), a aplikacja i tak przetwarza dane o zdrowiu, więc ten nawyk niewiele kosztuje.
-- **Dwa różne pytania regulacyjne.** To, *czy aplikacja jest wyrobem medycznym*, zależy od jej intended purpose (unijne rozporządzenie w sprawie wyrobów medycznych, MDR). *Czy aplikacja zawiera AI?* to osobne pytanie, na gruncie unijnego AI Act. To, że budujesz aplikację z pomocą agenta, nie robi z niej systemu AI; zrobiłaby to dopiero funkcja AI w samej aplikacji, np. chatbot albo model predykcyjny.
-- **Praca z pomocą AI.** Trailery, pull request i agent log twojej pary zapisują, który agent i model brały udział, ile to kosztowało i kto zrobił review. Na W6 podsumujecie to dla całego semestru.
+- **Agenci.** Następna sesja agenta planuje na podstawie tych samych zapisów (rozdział 3). Zerwany ślad dla ludzi to zerwany kontekst dla agentów.
+- **Oprogramowanie regulowane.** Normy dla oprogramowania wyrobów medycznych, takie jak IEC 62304, wymagają, żeby każde wymaganie dało się powiązać z projektem, testami i środkami kontroli ryzyka oraz żeby każdy zewnętrzny komponent (SOUP) był zarejestrowany. Przy intended purpose, który podał klient, Mood Tracker nie jest wyrobem medycznym. Inaczej sformułowane przeznaczenie mogłoby to zmienić (zob. [rozwój produktu](../../product/purpose/)). Aplikacja i tak przetwarza dane o zdrowiu, więc ten nawyk niewiele kosztuje.
+- **Dwa różne pytania regulacyjne.** To, *czy aplikacja jest wyrobem medycznym*, zależy od jej intended purpose (unijne rozporządzenie w sprawie wyrobów medycznych, MDR). *Czy aplikacja zawiera AI?* to osobne pytanie, na gruncie unijnego AI Act. To, że budujesz aplikację z pomocą agenta, nie robi z niej systemu AI. Stałaby się nim dopiero dzięki funkcji AI w samej aplikacji, np. chatbotowi albo modelowi predykcyjnemu.
+- **Praca z pomocą AI.** Trailery, pull request i log agenta twojej pary zapisują, jaki agent i jaki model brały udział, ile to kosztowało i kto zrobił review. Na W6 podsumujecie to dla całego semestru.
 
-```bash title="Po śladzie z Gitem"
+```bash title="Śledzenie zmian w Gicie"
 git log --oneline --grep="GOAL-1"                        # every commit for the goal
 git log --format='%h %s%n  %(trailers:key=AI-assisted)'  # who assisted each commit
 git blame lib/config.dart                                # which commit wrote each line
@@ -59,7 +59,7 @@ git blame lib/config.dart                                # which commit wrote ea
 />
 
 <Quiz
-	question="Która komenda wypisze każdy commit zrobiony dla GOAL-1?"
+	question="Które polecenie wypisze każdy commit zrobiony dla GOAL-1?"
 	options={[
 		'<code>git log --grep="GOAL-1"</code>',
 		'<code>git blame GOAL-1</code>',
@@ -76,10 +76,10 @@ git blame lib/config.dart                                # which commit wrote ea
 	explain="Działa to tylko dlatego, że każdy commit ma trailer <code>Refs: GOAL-1</code>. Bez niego commity nadal istnieją, ale nic nie łączy ich z celem."
 />
 
-<AtWork>W medtechu śledzalność nie jest opcjonalna: audytorzy o nią pytają. Jeśli choć raz zrobisz to na prawdziwym projekcie, masz realną przewagę.</AtWork>
+<AtWork>W medtechu śledzalność nie jest opcjonalna: audytorzy o nią pytają. Jeśli choć raz zrobisz to w prawdziwym projekcie, masz realną przewagę.</AtWork>
 
 :::tip[Zrób to w swoim projekcie]
-Wybierz jedną linię kodu, którą twoja para zmieniła w tym tygodniu, i przejdź z nią wstecz: `git blame` → pull request → plan → ADR → cel. Tam, gdzie ślad się urywa, dodaj brakujący zapis od razu, póki jeszcze pamiętasz powód.
+Wybierz jedną linię kodu, którą twoja para zmieniła w tym tygodniu, i prześledź jej historię wstecz: `git blame` → pull request → plan → ADR → cel. Tam, gdzie ślad się urywa, dodaj brakujący zapis od razu, póki jeszcze pamiętasz powód.
 :::
 
 <Done />

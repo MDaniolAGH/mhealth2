@@ -31,7 +31,7 @@ The build **expires after 90 days**, and the app stops working for the iPhone pa
 
 Store review is not only about crashes. For health apps, the text and the data matter as much:
 
-- **Medical claims.** Apple's App Store Review Guidelines (1.4.1) can ask a medical app for regulatory clearance. Claims your intended purpose does not cover are the fastest way to a rejection.
+- **Medical claims.** Under Apple's App Store Review Guidelines (1.4.1), a medical app may have to provide documentation of regulatory clearance. Claims your intended purpose does not cover are the fastest way to a rejection.
 - **Health declaration.** Google Play asks **every** app for a health-apps declaration in Play Console, including apps without health features.
 - **Privacy labels.** Apple's *App Privacy* details and Google Play's *Data safety* section must match what the app really collects. Build them from your data inventory, not from memory.
 - **Platform rules.** For example, from 31 August 2026 Google Play requires new apps and updates to target Android 16 (API level 36). Rules like this change every year.
@@ -47,7 +47,7 @@ Store review is not only about crashes. For health apps, the text and the data m
 
 ## Versions and builds
 
-Every release has a **version** (what people see, such as `1.3.0`) and a **build number** (which exact build, such as `12`). The About screen from Part 2 shows both, so support can tell which build a participant runs. Keep **release notes** for every build, and roll out gradually where the store allows it (staged rollout on Google Play, phased release on the App Store), so a bad build reaches few people.
+Every release has a **version** (what people see, such as `1.3.0`) and a **build number** (which exact build, such as `12`). The About screen from Part 2 shows both, so support can tell which build a participant runs. Keep **release notes** for every build, and roll out gradually where the store allows it (staged rollout on Google Play, phased release on the App Store), so that a bad build reaches only a few people.
 
 ```bash title="Release builds (Flutter)"
 flutter build appbundle --release --build-name=1.3.0 --build-number=12 \
@@ -82,7 +82,7 @@ Signing keys and keystores never go into the repository. Developer accounts cost
 		'Yes: only third-party collection counts for privacy labels',
 		'Yes: the data stays in the clinic, so it is not collected',
 		'No: the label must describe what the app collects, including data sent to your own server',
-		'It does not matter, labels are not checked',
+		'It does not matter: labels are not checked',
 	]}
 	answer={2}
 	why={[
